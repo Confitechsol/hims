@@ -1,6 +1,18 @@
 @extends('layouts.adminLayout')
 
 @section('content')
+@php
+    $issueItemPermCatId = permCatId('Issue Item');
+    $canAddIssueItem    = $issueItemPermCatId ? canAdd($issueItemPermCatId) : false;
+    $canEditIssueItem   = $issueItemPermCatId ? canEdit($issueItemPermCatId) : false;
+    $canDeleteIssueItem = $issueItemPermCatId ? canDelete($issueItemPermCatId) : false;
+
+    $itemStockPermCatId = permCatId('Item Stock');
+    $canViewItemStock   = $itemStockPermCatId ? canView($itemStockPermCatId) : false;
+
+    $itemPermCatId = permCatId('Item');
+    $canViewItem   = $itemPermCatId ? canView($itemPermCatId) : false;
+@endphp
     <!-- ========================
         Start Page Content
     ========================= -->
@@ -33,13 +45,16 @@
                                     <h4 class="fw-bold mb-0">Issue Item Details</h4>
                                 </div>
                                 <div class="d-flex align-items-center flex-wrap gap-2">
-                                    <div class="text-end d-flex">
-                                        <a href="javascript:void(0);" class="btn btn-primary text-white ms-2 btn-md"
-                                            data-bs-toggle="modal" data-bs-target="#add_issue_item"><i
-                                                class="ti ti-plus me-1"></i>Issue Item </a>
-                                               
-                                    </div>
-                                    <!-- First Modal -->
+                                    @if ($canAddIssueItem)
+                                        <div class="text-end d-flex">
+                                            <a href="javascript:void(0);" class="btn btn-primary text-white ms-2 btn-md"
+                                                data-bs-toggle="modal" data-bs-target="#add_issue_item"><i
+                                                    class="ti ti-plus me-1"></i>Issue Item </a>
+                                                   
+                                        </div>
+                                    @endif
+                                <!-- First Modal -->
+                                    @if ($canAddIssueItem)
                                     <div class="modal fade" id="add_issue_item" tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered modal-xl">
                                             <div class="modal-content">
@@ -134,15 +149,20 @@
                                             </div>
                                         </div>
                                     </div>
+                                    @endif
 
 
                                                     
-                                    <a href="{{ route('inventory-details')}}"
-                                        class="btn btn-outline-primary d-inline-flex align-items-center"><i
-                                            class="ti ti-menu me-1"></i>Inventory</a>
-                                    <a href="{{ route('items')}}"
-                                        class="btn btn-outline-primary d-inline-flex align-items-center"><i
-                                            class="ti ti-menu me-1"></i>Item</a>
+                                    @if ($canViewItemStock)
+                                        <a href="{{ route('inventory-details')}}"
+                                            class="btn btn-outline-primary d-inline-flex align-items-center"><i
+                                                class="ti ti-menu me-1"></i>Inventory</a>
+                                    @endif
+                                    @if ($canViewItem)
+                                        <a href="{{ route('items')}}"
+                                            class="btn btn-outline-primary d-inline-flex align-items-center"><i
+                                                class="ti ti-menu me-1"></i>Item</a>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -185,16 +205,20 @@
                                                         <span class="badge bg-success">Returned</span>
 
                                                     @elseif (!is_null($issue->return_date))
-                                                        <span class="badge bg-info text-dark return-btn"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#returnModal"
-                                                            data-id="{{ $issue->id }}"
-                                                            data-item="{{ $issue->item->name ?? '' }}"
-                                                            data-category="{{ $issue->item->category->name ?? '' }}"
-                                                            data-quantity="{{ $issue->quantity }}"
-                                                            style="cursor:pointer;">
-                                                            Click to return
-                                                        </span>
+                                                        @if ($canEditIssueItem)
+                                                            <span class="badge bg-info text-dark return-btn"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#returnModal"
+                                                                data-id="{{ $issue->id }}"
+                                                                data-item="{{ $issue->item->name ?? '' }}"
+                                                                data-category="{{ $issue->item->category->name ?? '' }}"
+                                                                data-quantity="{{ $issue->quantity }}"
+                                                                style="cursor:pointer;">
+                                                                Click to return
+                                                            </span>
+                                                        @else
+                                                            <span class="badge bg-info text-dark">Return scheduled</span>
+                                                        @endif
 
                                                     @else
                                                         <span class="badge bg-warning text-dark">Issued</span>
@@ -202,25 +226,31 @@
                                                 </td>
 
                                                 <td>
-                                                    <a href="javascript:void(0);" 
-                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill editIssueBtn"
-                                                        data-id="{{ $issue->id }}" data-bs-toggle="tooltip" title="Edit">
-                                                        <i class="ti ti-pencil"></i>
-                                                    </a>
+                                                    @if ($canEditIssueItem || $canDeleteIssueItem)
+                                                        @if ($canEditIssueItem)
+                                                            <a href="javascript:void(0);" 
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill editIssueBtn"
+                                                                data-id="{{ $issue->id }}" data-bs-toggle="tooltip" title="Edit">
+                                                                <i class="ti ti-pencil"></i>
+                                                            </a>
+                                                        @endif
 
-                                                    <a href="javascript:void(0);" 
-                                                        class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
-                                                        onclick="if(confirm('Are you sure you want to delete this issue record?')) { document.getElementById('delete-issue-{{ $issue->id }}').submit(); }"
-                                                        data-bs-toggle="tooltip" title="Delete">
-                                                        <i class="ti ti-trash"></i>
-                                                    </a>
+                                                        @if ($canDeleteIssueItem)
+                                                            <a href="javascript:void(0);" 
+                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-danger rounded-pill"
+                                                                onclick="if(confirm('Are you sure you want to delete this issue record?')) { document.getElementById('delete-issue-{{ $issue->id }}').submit(); }"
+                                                                data-bs-toggle="tooltip" title="Delete">
+                                                                <i class="ti ti-trash"></i>
+                                                            </a>
 
-                                                    <form id="delete-issue-{{ $issue->id }}" 
-                                                        action="{{ route('issue-items.destroy', $issue->id) }}" 
-                                                        method="POST" style="display: none;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                    </form>
+                                                            <form id="delete-issue-{{ $issue->id }}" 
+                                                                action="{{ route('issue-items.destroy', $issue->id) }}" 
+                                                                method="POST" style="display: none;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                            </form>
+                                                        @endif
+                                                    @endif
                                                 </td>
                                             </tr>
                                            <!-- Return Item Modal -->

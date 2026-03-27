@@ -63,6 +63,8 @@ class DischargeCard extends Model
         'medicine_types',
         'intervals',
         'durations',
+        'med_dates',
+        'doctor_advice',
         'discharged_by',
         'barcode',
         'created_by',

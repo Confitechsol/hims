@@ -181,6 +181,9 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/patients/import', [PatientController::class, 'import'])->name('patient-import');
     Route::post('/patients/bulk-import', [PatientController::class, 'bulkImport'])->name('patients.import');
     Route::get('/patients/export', [PatientController::class, 'exportPatientsExcel'])->name('patients.export');
+    Route::get('/districts', [PatientController::class, 'district']);
+    Route::get('/states', [PatientController::class, 'state']);
+
 
     Route::get('/languages', [LanguagesController::class, 'index'])->name('languages');
     Route::post('/languages/create', [LanguagesController::class, 'store'])->name('languages.store');

@@ -43,6 +43,11 @@ class DoctorController extends Controller
     //     'message' => 'Staff list fetched successfully',
     //     'data' => $staffs
     // ]);
+    if ($request->has('search')) {
+        return response()->json([
+            'result' => $doctors
+        ]);
+    }
     return view('admin.doctor.doctors', compact('doctors', 'perPage', 'search'));
    }
     public function create()
@@ -73,9 +78,9 @@ class DoctorController extends Controller
     {
         
         $request->validate([
-            'doctor_id' => 'required',
+            'doctor_id' => 'nullable',
             'name' => 'required',
-            'email' => 'required|email',
+            'email' => 'nullable|email',
            
         ]);
 
@@ -84,7 +89,6 @@ class DoctorController extends Controller
         $doctor = new Doctor();
         $doctor->hospital_id     = Auth::user()->hospital_id;
         $doctor->branch_id       = Auth::user()->branch_id ?? null;
-        $doctor->doctor_id       = $request->doctor_id;
         $doctor->registration_no = $request->registration_no;
         $doctor->role_id         = $request->role;
         $doctor->staff_designation_id = $request->designation;
@@ -113,6 +117,17 @@ class DoctorController extends Controller
         $doctor->password = '123456';
         $doctor->user_id = '123456';
         $doctor->is_active = '1';
+
+        $lastDoctor = Doctor::orderByRaw('CAST(doctor_id AS UNSIGNED) DESC')->first();
+        //dd($lastDoctor);
+
+        if ($lastDoctor && is_numeric($lastDoctor->doctor_id)) {
+            $doctorId = (string) ($lastDoctor->doctor_id + 1);
+        } else {
+            $doctorId = "1";
+        }
+
+        $doctor->doctor_id = $doctorId;
 
         if ($request->file('file')) {
             $file = $request->file('file');
@@ -144,7 +159,7 @@ class DoctorController extends Controller
         // Find Doctor record
         $Doctor = Doctor::findOrFail($id);
 
-        $Doctor->doctor_id = $request->doctor_id;
+        $Doctor->doctor_id = $request->id;
         $Doctor->role_id = $request->role;
         $Doctor->staff_designation_id = $request->designation;
         $Doctor->department_id = $request->department;

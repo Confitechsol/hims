@@ -244,11 +244,6 @@
         <div class="top_head">
             <table style="width: 100%; table-layout: fixed; border-collapse: collapse; margin: 0; padding: 0;">
                 <tr>
-                    <td class="first_logo" style="width: 35%; padding: 0 5px; margin: 0; vertical-align: top;">
-                        @if (file_exists(public_path('assets/images/logo.webp')))
-                            <img src="{{ public_path('assets/images/logo.webp') }}" alt="LOGO" style="height: 50px; display: block; margin-bottom: 3px;">
-                        @endif
-                    </td>
                     <td class="second_logo" style="width: 30%; padding: 0 5px; margin: 0; vertical-align: middle; text-align: center;">
                         @if (file_exists(public_path('assets/images/nabh-logo.png')))
                             <div style="text-align: center;">
@@ -257,6 +252,12 @@
                         @endif
                         <p style="margin: 0; font-size: 10px;">NABH/PESHCO-2018-3150/L-03</p>
                     </td>
+                    <td class="first_logo" style="width: 20%; padding: 0 5px; margin: 0; vertical-align: middle;">
+                        @if (file_exists(public_path('assets/images/logo.webp')))
+                            <img src="{{ public_path('assets/images/logo.webp') }}" alt="LOGO" style="height: 50px; display: block; margin-bottom: 3px;">
+                        @endif
+                    </td>
+                    
                     <td class="about_info" style="width: 35%; padding: 0 5px; margin: 0; vertical-align: top; text-align: right;">
                         <p style="margin: 1px 0;"><strong>{{ $hospital->name ?? 'Hospital Name' }}</strong></p>
                         <p style="margin: 1px 0;">{{ $hospital->address ?? 'Hospital Address' }}</p>

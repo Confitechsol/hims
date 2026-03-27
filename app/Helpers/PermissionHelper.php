@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\PermissionCategory;
+
 if (!function_exists('hasPermission')) {
     /**
      * Check if the current user has a specific permission
@@ -151,5 +153,34 @@ if (!function_exists('isSuperAdmin')) {
     {
         $roleName = getUserRoleName();
         return $roleName === 'Super Admin' || $roleName === 'Admin';
+    }
+}
+
+if (!function_exists('permCatId')) {
+    /**
+     * Resolve permission category ID by name or short code.
+     *
+     * Uses a simple static cache so repeated calls within a single request
+     * don't hit the database multiple times.
+     *
+     * @param string $identifier Permission category name or short_code
+     * @return int|null
+     */
+    function permCatId(string $identifier): ?int
+    {
+        static $cache = [];
+
+        if (array_key_exists($identifier, $cache)) {
+            return $cache[$identifier];
+        }
+
+        $category = PermissionCategory::query()
+            ->where('name', $identifier)
+            ->orWhere('short_code', $identifier)
+            ->first();
+
+        $cache[$identifier] = $category?->id;
+
+        return $cache[$identifier];
     }
 }

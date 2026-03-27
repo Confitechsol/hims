@@ -18,12 +18,28 @@ use Illuminate\Support\Facades\Validator;
 
 class InventoriesController extends Controller
 {
+    /**
+     * Permission category identifiers used in the permissions matrix.
+     * These should match the "name" (or "short_code") values defined in
+     * `permission_category` for the Inventory group.
+     */
+    private const PERM_CAT_ITEM_STOCK = 'Item Stock';
+    private const PERM_CAT_ITEM       = 'Item';
+    private const PERM_CAT_ISSUE_ITEM = 'Issue Item';
+
     public function index()
     {
+        $permCatId = permCatId(self::PERM_CAT_ITEM_STOCK);
+        if (!canView($permCatId)) {
+            abort(403, 'You do not have permission to view inventory stock.');
+        }
+
         $categories = ItemCategory::all();
         $suppliers  = ItemSupplier::all();
         $stores     = ItemStore::all();
-        $stocks     = ItemStock::with(['itemCategory', 'item', 'supplier', 'store'])->latest()->get();
+        $stocks = ItemStock::with(['itemCategory', 'item', 'supplier', 'store'])
+    ->latest()
+    ->paginate(50);
         return view('admin.inventory.inventory_details', compact('categories', 'suppliers', 'stores', 'stocks'));
     }
     public function getItems($categoryId)
@@ -34,6 +50,11 @@ class InventoriesController extends Controller
 
     public function store(Request $request)
     {
+        $permCatId = permCatId(self::PERM_CAT_ITEM_STOCK);
+        if (!canAdd($permCatId)) {
+            abort(403, 'You do not have permission to add inventory stock.');
+        }
+
         //dd($request->all());
         $request->validate([
             'item_category' => 'required',
@@ -104,6 +125,10 @@ class InventoriesController extends Controller
     }
     public function edit($id)
     {
+        $permCatId = permCatId(self::PERM_CAT_ITEM_STOCK);
+        if (!canEdit($permCatId)) {
+            abort(403, 'You do not have permission to edit inventory stock.');
+        }
 
         $stock = ItemStock::with(['itemCategory', 'item', 'supplier', 'store', 'batches'])->find($id);
 
@@ -127,6 +152,11 @@ class InventoriesController extends Controller
 
     public function update(Request $request, $id)
     {
+        $permCatId = permCatId(self::PERM_CAT_ITEM_STOCK);
+        if (!canEdit($permCatId)) {
+            abort(403, 'You do not have permission to edit inventory stock.');
+        }
+
         try {
             //dd($request->all());
             DB::beginTransaction();
@@ -194,6 +224,11 @@ class InventoriesController extends Controller
     }
     public function destroy($id)
     {
+        $permCatId = permCatId(self::PERM_CAT_ITEM_STOCK);
+        if (!canDelete($permCatId)) {
+            abort(403, 'You do not have permission to delete inventory stock.');
+        }
+
         DB::beginTransaction();
 
         try {
@@ -216,6 +251,11 @@ class InventoriesController extends Controller
 
     public function items()
     {
+        $permCatId = permCatId(self::PERM_CAT_ITEM);
+        if (!canView($permCatId)) {
+            abort(403, 'You do not have permission to view inventory items.');
+        }
+
         $items      = Item::with('category')->get();
         $categories = ItemCategory::select('id', 'item_category')->get();
         return view('admin.inventory.item_details', compact('items', 'categories'));
@@ -223,6 +263,11 @@ class InventoriesController extends Controller
 
     public function storeItem(Request $request)
     {
+        $permCatId = permCatId(self::PERM_CAT_ITEM);
+        if (!canAdd($permCatId)) {
+            abort(403, 'You do not have permission to add inventory items.');
+        }
+
         $validator = Validator::make($request->all(), [
             'item_category_id' => 'required|exists:item_category,id',
             'name'             => 'required|string|max:255',
@@ -252,6 +297,10 @@ class InventoriesController extends Controller
     }
     public function editItem($id)
     {
+        $permCatId = permCatId(self::PERM_CAT_ITEM);
+        if (!canEdit($permCatId)) {
+            abort(403, 'You do not have permission to edit inventory items.');
+        }
 
         try {
             // Fetch item details
@@ -273,6 +322,11 @@ class InventoriesController extends Controller
     }
     public function updateItem(Request $request, $id)
     {
+        $permCatId = permCatId(self::PERM_CAT_ITEM);
+        if (!canEdit($permCatId)) {
+            abort(403, 'You do not have permission to edit inventory items.');
+        }
+
         try {
             // ✅ 1. Validate inputs
             $validated = $request->validate([
@@ -331,6 +385,11 @@ class InventoriesController extends Controller
     }
     public function destroyItem($id)
     {
+        $permCatId = permCatId(self::PERM_CAT_ITEM);
+        if (!canDelete($permCatId)) {
+            abort(403, 'You do not have permission to delete inventory items.');
+        }
+
         try {
             // ✅ 1. Find the item
             $item = Item::findOrFail($id);
@@ -354,6 +413,11 @@ class InventoriesController extends Controller
 
     public function issueItems()
     {
+        $permCatId = permCatId(self::PERM_CAT_ISSUE_ITEM);
+        if (!canView($permCatId)) {
+            abort(403, 'You do not have permission to view issued items.');
+        }
+
         $categories = ItemCategory::all();
         $itemIssues = ItemIssue::with(['item', 'category', 'issuedTo'])->get();
         // $suppliers = ItemSupplier::all();
@@ -374,6 +438,11 @@ class InventoriesController extends Controller
 
     public function storeIssuedItem(Request $request)
     {
+        $permCatId = permCatId(self::PERM_CAT_ISSUE_ITEM);
+        if (!canAdd($permCatId)) {
+            abort(403, 'You do not have permission to issue items.');
+        }
+
         $validator = Validator::make($request->all(), [
             'department_id'    => 'required',
             'item_category_id' => 'required|integer|exists:item_category,id',
@@ -419,6 +488,10 @@ class InventoriesController extends Controller
     }
     public function editIssuedItem($id)
     {
+        $permCatId = permCatId(self::PERM_CAT_ISSUE_ITEM);
+        if (!canEdit($permCatId)) {
+            abort(403, 'You do not have permission to edit issued items.');
+        }
 
         $issue = ItemIssue::with(['category', 'item', 'issuedTo', 'department'])
             ->findOrFail($id);
@@ -435,6 +508,11 @@ class InventoriesController extends Controller
 
     public function updateIssuedItem(Request $request, $id)
     {
+        $permCatId = permCatId(self::PERM_CAT_ISSUE_ITEM);
+        if (!canEdit($permCatId)) {
+            abort(403, 'You do not have permission to edit issued items.');
+        }
+
 
         // Validate incoming request
         $validator = Validator::make($request->all(), [
@@ -480,6 +558,11 @@ class InventoriesController extends Controller
     }
     public function destroyIssuedItem($id)
     {
+        $permCatId = permCatId(self::PERM_CAT_ISSUE_ITEM);
+        if (!canDelete($permCatId)) {
+            abort(403, 'You do not have permission to delete issued items.');
+        }
+
         try {
             // ✅ 1. Find the item
             $item = ItemIssue::findOrFail($id);
@@ -835,6 +918,10 @@ class InventoriesController extends Controller
     }
     public function returnIssuedItem(Request $request, $id)
     {
+        $permCatId = permCatId(self::PERM_CAT_ISSUE_ITEM);
+        if (!canEdit($permCatId)) {
+            abort(403, 'You do not have permission to return issued items.');
+        }
 
         $issue = ItemIssue::findOrFail($id);
         //dd($issue);

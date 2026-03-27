@@ -103,7 +103,7 @@
                         <div class="col-md-4">
                             <label class="form-label">Patient Name</label>
                             <input type="text" class="form-control" name="patient_name"
-                                value="{{ $dischargeData->patient_name }}" autocomplete="off">
+                                value="{{ $dischargeData->patient_name }}" autocomplete="off" readonly>
                             <input type="hidden" class="form-control" name="patient_id"
                                 value="{{ $dischargeData->patient_id }}">
                         </div>
@@ -158,7 +158,7 @@
                                 Age
                             </label>
                             <input type="text" class="form-control" id="age_text" name="age" step="0.01"
-                                value="{{ $dischargeData->age }}" autocomplete="off">
+                                value="{{ $dischargeData->age }}" autocomplete="off" readonly>
                         </div>
                         <div class="col-md-2">
                             <label for="gender" class="form-label">
@@ -179,7 +179,7 @@
                                 Phone
                             </label>
                             <input type="tel" value="{{ $dischargeData->phone }}" class="form-control"
-                                id="phone_text" name="phone" autocomplete="off">
+                                id="phone_text" name="phone" autocomplete="off" readonly>
                         </div>
 
                         <div class="col-md-3">
@@ -187,7 +187,7 @@
                                 <i class="bi bi-heart"></i>
                                 Marital Status
                             </label>
-                            <select class="form-select" id="marital_status_text" name="marital_status">
+                            <select class="form-select" id="marital_status_text" name="marital_status" readonly>
                                 <option value="">Select</option>
                                 <option value="Married">Married</option>
                                 <option value="Single">Single</option>
@@ -342,7 +342,7 @@
                                 <i class="bi bi-chat-left-text"></i>
                                 Remarks
                             </label>
-                            <textarea class="form-control" id="remarks_text" name="remarks" rows="3">{{ $dischargeData->remarks }}</textarea>
+                            <textarea class="form-control" id="remarks_text" name="remarks" rows="6">{!! $dischargeData->remarks !!}</textarea>
                         </div>
                     </div>
                     <hr class="my-4">
@@ -372,7 +372,7 @@
                                     </div>
                                     <div class="row g-3">
 
-                                        <div class="col-md-3">
+                                        <div class="col-md-2">
                                             <label class="form-label">Medicine</label>
 
                                             <select class="med-medicine" name="meds[]">
@@ -382,7 +382,7 @@
 
                                         </div>
 
-                                        <div class="col-md-3">
+                                        <div class="col-md-2">
                                             <label class="form-label">Type</label>
 
                                             <select class="med-types" name="med_types[]"
@@ -424,6 +424,12 @@
 
                                         </div>
 
+                                        <div class="col-md-2">
+                                            <label class="form-label">Date</label>
+                                            <input type="date" class="form-control med-date py-2" name="med_date[]"
+                                                value="{{ trim($dischargeData->med_dates[$i]) }}" />
+                                        </div>
+
                                     </div>
 
 
@@ -435,6 +441,15 @@
                         <button type="button" class="btn-add-medicine mt-3" id="addMedBtn">
                             Add Medicine
                         </button>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label for="remarks" class="form-label">
+                                <i class="bi bi-chat-left-text"></i>
+                                Doctor Advice
+                            </label>
+                            <textarea class="form-control" id="doctor_advice_text" name="doctor_advice" rows="3">{!! $dischargeData->doctor_advice !!}</textarea>
+                        </div>
                     </div>
 
                     <hr class="my-4">
@@ -729,6 +744,8 @@
                 initTomSelects(row)
             })
 
+            ClassicEditor.create(document.querySelector('#remarks_text'))
+            ClassicEditor.create(document.querySelector('#doctor_advice_text'))
             ClassicEditor.create(document.querySelector('#diagnosis_text'))
             ClassicEditor.create(document.querySelector('#ot_note_text'))
             ClassicEditor.create(document.querySelector('#course_in_hospital_text'))
@@ -763,12 +780,12 @@
                     </div>
                     <div class="row g-3">
 
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label>Medicine</label>
                             <select class="med-medicine" name="meds[]"></select>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label>Type</label>
                             <select class="med-types" name="med_types[]">
                                     <option value="">Select Medicine Type</option>
@@ -790,6 +807,10 @@
                         <div class="col-md-3">
                             <label>Duration</label>
                             <select class="med-duration" name="med_duration[]"></select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-control med-date py-2" name="med_date[]" />
                         </div>
                     </div>
                 </div>
@@ -821,6 +842,21 @@
                     row.remove(); // remove empty row
                 }
             });
+
+            // ✅ IMPORTANT FIX
+            const form = this;
+            if (document.querySelectorAll('.med-row').length === 0) {
+
+                // create hidden empty arrays
+                ['meds', 'med_types', 'med_interval', 'med_duration', 'med_date'].forEach(name => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = name + '[]';
+                    input.value = '';
+                    form.appendChild(input);
+                });
+
+            }
 
         })
     </script>
