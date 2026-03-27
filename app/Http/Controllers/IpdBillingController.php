@@ -94,8 +94,9 @@ class IpdBillingController extends Controller
 
         $doctors = Doctor::orderBy('name')->get(['id', 'name', 'surname']);
 
-        // Calculate all charges
-        $breakup = $this->calculateBreakup($ipdId);
+        // Calculate all charges; for discharged IPD, lock to discharge date.
+        $endDate = $this->resolveBillingEndDateForIpd($ipd);
+        $breakup = $this->calculateBreakup($ipdId, $endDate);
 
         // Discount and due patient party for display (final bill logic)
         $totalDiscount = (float) ($ipd->mou_discount ?? 0) + (float) ($ipd->special_discount ?? 0);
@@ -106,8 +107,8 @@ class IpdBillingController extends Controller
         $breakup['due_patient_party_amount'] = $duePatientPartyAmount;
         $breakup['net_balance'] = $netBalance;
 
-        // Get detailed date-wise breakdown
-        $detailedBreakup = $this->getDetailedBreakup($ipdId, $ipd);
+        // Get detailed date-wise breakdown with same boundary as summary.
+        $detailedBreakup = $this->getDetailedBreakup($ipdId, $ipd, $endDate);
 
         return view('admin.billing.ipd_breakup', compact('ipd', 'breakup', 'detailedBreakup', 'doctors'));
     }
@@ -130,7 +131,8 @@ class IpdBillingController extends Controller
 
         $totalDiscount = $ipd->mou_discount + $ipd->special_discount;
         $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
-        $breakup = $this->calculateBreakup($ipdId);
+        $endDate = $this->resolveBillingEndDateForIpd($ipd);
+        $breakup = $this->calculateBreakup($ipdId, $endDate);
         $outstanding = $breakup['outstanding'] ?? 0;
         $outstandingAfterDiscount = max(0, $outstanding - $totalDiscount);
         $netBalance = max(0, $outstanding - $totalDiscount - $duePatientPartyAmount);
@@ -167,7 +169,8 @@ class IpdBillingController extends Controller
 
         $totalDiscount = (float) ($ipd->mou_discount ?? 0) + (float) ($ipd->special_discount ?? 0);
         $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
-        $breakup = $this->calculateBreakup($ipdId);
+        $endDate = $this->resolveBillingEndDateForIpd($ipd);
+        $breakup = $this->calculateBreakup($ipdId, $endDate);
         $outstanding = $breakup['outstanding'] ?? 0;
         $netBalance = max(0, $outstanding - $totalDiscount - $duePatientPartyAmount);
 
@@ -225,8 +228,8 @@ class IpdBillingController extends Controller
         // This ensures a custom charge set on admission/transfer applies to all subsequent days in that period
         $bedGroupCustomCharges = []; // Format: ['bed_group_id|history_index' => daywise_charge_object]
         foreach ($bedHistories as $historyIndex => $history) {
-            $bedHistoryFromDate = Carbon::parse($history->from_date)->startOfDay();
-            $bedHistoryToDate = $history->to_date ? Carbon::parse($history->to_date)->endOfDay() : Carbon::now()->endOfDay();
+            $bedHistoryFromDate = Carbon::parse($history->from_date);
+            $bedHistoryToDate = $history->to_date ? Carbon::parse($history->to_date) : Carbon::now();
             
             // Find the most recent custom bed charge for this bed group within this history period
             $mostRecentDaywise = null;
@@ -236,7 +239,7 @@ class IpdBillingController extends Controller
                 if ((int)$daywise->bed_group_id === (int)$history->bed_group_id) {
                     $daywiseDateCarbon = Carbon::parse($daywise->charge_date)->startOfDay();
                     
-                    if ($daywiseDateCarbon->gte($bedHistoryFromDate) && $daywiseDateCarbon->lte($bedHistoryToDate)) {
+                    if ($daywiseDateCarbon->gte($bedHistoryFromDate->copy()->startOfDay()) && $daywiseDateCarbon->lte($bedHistoryToDate->copy()->endOfDay())) {
                         if ($mostRecentDate === null || $daywiseDateCarbon->gt($mostRecentDate)) {
                             $mostRecentDate = $daywiseDateCarbon;
                             $mostRecentDaywise = $daywise;
@@ -259,15 +262,17 @@ class IpdBillingController extends Controller
             $periodStart = $currentDate->copy()->subDay()->setTime(10, 1, 0);
             $periodEnd = $currentDate->copy()->setTime(10, 1, 0);
 
-            // Find which bed was assigned during this period (use date-only so admission time doesn't exclude same day)
+            // Find which bed was assigned during this period using exact datetime overlap.
+            // Period is treated as [start, end): includes start, excludes end to avoid double-counting boundaries.
             $activeBed = null;
             $activeBedHistoryIndex = null;
             foreach ($bedHistories as $historyIndex => $history) {
-                $fromDate = Carbon::parse($history->from_date)->startOfDay();
-                $toDate = $history->to_date ? Carbon::parse($history->to_date)->endOfDay() : null;
+                $fromDate = Carbon::parse($history->from_date);
+                $toDate = $history->to_date ? Carbon::parse($history->to_date) : null;
 
-                if ($fromDate->lte($periodEnd) && (!$toDate || $toDate->gte($periodStart))) {
-                    if (!$activeBed || $fromDate->gt(Carbon::parse($activeBed->from_date)->startOfDay())) {
+                // Overlap condition for [fromDate, toDate) with [periodStart, periodEnd)
+                if ($fromDate->lt($periodEnd) && (!$toDate || $toDate->gt($periodStart))) {
+                    if (!$activeBed || $fromDate->gt(Carbon::parse($activeBed->from_date))) {
                         $activeBed = $history;
                         $activeBedHistoryIndex = $historyIndex;
                     }
@@ -344,8 +349,9 @@ class IpdBillingController extends Controller
                 ];
             }
 
-            // Fallback: use IpdDaywiseBedCharge for this date if no charge from history
-            if ($bedCost <= 0 && $daywiseCharges->has($chargeDate)) {
+            // Fallback: use IpdDaywiseBedCharge when history is missing.
+            // Do NOT use fallback for non-overlapping periods (prevents extra-day billing).
+            if ($bedCost <= 0 && $daywiseCharges->has($chargeDate) && ($activeBed || $bedHistories->isEmpty())) {
                 $daywise = $daywiseCharges->get($chargeDate);
                 $bedCost = (float) ($daywise->bed_charge ?? 0);
                 if ($bedCost > 0) {
@@ -521,23 +527,8 @@ class IpdBillingController extends Controller
      */
     public function getBillingSummaryForIpd($ipdId)
     {
-        // If IPD is discharged, lock the summary to the discharge date
-        // so bed charges (and other time-based items) are not extended beyond discharge.
-        $endDate = null;
-
         $ipd = IpdDetail::find($ipdId);
-        if ($ipd && $ipd->discharged === 'yes') {
-            // Prefer explicit discharged_date on IPD record if present
-            if (!empty($ipd->discharged_date)) {
-                $endDate = Carbon::parse($ipd->discharged_date)->format('Y-m-d');
-            } else {
-                // Fallback to discharge card date if available
-                $dischargeCard = DischargeCard::where('ipd_details_id', $ipdId)->orderByDesc('id')->first();
-                if ($dischargeCard && !empty($dischargeCard->discharge_date)) {
-                    $endDate = Carbon::parse($dischargeCard->discharge_date)->format('Y-m-d');
-                }
-            }
-        }
+        $endDate = $ipd ? $this->resolveBillingEndDateForIpd($ipd) : null;
 
         $breakup = $this->calculateBreakup($ipdId, $endDate);
         return [
@@ -554,9 +545,31 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * Resolve billing end date for an IPD.
+     * For discharged IPD, billing stops at discharge date.
+     */
+    private function resolveBillingEndDateForIpd(IpdDetail $ipd): ?string
+    {
+        if (($ipd->discharged ?? 'no') !== 'yes') {
+            return null;
+        }
+
+        if (!empty($ipd->discharged_date)) {
+            return Carbon::parse($ipd->discharged_date)->format('Y-m-d');
+        }
+
+        $dischargeCard = DischargeCard::where('ipd_details_id', $ipd->id)->orderByDesc('id')->first();
+        if ($dischargeCard && !empty($dischargeCard->discharge_date)) {
+            return Carbon::parse($dischargeCard->discharge_date)->format('Y-m-d');
+        }
+
+        return null;
+    }
+
+    /**
      * Get detailed date-wise breakdown
      */
-    private function getDetailedBreakup($ipdId, $ipd)
+    private function getDetailedBreakup($ipdId, $ipd, $endDate = null)
     {
         $admissionDate = $ipd->date; // datetime for pathology/radiology
         $admissionDateOnly = $ipd->date ? Carbon::parse($ipd->date)->format('Y-m-d') : null; // date-only for doctor visits
@@ -564,7 +577,7 @@ class IpdBillingController extends Controller
         $caseReferenceId = $ipd->case_reference_id;
         
         // Bed Charges Details - Calculate dynamically from PatientBedHistory
-        $bedChargesData = $this->calculateBedChargesFromHistory($ipdId);
+        $bedChargesData = $this->calculateBedChargesFromHistory($ipdId, $endDate);
         $bedChargesDetails = collect($bedChargesData['details'])->map(function($charge) {
             return [
                 'date' => $charge->charge_date,
