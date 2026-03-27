@@ -1086,7 +1086,8 @@ Route::get('/radiology_test_export', [ExcelImportController::class, 'exportRadio
 
 Route::prefix('reports')->group(function () {
     Route::get('/finance', function () {
-        return view('admin.reports.finance.index'); })->name('finance');
+        return view('admin.reports.finance.index');
+    })->name('finance');
     Route::get('/inventory', [InventoriesController::class, 'reports'])->name('inventory-reports');
     Route::get('/inventory-stock', [InventoriesController::class, 'stockReports'])->name('inventory-stock-reports');
     Route::get('/inventory-item', [InventoriesController::class, 'itemReports'])->name('inventory-item-reports');
