@@ -59,9 +59,6 @@ class PackageController extends Controller
             $user = Auth::user();
 
             $package = Package::create([
-                // Legacy integer column `packageId` without default; keep it in a safe small range
-                // This column is not used as primary key (the `id` column is), so we can use a fixed value.
-                'packageId' => 1,
                 'hospital_id' => $user->hospital_id ?? null,
                 'branch_id' => $user->branch_id ?? null,
                 'name' => $request->name,

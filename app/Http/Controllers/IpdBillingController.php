@@ -1058,8 +1058,31 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * Normalize Y-m-d for bed charge period columns (falls back to billing day charge_date).
+     */
+    private function normalizeBedChargePeriodDate($value, string $fallbackYmd): string
+    {
+        if ($value === null || $value === '') {
+            return $fallbackYmd;
+        }
+        try {
+            if ($value instanceof \DateTimeInterface) {
+                return $value->format('Y-m-d');
+            }
+
+            return Carbon::parse($value)->format('Y-m-d');
+        } catch (\Throwable $e) {
+            return $fallbackYmd;
+        }
+    }
+
+    /**
      * Group day-wise bed charges by bed and contiguous date ranges for display.
      * Returns one row per (bed + contiguous date range): e.g. "SINGLE - 5 SINGLE @5000 | 5 Days | 17/01/2026 To 21/01/2026".
+     *
+     * Uses period_start_date / period_end_date (10:01–10:01 hospital day) for the printed "Date Range".
+     * charge_date alone can repeat the same calendar day when the billing day label differs from the
+     * occupancy window (e.g. admit 27 10:31 → one line with charge_date 28 but period 27→28).
      *
      * @param \Illuminate\Support\Collection $bedChargesDetails Day-wise details from calculateBedChargesFromHistory
      * @return \Illuminate\Support\Collection
@@ -1080,6 +1103,8 @@ class IpdBillingController extends Controller
             $sorted = $items->sortBy('charge_date')->values();
             $prevDate = null;
             $rangeStart = null;
+            $rangeDisplayFrom = null;
+            $rangeDisplayTo = null;
             $rangeDays = 0;
             $rangeAmount = 0;
             $rangeRate = null;
@@ -1091,14 +1116,17 @@ class IpdBillingController extends Controller
                     ? $d->charge_date->format('Y-m-d')
                     : Carbon::parse($d->charge_date)->format('Y-m-d');
 
+                $pStart = $this->normalizeBedChargePeriodDate($d->period_start_date ?? null, $dDate);
+                $pEnd = $this->normalizeBedChargePeriodDate($d->period_end_date ?? null, $dDate);
+
                 $isConsecutive = $prevDate !== null && Carbon::parse($prevDate)->addDay()->format('Y-m-d') === $dDate;
 
                 if ($rangeStart === null || !$isConsecutive) {
                     // Flush previous range if any
                     if ($rangeStart !== null && $rangeDays > 0) {
                         $result->push((object) [
-                            'from_date' => $rangeStart,
-                            'to_date' => $prevDate,
+                            'from_date' => $rangeDisplayFrom,
+                            'to_date' => $rangeDisplayTo,
                             'no_of_days' => $rangeDays,
                             'bed_charge' => $rangeAmount,
                             'bed_charge_rate' => $rangeRate,
@@ -1108,6 +1136,8 @@ class IpdBillingController extends Controller
                         ]);
                     }
                     $rangeStart = $dDate;
+                    $rangeDisplayFrom = $pStart;
+                    $rangeDisplayTo = $pEnd;
                     $rangeDays = 1;
                     $rangeAmount = (float) ($d->bed_charge ?? 0);
                     $rangeRate = (float) ($d->bed_charge_rate ?? 0);
@@ -1116,14 +1146,15 @@ class IpdBillingController extends Controller
                 } else {
                     $rangeDays++;
                     $rangeAmount += (float) ($d->bed_charge ?? 0);
+                    $rangeDisplayTo = $pEnd;
                 }
                 $prevDate = $dDate;
             }
 
             if ($rangeStart !== null && $rangeDays > 0) {
                 $result->push((object) [
-                    'from_date' => $rangeStart,
-                    'to_date' => $prevDate,
+                    'from_date' => $rangeDisplayFrom,
+                    'to_date' => $rangeDisplayTo,
                     'no_of_days' => $rangeDays,
                     'bed_charge' => $rangeAmount,
                     'bed_charge_rate' => $rangeRate,
