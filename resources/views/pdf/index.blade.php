@@ -356,7 +356,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient->areaName->pincode ?? '' }}
+                        {{ $IpdPatient->patient['pin_code'] }}
                     </div>
                 </div>
 
@@ -383,7 +383,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient->areaName->name ?? '' }}
+                        {{ $IpdPatient->patient['area'] }}
                     </div>
                 </div>
                 <div class="patient_items">
