@@ -33,7 +33,7 @@
 
                         {{-- Name --}}
                         <div class="col-md-6">
-                            <label for="name" class="form-label">Name</label>
+                            <label for="name" class="form-label">Name*</label>
                             <input type="text" id="name" name="name"
                                 class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" />
                             @error('name')
@@ -109,7 +109,7 @@
 
                                 {{-- DOB --}}
                                 <div class="col-md-4">
-                                    <label for="birth_date" class="form-label">Date of Birth*</label>
+                                    <label for="birth_date" class="form-label">Date of Birth</label>
                                     <input type="date" id="birth_date" name="birth_date"
                                         class="form-control @error('birth_date') is-invalid @enderror"
                                         value="{{ old('birth_date') }}" />
@@ -295,7 +295,7 @@
 
                         {{-- Area --}}
                         <div class="col-md-3">
-                            <label for="area" class="form-label">Area</label>
+                            <label for="area" class="form-label">Area*</label>
                             <input type="text" id="area" name="area"
                                 class="form-control @error('area') is-invalid @enderror"
                                 value="{{ old('area') }}" />
