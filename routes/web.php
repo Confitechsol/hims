@@ -1189,3 +1189,8 @@ Route::get('/reports/patient-reports-index', function () {
     return view('admin.reports.patient.index');
 })->name('patient-reports-index');
 
+Route::get('/reports/patient-reports', function () {
+    return view('admin.reports.patient.patient_reports');
+})->name('patient-reports');
+
+    Route::get('/patient-reports', [PatientReportController::class, 'patientReport'])->name('patient.patient_reports');

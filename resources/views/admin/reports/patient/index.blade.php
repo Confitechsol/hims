@@ -28,7 +28,7 @@
                 <div class="card-body">
                     <div class="row align-items-center gy-4">
                         <div class="col-md-4">
-                            <a href="">
+                            <a href="{{ route('patient.patient_reports') }}">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
                                     <p>Patient Report</p>
