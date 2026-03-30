@@ -90,6 +90,7 @@ use App\Http\Controllers\TransactionReportController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PatientReportController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -183,6 +184,10 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/patients/export', [PatientController::class, 'exportPatientsExcel'])->name('patients.export');
     Route::get('/districts', [PatientController::class, 'district']);
     Route::get('/states', [PatientController::class, 'state']);
+    Route::get('/report/patient', [PatientReportController::class, 'patientReport'])->name('patient-report');
+    
+
+    
 
 
     Route::get('/languages', [LanguagesController::class, 'index'])->name('languages');
@@ -1086,8 +1091,7 @@ Route::get('/radiology_test_export', [ExcelImportController::class, 'exportRadio
 
 Route::prefix('reports')->group(function () {
     Route::get('/finance', function () {
-        return view('admin.reports.finance.index');
-    })->name('finance');
+        return view('admin.reports.finance.index'); })->name('finance');
     Route::get('/inventory', [InventoriesController::class, 'reports'])->name('inventory-reports');
     Route::get('/inventory-stock', [InventoriesController::class, 'stockReports'])->name('inventory-stock-reports');
     Route::get('/inventory-item', [InventoriesController::class, 'itemReports'])->name('inventory-item-reports');
