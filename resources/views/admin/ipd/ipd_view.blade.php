@@ -2535,10 +2535,7 @@
                                                             placeholder="Search">
                                                     </div>
                                                     <div class="text-end d-flex">
-                                                        <button type="button"
-                                                            class="btn btn-primary text-white ms-2 btn-md add-bed-history-btn">
-                                                            <i class="ti ti-plus me-1"></i>Add Bed History
-                                                        </button>
+                                                        {{-- This tab is for radiology; bed-history actions must not appear here --}}
                                                     </div>
                                                 </div>
                                                 <!-- Table start -->
@@ -3928,10 +3925,7 @@
                                                             placeholder="Search">
                                                     </div>
                                                     <div class="text-end d-flex">
-                                                        <button type="button"
-                                                            class="btn btn-primary text-white ms-2 btn-md add-bed-history-btn">
-                                                            <i class="ti ti-plus me-1"></i>Add Bed History
-                                                        </button>
+                                                        {{-- This tab is for live consultation; bed-history actions must not appear here --}}
                                                     </div>
                                                 </div>
                                                 <!-- Table start -->
@@ -4220,10 +4214,7 @@
                                                             placeholder="Search">
                                                     </div>
                                                     <div class="text-end d-flex">
-                                                        <button type="button"
-                                                            class="btn btn-primary text-white ms-2 btn-md add-bed-history-btn">
-                                                            <i class="ti ti-plus me-1"></i>Add Bed History
-                                                        </button>
+                                                        {{-- This tab is for treatment history; bed-history actions must not appear here --}}
                                                     </div>
                                                 </div>
                                                 <!-- Table start -->
@@ -4470,10 +4461,12 @@
                                                             placeholder="Search">
                                                     </div>
                                                     <div class="text-end d-flex">
-                                                        <button type="button"
-                                                            class="btn btn-primary text-white ms-2 btn-md add-bed-history-btn">
-                                                            <i class="ti ti-plus me-1"></i>Add Bed History
-                                                        </button>
+                                                        @if ($ipd->discharged != 'yes')
+                                                            <button type="button"
+                                                                class="btn btn-primary text-white ms-2 btn-md add-bed-history-btn">
+                                                                <i class="ti ti-plus me-1"></i>Add Bed History
+                                                            </button>
+                                                        @endif
                                                     </div>
                                                 </div>
                                                 <!-- Table start -->
@@ -4486,7 +4479,9 @@
                                                                 <th>From Date</th>
                                                                 <th>To Date</th>
                                                                 <th>Active</th>
-                                                                <th>Action</th>
+                                                                @if ($ipd->discharged != 'yes')
+                                                                    <th>Action</th>
+                                                                @endif
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -4503,7 +4498,8 @@
                                                                     </td>
                                                                     <td>{{ $history->is_active === 'yes' ? 'Yes' : 'No' }}
                                                                     </td>
-                                                                    <td>
+                                                                    @if ($ipd->discharged != 'yes')
+                                                                        <td>
                                                                         @php
                                                                             $daywiseCharge = \App\Models\IpdDaywiseBedCharge::where(
                                                                                 'ipd_id',
@@ -4540,7 +4536,8 @@
                                                                             title="Edit">
                                                                             <i class="ti ti-edit"></i>
                                                                         </button>
-                                                                    </td>
+                                                                        </td>
+                                                                    @endif
                                                                 </tr>
                                                             @endforeach
 
