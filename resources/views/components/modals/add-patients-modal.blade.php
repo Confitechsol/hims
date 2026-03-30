@@ -91,7 +91,7 @@
 
                                 {{-- Gender --}}
                                 <div class="col-md-3">
-                                    <label for="gender" class="form-label">Gender</label>
+                                    <label for="gender" class="form-label">Gender*</label>
                                     <select name="gender" class="form-control @error('gender') is-invalid @enderror">
                                         <option value="">Select</option>
                                         <option value="Male" {{ old('gender') == 'Male' ? 'selected' : '' }}>Male
@@ -109,7 +109,7 @@
 
                                 {{-- DOB --}}
                                 <div class="col-md-4">
-                                    <label for="birth_date" class="form-label">Date of Birth</label>
+                                    <label for="birth_date" class="form-label">Date of Birth*</label>
                                     <input type="date" id="birth_date" name="birth_date"
                                         class="form-control @error('birth_date') is-invalid @enderror"
                                         value="{{ old('birth_date') }}" />
@@ -183,7 +183,7 @@
                                 {{-- Marital Status --}}
                                 <div class="col-md-3">
                                     <label for="marital_status" class="form-label">Marital
-                                        Status</label>
+                                        Status*</label>
                                     <select name="marital_status"
                                         class="form-control @error('marital_status') is-invalid @enderror">
                                         <option value="">Select</option>
