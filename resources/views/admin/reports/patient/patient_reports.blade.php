@@ -39,8 +39,9 @@
                                 <label class="form-label">
                                     Date From <span class="text-danger">*</span>
                                 </label>
-                                <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}"
-                                    max="{{ now()->toDateString() }}">
+                                {{-- <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}"
+                                    max="{{ now()->toDateString() }}"> --}}
+                                <input type="date" id="from_date">
                             </div>
 
                             {{-- Date To --}}
@@ -48,14 +49,16 @@
                                 <label class="form-label">
                                     Date To <span class="text-danger">*</span>
                                 </label>
-                                <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}"
-                                    max="{{ now()->toDateString() }}">
+                                {{-- <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}"
+                                    max="{{ now()->toDateString() }}"> --}}
+                                <input type="date" id="to_date">
                             </div>
 
                             {{-- Export --}}
                             <div class="col-md-3 mt-4">
-                                <button class="btn btn-success" onclick="exportToExcel('ipd-reports-table')">Export to
-                                    Excel</button>
+                                <button type="button" class="btn btn-success" onclick="exportAllData()">
+                                    Export to Excel
+                                </button>
                                 <button class="btn btn-danger" onclick="exportToPDF('ipd-reports-table')">Export to
                                     PDF</button>
                             </div>
@@ -137,6 +140,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <script>
         $(document).ready(function () {
@@ -148,5 +152,129 @@
             });
         });
     </script>
+    <script>
+function exportAllData() {
+    let fromDate = document.getElementById('from_date').value;
+    let toDate = document.getElementById('to_date').value;
+
+    if (!fromDate || !toDate) {
+        alert("Please select date range");
+        return;
+    }
+
+    fetch(`{{ url('/patient-report') }}?from_date=${fromDate}&to_date=${toDate}`)
+        .then(response => response.json())
+        .then(data => {
+
+            let excelData = [];
+
+            // Header
+            excelData.push([
+                "ID",
+                "ADM DT",
+                "PATIENT NAME",
+                "DATE OF BIRTH",
+                "AGE",
+                "SEX",
+                "MOBILE NO",
+                "AREA",
+                "UNDER DOCTOR",
+                "Location",
+                "DISTRICT",
+                "STATE",
+              //  "Department",
+              "M. Exe",
+              "Language",
+             "NEWS Paper",
+             "MONTH"
+                
+            ]);
+
+                        // Rows
+            (data.data || []).forEach(item => {
+                // For each ipds row, export a row with correct doctor and m.exe
+                if (item.ipds && item.ipds.length > 0) {
+                    item.ipds.forEach(ipd => {
+                        // UNDER DOCTOR: if cons_doctor matches doctor.id, show doctor.name, else blank
+                        let doctorName = '';
+                        if (
+                            ipd.doctor &&
+                            ipd.doctor.id &&
+                            ipd.cons_doctor &&
+                            String(ipd.doctor.id) === String(ipd.cons_doctor)
+                        ) {
+                            doctorName = ipd.doctor.name;
+                        }
+                        // M. Exe: refference field
+                        let mExe = ipd.refference || '';
+                        // Get month name from created_at
+                        let monthName = '';
+                        if (item.created_at) {
+                            const dateObj = new Date(item.created_at);
+                            if (!isNaN(dateObj)) {
+                                monthName = dateObj.toLocaleString('default', { month: 'long' });
+                            }
+                        }
+                        excelData.push([
+                            item.id,
+                            item.created_at,
+                            item.patient_name,
+                            item.dob,
+                            item.age,
+                            item.gender,
+                            item.mobileno,
+                            item.area,
+                            doctorName,
+                            item.address,
+                            (item.district_name && item.district_name.name) ? item.district_name.name : item.district,
+                            (item.state_name && item.state_name.name) ? item.state_name.name : item.state,
+                            mExe,
+                            Array.isArray(item.languages_speak) ? item.languages_speak.join(', ') : item.languages_speak,
+                            item.newspaper_preference,
+                            monthName
+                        ]);
+                    });
+                } else {
+                    // If no ipds, still export a row
+                    let monthName = '';
+                    if (item.created_at) {
+                        const dateObj = new Date(item.created_at);
+                        if (!isNaN(dateObj)) {
+                            monthName = dateObj.toLocaleString('default', { month: 'long' });
+                        }
+                    }
+                    excelData.push([
+                        item.id,
+                        item.created_at,
+                        item.patient_name,
+                        item.dob,
+                        item.age,
+                        item.gender,
+                        item.mobileno,
+                        item.area,
+                        '', // doctorName
+                        item.address,
+                        (item.district_name && item.district_name.name) ? item.district_name.name : item.district,
+                        (item.state_name && item.state_name.name) ? item.state_name.name : item.state,
+                        '', // mExe
+                        Array.isArray(item.languages_speak) ? item.languages_speak.join(', ') : item.languages_speak,
+                        item.newspaper_preference,
+                        monthName
+                    ]);
+                }
+            });
+
+            let ws = XLSX.utils.aoa_to_sheet(excelData);
+            let wb = XLSX.utils.book_new();
+
+            XLSX.utils.book_append_sheet(wb, ws, "Patients");
+
+            XLSX.writeFile(wb, "Patient_Report.xlsx");
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+}
+</script>
 
 @endsection
