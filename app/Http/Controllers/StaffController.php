@@ -77,6 +77,7 @@ class StaffController extends Controller
         $request->validate([
             'employee_id' => 'required',
             'name' => 'required',
+            'role' => 'required',
             'email' => 'nullable|email',
            
         ]);
@@ -115,7 +116,7 @@ class StaffController extends Controller
         $staff->identification_number = $request->identification_number;
         $staff->local_identification_number = $request->local_identification_number;
         $staff->password = '123456';
-        $staff->user_id = '123456';
+        $staff->user_id = '0';
         $staff->is_active = '1';
 
         if ($request->file('file')) {
@@ -134,6 +135,7 @@ class StaffController extends Controller
         $request->validate([
             'employee_id' => 'required',
             'name' => 'required',
+            'role' => 'required',
             'email' => 'required|email',
         ]);
 
