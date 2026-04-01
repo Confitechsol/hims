@@ -151,7 +151,7 @@ class DoctorController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'doctor_id' => 'required',
+            
             'name' => 'required',
             'email' => 'required|email',
         ]);
