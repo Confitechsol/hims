@@ -55,7 +55,7 @@
                             </div>
 
                             {{-- Export --}}
-                            <div class="col-md-3 mt-4">
+                            <div class="col-md-3">
                                 <button type="button" class="btn btn-success" onclick="exportAllData()">
                                     Export to Excel
                                 </button>
@@ -140,7 +140,8 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/js/select2.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Use XLSX-STYLE library to support formatting -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-style@latest/dist/xlsx.full.min.js"></script>
 
     <script>
         $(document).ready(function () {
@@ -168,6 +169,18 @@ function exportAllData() {
 
             let excelData = [];
 
+            excelData.push(["SAMARITAN CLINIC PVT. LTD."]);
+            excelData.push(["10/4D, ELGIN ROAD"]);
+            excelData.push([""]);
+            excelData.push(["KOLKATA"]);
+            excelData.push([""]);
+            excelData.push([""]);
+            excelData.push(["DOCTOR WISE ADMISSION REGISTER (PACKAGE)"]);
+            excelData.push([`From: ${fromDate} To: ${toDate}`]);
+            excelData.push([""]); 
+
+        
+
             // Header
             excelData.push([
                 "ID",
@@ -182,7 +195,7 @@ function exportAllData() {
                 "Location",
                 "DISTRICT",
                 "STATE",
-              //  "Department",
+              //"Department",
               "M. Exe",
               "Language",
              "NEWS Paper",
@@ -264,17 +277,49 @@ function exportAllData() {
                 }
             });
 
-            let ws = XLSX.utils.aoa_to_sheet(excelData);
-            let wb = XLSX.utils.book_new();
+           // ✅ CREATE SHEET
+        let ws = XLSX.utils.aoa_to_sheet(excelData);
 
-            XLSX.utils.book_append_sheet(wb, ws, "Patients");
-
-            XLSX.writeFile(wb, "Patient_Report.xlsx");
-        })
-        .catch(error => {
-            console.error("Error:", error);
-        });
-}
-</script>
-
+                 // MERGE HEADER ROWS
+         ws['!merges'] = [
+             { s: { r: 0, c: 0 }, e: { r: 0, c: 15 } },
+             { s: { r: 1, c: 0 }, e: { r: 1, c: 15 } },
+             { s: { r: 3, c: 0 }, e: { r: 3, c: 15 } },
+             { s: { r: 4, c: 0 }, e: { r: 4, c: 15 } }
+         ];
+         
+                // CENTER + BOLD HEADER FUNCTION
+         function centerRow(row) {
+             for (let col = 0; col <= 15; col++) {
+                 let cell = XLSX.utils.encode_cell({ r: row, c: col });
+                 if (!ws[cell]) continue;
+                 ws[cell].s = {
+                     alignment: { horizontal: "center" },
+                     font: { bold: true }
+                 };
+             }
+         }
+         
+         // APPLY STYLE
+         centerRow(0);
+         centerRow(1);
+         centerRow(3);
+         centerRow(4);
+         
+                 // ✅ CREATE WORKBOOK
+                 let wb = XLSX.utils.book_new();
+                 XLSX.utils.book_append_sheet(wb, ws, "Patients");
+         
+                 // ✅ DOWNLOAD
+                 XLSX.writeFile(wb, "Patient_Report.xlsx");
+         
+             })
+             .catch(error => {
+                 console.error("Error:", error);
+             });
+         
+         }
+         </script>
+         
+         
 @endsection
