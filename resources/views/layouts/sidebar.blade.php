@@ -572,6 +572,9 @@
                                 <li><a href="{{ route('patient-reports-index') }}"
                                         class="{{ request()->routeIs('patient-reports-index') ? 'active' : '' }}">Patient
                                         Report</a></li>
+                                <li><a href="{{ route('hospital-reports-index') }}"
+                                        class="{{ request()->routeIs('hospital-reports-index') ? 'active' : '' }}">Hospital
+                                        Report</a></li>
                                 <!-- <li><a href="{{ route('finance') }}"  class="{{ request()->routeIs('death') ? 'active' : '' }}">Appointment
                                             Report</a></li> -->
 
