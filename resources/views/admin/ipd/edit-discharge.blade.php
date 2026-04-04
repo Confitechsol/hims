@@ -60,6 +60,14 @@
     .ck-editor__editable {
         min-height: 250px;
     }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem 1rem 0;
+        background: white;
+        justify-content: flex-end;
+    }
 </style>
 
 @section('content')
@@ -90,6 +98,8 @@
                     @method('PUT')
 
                     <input type="hidden" name="ipd_details_id" value="{{ $dischargeData->ipd_details_id }}">
+                    <input type="hidden" name="is_draft" value="{{ $dischargeData->is_draft == 1 ? 'true' : 'false' }}"
+                        id="is-Draft">
 
                     <!-- BASIC INFORMATION -->
 
@@ -539,11 +549,24 @@
                         </div>
                     </div>
                     <hr class="my-4">
-                    <div class="text-end w-100">
-                        <button type="submit" class="btn btn-primary">
-                            Update Discharge
-                        </button>
-                    </div>
+
+                    @if ($dischargeData->is_draft == 1)
+                        <div class="action-buttons d-flex justify-content-end gap-2">
+                            <button type="submit" class="btn btn-outline-secondary">
+                                Update Draft
+                            </button>
+
+                            <button type="submit" class="btn btn-primary" id="final-submit">
+                                Final Discharge
+                            </button>
+                        </div>
+                    @else
+                        <div class="text-end w-100">
+                            <button type="submit" class="btn btn-primary">
+                                Update Discharge
+                            </button>
+                        </div>
+                    @endif
 
                 </form>
 
@@ -842,7 +865,8 @@
                     row.remove(); // remove empty row
                 }
             });
-
+            const isFinalSubmit = e.submitter && e.submitter.id === 'final-submit';
+            document.getElementById('is-Draft').value = isFinalSubmit ? "false" : "true";
             // ✅ IMPORTANT FIX
             const form = this;
             if (document.querySelectorAll('.med-row').length === 0) {

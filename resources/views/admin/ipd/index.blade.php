@@ -80,12 +80,30 @@
                                                     </div>
                                                 </div>
                                                 <div class="me-2">
-                                                    <input type="date" name="from_date" value="{{ request('from_date') }}"
-                                                        class="form-control shadow-sm" title="From date">
+                                                    <input type="date" name="from_date"
+                                                        value="{{ request('from_date') }}" class="form-control shadow-sm"
+                                                        title="From date">
                                                 </div>
                                                 <div class="me-2">
                                                     <input type="date" name="to_date" value="{{ request('to_date') }}"
                                                         class="form-control shadow-sm" title="To date">
+                                                </div>
+                                                <div class="me-2">
+                                                    <select name="draft_filter" class="form-select shadow-sm pe-5"
+                                                        title="Discharge Status">
+
+                                                        <option value="">All</option>
+
+                                                        <option value="draft"
+                                                            {{ request('draft_filter') == 'draft' ? 'selected' : '' }}>
+                                                            Drafts
+                                                        </option>
+
+                                                        <option value="yes"
+                                                            {{ request('draft_filter') == 'yes' ? 'selected' : '' }}>
+                                                            Final
+                                                        </option>
+                                                    </select>
                                                 </div>
                                                 <div>
                                                     <button class="btn btn-primary" type="submit">Search</button>
@@ -146,7 +164,8 @@
                                             <tbody>
                                                 @foreach ($ipd as $ipdDetails)
                                                     <tr>
-                                                        <td>{{ ($ipd->currentPage() - 1) * $ipd->perPage() + $loop->iteration }}</td>
+                                                        <td>{{ ($ipd->currentPage() - 1) * $ipd->perPage() + $loop->iteration }}
+                                                        </td>
                                                         <td><a href="{{ route('ipd.show', ['id' => $ipdDetails->id]) }}"
                                                                 class="text-primary">{{ $ipdDetails->ipd_no }}</a>
                                                         </td>
@@ -233,11 +252,22 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
+                                                    @if ($ipd->isEmpty())
+                                                        <tr>
+                                                            <td colspan="13" class="text-center">No records found.</td>
+                                                        </tr>
+                                                    @endif
                                                     @foreach ($ipd as $ipdDetails)
                                                         <tr>
                                                             <td>{{ $loop->iteration }}</td>
                                                             <td><a href="{{ route('ipd.show', ['id' => $ipdDetails->id]) }}"
                                                                     class="text-primary">{{ $ipdDetails->ipd_no }}</a>
+                                                                @if (strtolower(trim($ipdDetails->discharged)) === 'draft')
+                                                                    <span
+                                                                        class="badge bg-warning-subtle text-warning ms-2">
+                                                                        Draft
+                                                                    </span>
+                                                                @endif
                                                             </td>
                                                             <td>{{ $ipdDetails->patient->patient_name }}
                                                             </td>

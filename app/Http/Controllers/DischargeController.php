@@ -69,6 +69,7 @@ class DischargeController extends Controller
             'doctor_advice'      => ['nullable', 'string'],
             'discharged_by'      => ['nullable', 'string'],
             'current_user'       => ['nullable', 'string'],
+            'isDraft'            => ['nullable', 'string'],
         ]);
 
         // dd($validated);
@@ -122,12 +123,6 @@ class DischargeController extends Controller
             $implodedIntervals = ! empty($finalIntervals) ? implode(", ", $finalIntervals) : null;
             $implodedDurations = ! empty($finalDurations) ? implode("||", $finalDurations) : null;
             $implodedDates     = ! empty($finalDates) ? implode("||", $finalDates) : null;
-            // $durations         = array_filter((array) $request->med_duration, fn($d) => $d !== null && $d !== '');
-            // $implodedMeds      = implode(", ", $meds);
-            // $implodedMedTypes  = implode(", ", $medTypes);
-            // $implodedIntervals = implode(", ", $intervals);
-            // $implodedDurations = implode("||", $durations);
-            // $durationsJson     = json_encode(array_values($durations));
             // dd($implodedDates);
             $barcodePayload = [
                 'type'               => 'DISCHARGE',
@@ -241,17 +236,27 @@ class DischargeController extends Controller
                 'intervals'          => $implodedIntervals ?? null,
                 'durations'          => $implodedDurations ?? null,
                 'med_dates'          => $implodedDates ?? null,
+                'is_draft'           => $validated['isDraft'] === "true" ? 1 : 0,
 
                 'doctor_advice'      => $validated['doctor_advice'] ?? null,
                 'discharged_by'      => $validated['discharged_by'] ?? null,
                 'created_by'         => Auth::id(),
             ]);
-
+            // dd($discharge);
             // -------------------------------
             // 🔹 Mark IPD as Discharged
             // -------------------------------
+            if ($validated['isDraft'] === "true") {
+                IpdDetail::where('id', $validated['ipd_details_id'])
+                    ->update(['discharged' => 'draft', 'discharged_date' => now()]);
+
+                DB::commit();
+                return redirect()
+                    ->back()
+                    ->with('success', 'Discharge details saved as draft.');
+            }
             IpdDetail::where('id', $validated['ipd_details_id'])
-                ->update(['discharged' => 'yes']);
+                ->update(['discharged' => 'yes', 'discharged_date' => now()]);
 
             DB::commit();
 
@@ -393,6 +398,7 @@ class DischargeController extends Controller
             'doctor_advice'      => ['nullable', 'string'],
             'discharged_by'      => ['nullable', 'string'],
             'current_user'       => ['nullable', 'string'],
+            'is_draft'           => ['nullable', 'string'],
         ]);
 
         // dd($validated);
@@ -553,12 +559,22 @@ class DischargeController extends Controller
                 'durations'          => $implodedDurations ?? null,
                 'med_dates'          => $implodedDates ?? null,
                 'doctor_advice'      => $validated['doctor_advice'] ?? null,
+                'is_draft'           => $validated['is_draft'] == "true" ? 1 : 0,
             ]);
 
+            if ($validated['is_draft'] == "false") {
+                IpdDetail::where('id', $validated['ipd_details_id'])
+                    ->update(['discharged' => 'yes', 'discharged_date' => now()]);
+
+                DB::commit();
+                return redirect()
+                    ->route('ipd', ['tab' => 'discharge'])
+                    ->with('success', 'Patient discharged successfully.');
+            }
             DB::commit();
 
             return redirect()
-                ->route('ipd')
+                ->route('ipd', ['tab' => 'discharge'])
                 ->with('success', 'Discharge Updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();

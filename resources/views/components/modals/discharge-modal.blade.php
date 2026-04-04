@@ -424,7 +424,7 @@
                     @csrf
                     <!-- Basic Information Section -->
                     <input type="hidden" name="ipd_details_id" id="ipd-id">
-
+                    <input type="hidden" name="isDraft" id="isDraft" value="false">
                     <h5 class="section-title mt-4">
                         <i class="bi bi-person-badge"></i>
                         Basic Information
@@ -933,10 +933,10 @@
                             <i class="bi bi-x-circle"></i>
                             Cancel
                         </button>
-                        {{-- <button type="submit" class="btn btn-outline-primary" id="as-draft">
+                        <button type="submit" class="btn btn-outline-primary" id="as-draft">
                             <i class="bi bi-check-circle"></i>
                             Save As Draft
-                        </button> --}}
+                        </button>
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-circle"></i>
                             Submit
@@ -1303,11 +1303,27 @@
     });
 </script>
 
+{{-- <script>
+    let isDraftClicked = false;
+
+    document.getElementById('as-draft').addEventListener('click', function() {
+        isDraftClicked = true;
+        document.getElementById('isDraft').value = "true";
+
+        document.getElementById('patientDischargeForm').dispatchEvent(new Event('submit'));
+    });
+</script> --}}
 <script>
     document.getElementById('patientDischargeForm').addEventListener('submit', function(e) {
 
         e.preventDefault(); // ⛔ stop immediate submit
         const form = this;
+
+        // if (!isDraftClicked) {
+        //     document.getElementById('isDraft').value = "false";
+        // }
+        const isDraft = e.submitter && e.submitter.id === 'as-draft';
+        document.getElementById('isDraft').value = isDraft ? "true" : "false";
 
         // Dummy payment status (for now)
         const isPaymentCleared = window.outstanding == 0; // 🔁 change later with real API

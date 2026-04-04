@@ -82,6 +82,7 @@ return new class extends Migration
             // 🔹 Meta
             $table->string('discharged_by', 255)->nullable()->index();
             $table->unsignedBigInteger('created_by')->nullable()->index();
+            $table->tinyInteger('is_draft')->nullable()->default(0);
 
             $table->timestamps();
         });
