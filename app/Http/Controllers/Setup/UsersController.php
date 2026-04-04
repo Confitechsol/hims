@@ -134,6 +134,9 @@ class UsersController extends Controller
         $user->is_active   = 1;
         $user->save();
 
+        $staff->user_id = $user->id;
+        $staff->save();
+
         return back()->with('success', 'Credentials created! Password: ' . $password);
     }
     public function showChangePassword()

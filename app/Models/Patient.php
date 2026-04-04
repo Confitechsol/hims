@@ -7,6 +7,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Patient extends Model
 {
+    /**
+     * Get the district for the patient.
+     */
+    public function districtName()
+    {
+        return $this->belongsTo(\App\Models\District::class, 'district');
+    }
+
+    /**
+     * Get the state for the patient.
+     */
+    public function stateName()
+    {
+        return $this->belongsTo(\App\Models\State::class, 'state');
+    }
     use HasFactory;
 
     use SoftDeletes;
@@ -65,6 +80,7 @@ class Patient extends Model
         'newspaper_preference',
         'occupation',
         'police_station',
+        'pin_code',
     ];
 
     protected $casts = [

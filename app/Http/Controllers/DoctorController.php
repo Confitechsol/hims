@@ -43,6 +43,11 @@ class DoctorController extends Controller
     //     'message' => 'Staff list fetched successfully',
     //     'data' => $staffs
     // ]);
+    if ($request->has('search')) {
+        return response()->json([
+            'result' => $doctors
+        ]);
+    }
     return view('admin.doctor.doctors', compact('doctors', 'perPage', 'search'));
    }
     public function create()
@@ -146,7 +151,7 @@ class DoctorController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'doctor_id' => 'required',
+            
             'name' => 'required',
             'email' => 'required|email',
         ]);

@@ -704,7 +704,7 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label class="form-label">Prescribe By <span class="text-danger">*</span></label>
-                                        <select class="form-control select2" style="width: 100%" name="prescribe_by" id="prescribe_by" required>
+                                        {{-- <select class="form-control select2" style="width: 100%" name="prescribe_by" id="prescribe_by" required>
                                             <option value="">Select Doctor</option>
                                             @php
                                                 $doctors = \App\Models\Doctor::all();
@@ -712,7 +712,20 @@
                                             @foreach($doctors as $doctor)
                                                 <option value="{{ $doctor->id }}">{{ $doctor->name }} ({{ $doctor->doctor_id ?? 'N/A' }})</option>
                                             @endforeach
-                                        </select>
+                                        </select> --}}
+                                        <select class="form-control select2" style="width: 100%" name="prescribe_by" id="prescribe_by" required>
+                                          <option value="">Select Doctor</option>
+                                      
+                                          @php
+                                              $doctors = \App\Models\Doctor::all();
+                                          @endphp
+                                      
+                                          @foreach($doctors as $doctor)
+                                              <option value="{{ $doctor->id }}">
+                                                  {{ $doctor->name }} {{ $doctor->surname }} ({{ $doctor->doctor_id ?? 'N/A' }})
+                                              </option>
+                                          @endforeach
+                                      </select>
                                     </div>
                                 </div>
                                 <div class="col-sm-12 mt-3">

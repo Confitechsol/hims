@@ -1,9 +1,12 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Bed;
 use App\Models\DischargeCard;
 use App\Models\Doctor;
 use App\Models\IpdDetail;
+use App\Models\PatientBedHistory;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -242,7 +245,16 @@ class DischargeController extends Controller
                 'discharged_by'      => $validated['discharged_by'] ?? null,
                 'created_by'         => Auth::id(),
             ]);
-            // dd($discharge);
+
+            // -------------------------------
+            // 🔹 Close bed history & release bed(s) (same pattern as IPD bed transfer)
+            // -------------------------------
+            $dischargeAt = $this->parseDischargeDateTimeForBedHistory(
+                $validated['discharge_date'] ?? null,
+                $validated['discharge_time'] ?? null
+            );
+            $this->releaseBedsAndCloseHistory((int) $validated['ipd_details_id'], $dischargeAt);
+
             // -------------------------------
             // 🔹 Mark IPD as Discharged
             // -------------------------------
@@ -256,7 +268,10 @@ class DischargeController extends Controller
                     ->with('success', 'Discharge details saved as draft.');
             }
             IpdDetail::where('id', $validated['ipd_details_id'])
-                ->update(['discharged' => 'yes', 'discharged_date' => now()]);
+                ->update([
+                    'discharged'      => 'yes',
+                    'discharged_date' => $validated['discharge_date'],
+                ]);
 
             DB::commit();
 
@@ -502,7 +517,11 @@ class DischargeController extends Controller
             $barcodeBinary = base64_decode($barcodePngBase64);
             // dd($barcodeBinary);
             // dd($validated);
-            $discharge = DischargeCard::findOrFail($id);
+            $discharge      = DischargeCard::findOrFail($id);
+            $oldDischargeAt = $this->parseDischargeDateTimeForBedHistory(
+                $this->dischargeDateToString($discharge->discharge_date),
+                $discharge->discharge_time
+            );
             // dd($discharge);
             $discharge->update([
                 'ipd_details_id'     => $validated['ipd_details_id'],
@@ -571,6 +590,19 @@ class DischargeController extends Controller
                     ->route('ipd', ['tab' => 'discharge'])
                     ->with('success', 'Patient discharged successfully.');
             }
+            $newDischargeAt = $this->parseDischargeDateTimeForBedHistory(
+                $validated['discharge_date'],
+                $validated['discharge_time'] ?? null
+            );
+            $this->syncBedHistoryToDateOnDischargeEdit(
+                (int) $validated['ipd_details_id'],
+                $oldDischargeAt,
+                $newDischargeAt
+            );
+
+            IpdDetail::where('id', $validated['ipd_details_id'])
+                ->update(['discharged_date' => $validated['discharge_date']]);
+
             DB::commit();
 
             return redirect()
@@ -584,5 +616,84 @@ class DischargeController extends Controller
                 ->withInput();
         }
 
+    }
+
+    /**
+     * Normalize discharge_date from DB / model to Y-m-d for parsing.
+     */
+    private function dischargeDateToString($dischargeDate): ?string
+    {
+        if ($dischargeDate === null || $dischargeDate === '') {
+            return null;
+        }
+        if ($dischargeDate instanceof \DateTimeInterface) {
+            return $dischargeDate->format('Y-m-d');
+        }
+
+        return trim((string) $dischargeDate);
+    }
+
+    /**
+     * Single datetime for bed history end / release, aligned with discharge card.
+     */
+    private function parseDischargeDateTimeForBedHistory(?string $dischargeDate, $dischargeTime): Carbon
+    {
+        $dischargeDate = $dischargeDate !== null ? trim($dischargeDate) : '';
+        if ($dischargeDate === '') {
+            return Carbon::now();
+        }
+        $timeStr = $dischargeTime !== null ? trim((string) $dischargeTime) : '';
+        if ($timeStr === '') {
+            return Carbon::parse($dischargeDate)->endOfDay();
+        }
+        try {
+            return Carbon::parse($dischargeDate . ' ' . $timeStr);
+        } catch (\Throwable $e) {
+            return Carbon::parse($dischargeDate)->endOfDay();
+        }
+    }
+
+    /**
+     * End active patient_bed_history rows and mark beds available (Bed.is_active = yes).
+     */
+    private function releaseBedsAndCloseHistory(int $ipdDetailsId, Carbon $dischargeAt): void
+    {
+        $toDate = $dischargeAt->format('Y-m-d H:i:s');
+
+        $bedIds = PatientBedHistory::where('ipd_id', $ipdDetailsId)
+            ->where('is_active', 'yes')
+            ->pluck('bed_id')
+            ->filter()
+            ->unique()
+            ->values();
+
+        PatientBedHistory::where('ipd_id', $ipdDetailsId)
+            ->where('is_active', 'yes')
+            ->update([
+                'to_date'   => $toDate,
+                'is_active' => 'no',
+            ]);
+
+        foreach ($bedIds as $bedId) {
+            Bed::where('id', $bedId)->update(['is_active' => 'yes']);
+        }
+    }
+
+    /**
+     * When discharge date/time is edited, move matching closed history to_date to the new moment.
+     */
+    private function syncBedHistoryToDateOnDischargeEdit(int $ipdDetailsId, Carbon $oldDischargeAt, Carbon $newDischargeAt): void
+    {
+        if (abs($oldDischargeAt->diffInSeconds($newDischargeAt)) < 2) {
+            return;
+        }
+        $from = $oldDischargeAt->copy()->subMinute()->format('Y-m-d H:i:s');
+        $to   = $oldDischargeAt->copy()->addMinute()->format('Y-m-d H:i:s');
+
+        PatientBedHistory::where('ipd_id', $ipdDetailsId)
+            ->where('is_active', 'no')
+            ->whereNotNull('to_date')
+            ->whereBetween('to_date', [$from, $to])
+            ->update(['to_date' => $newDischargeAt->format('Y-m-d H:i:s')]);
     }
 }

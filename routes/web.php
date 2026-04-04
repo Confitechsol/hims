@@ -90,6 +90,7 @@ use App\Http\Controllers\TransactionReportController;
 use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PatientReportController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -181,6 +182,13 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/patients/import', [PatientController::class, 'import'])->name('patient-import');
     Route::post('/patients/bulk-import', [PatientController::class, 'bulkImport'])->name('patients.import');
     Route::get('/patients/export', [PatientController::class, 'exportPatientsExcel'])->name('patients.export');
+    Route::get('/districts', [PatientController::class, 'district']);
+    Route::get('/states', [PatientController::class, 'state']);
+    Route::get('/report/patient', [PatientReportController::class, 'patientReport'])->name('patient-report');
+    Route::get('/patient-report', [PatientReportController::class, 'patientReportApi']);    
+
+    
+
 
     Route::get('/languages', [LanguagesController::class, 'index'])->name('languages');
     Route::post('/languages/create', [LanguagesController::class, 'store'])->name('languages.store');
@@ -856,8 +864,8 @@ Route::prefix('pharmacy')->group(function () {
             return 'Purchase route is working! Route order fixed.';
         });
         Route::get('/test-create', function () {
-            $suppliers  = \App\Models\MedicineSupplier::all();
-            $medicines  = \App\Models\Pharmacy::where('is_active', 'yes')->get();
+            $suppliers = \App\Models\MedicineSupplier::all();
+            $medicines = \App\Models\Pharmacy::where('is_active', 'yes')->get();
             $categories = \App\Models\MedicineCategory::all();
             return view('admin.pharmacy.purchase.test', compact('suppliers', 'medicines', 'categories'));
         });
@@ -1082,7 +1090,8 @@ Route::post('/radiology_import', [ExcelImportController::class, 'importRadiology
 Route::get('/radiology_test_export', [ExcelImportController::class, 'exportRadiologyTestExcel'])->name('radiologyTests.export');
 
 Route::prefix('reports')->group(function () {
-    Route::get('/finance', function () {return view('admin.reports.finance.index');})->name('finance');
+    Route::get('/finance', function () {
+        return view('admin.reports.finance.index'); })->name('finance');
     Route::get('/inventory', [InventoriesController::class, 'reports'])->name('inventory-reports');
     Route::get('/inventory-stock', [InventoriesController::class, 'stockReports'])->name('inventory-stock-reports');
     Route::get('/inventory-item', [InventoriesController::class, 'itemReports'])->name('inventory-item-reports');
@@ -1172,3 +1181,29 @@ Route::prefix('medicines')->group(function () {
     Route::post('/medicine_master_import', [ExcelImportController::class, 'importMedicineMasterExcel'])->name('medicineMaster.import');
 
 });
+
+
+// Patient report view
+
+Route::get('/reports/patient-reports-index', function () {
+    return view('admin.reports.patient.index');
+})->name('patient-reports-index');
+
+Route::get('/reports/patient-reports', function () {
+    return view('admin.reports.patient.patient_reports');
+})->name('patient-reports');
+
+    Route::get('/patient-reports', [PatientReportController::class, 'patientReport'])->name('patient.patient_reports');
+
+
+    // Patient report view
+
+Route::get('/reports/hospital-reports-index', function () {
+    return view('admin.reports.hospital.index');
+})->name('hospital-reports-index');
+
+Route::get('/reports/hospital-reports', function () {
+    return view('admin.reports.hospital.hospital_reports');
+})->name('hospital-reports');
+
+    // Route::get('/hospital-reports', [PatientReportController::class, 'hospitalReport'])->name('hospital.hospital_reports');
