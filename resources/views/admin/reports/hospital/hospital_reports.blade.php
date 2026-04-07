@@ -23,15 +23,15 @@
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Patient Report </h5>
+                        <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Hospital Report </h5>
                         <a href="reports/patient-reports-index" class="text-white fw-bold"><i
                                 class="fa-solid fa-angles-left text-white"></i>
-                            Patient</a>
+                            Hospital</a>
                     </div>
                 </div>
 
                 <div class="card-body">
-                    <form action="{{ route('ipd.ipd_reports') }}" method="GET">
+                    <form action="" method="GET">
                         <div class="row align-items-center">
 
                             {{-- Date From --}}

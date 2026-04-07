@@ -118,25 +118,25 @@ class IpdViewController extends Controller
         $vitalDetails     = PatientVital::with('vital')->where('patient_id', $patient_id)->get();
         $radiologyReports = RadiologyReport::with('radiology')->where('patient_id', $ipd->patient->id)->get();
         $doctorvisits     = DoctorVisit::with(['patient', 'doctor'])->where('patient_id', $ipd->patient->id)->get();
-        if ($ipd->discharged == 'yes') {
+        if ($ipd->discharged == 'yes' || $ipd->discharged == 'draft') {
             $dischargeCard      = DischargeCard::where('ipd_details_id', $id)->firstOrFail();
             $ipd->dischargeCard = $dischargeCard;
             $medCombinations    = [];
             $meds               = array_map(function ($med) {
                 return trim($med) === '' ? '' : trim($med);
-            }, explode(',', $dischargeCard->medicines ?? ''));
+            }, explode(',', $dischargeCard->medicines ?? null));
 
             $medTypes = array_map(function ($types) {
                 return trim($types) === '' ? '' : trim($types);
-            }, explode(',', $dischargeCard->medicine_types ?? ''));
+            }, explode(',', $dischargeCard->medicine_types ?? null));
 
             $intervals = array_map(function ($inv) {
                 return trim($inv) === '' ? '' : trim($inv);
-            }, explode(',', $dischargeCard->intervals ?? ''));
+            }, explode(',', $dischargeCard->intervals ?? null));
 
             $medDates = array_map(function ($date) {
                 return trim($date) === '' ? '' : trim($date);
-            }, explode('||', $dischargeCard->med_dates ?? ''));
+            }, explode('||', $dischargeCard->med_dates ?? null));
             $rawDurations = $dischargeCard->durations ?? '';
 
             if (str_contains($rawDurations, '||')) {
@@ -218,7 +218,6 @@ class IpdViewController extends Controller
 
             }
 
-           
             if ($ipd->doctor && $ipd->doctor->signature) {
                 $ipd->dischargeCard->signature = $ipd->doctor->signature;
             }

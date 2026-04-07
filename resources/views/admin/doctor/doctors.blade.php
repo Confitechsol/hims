@@ -57,7 +57,7 @@
 
                                     </div>
                                     <div class="mb-3">
-                                        <input type="text" id="search-input" class="form-control" placeholder="Search for beds..."
+                                        <input type="text" id="search-input" class="form-control" placeholder="Search for doctors..."
                                         >
                                     </div>
                                     <form action="{{ route('doctors.bulkDelete') }}" method="POST" id="bulk-delete-form">

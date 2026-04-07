@@ -68,6 +68,7 @@ class DischargeCard extends Model
         'discharged_by',
         'barcode',
         'created_by',
+        'is_draft',
     ];
 
     // Casts for date/datetime fields
