@@ -153,7 +153,7 @@ class PatientController extends Controller
             'occupation'            => 'nullable|string|max:255',
             'police_station'        => 'nullable|string|max:255',
             'pin_code'               => 'nullable|string|max:20',
-            'department_name'      => 'nullable|string|max:255',
+            'department_name'      =>  'nullable|string|max:255',
         ]);
 
       //  dd($validated);
@@ -279,6 +279,7 @@ class PatientController extends Controller
             'national_id_number'    => 'nullable|string|max:50',
             'pin_code'               => 'nullable|string|max:20',
             'police_station'        => 'nullable|string|max:255',
+            'department_name'      => 'nullable|string|max:255',
         ]);
 
         if ($validated->fails()) {
@@ -339,6 +340,7 @@ class PatientController extends Controller
         'identification_number' => $data['national_id_number'] ?? null,
         'pin_code'             => $data['pin_code'] ?? null,
         'police_station'       => $data['police_station'] ?? null,
+        'department_name'      => $data['department_name'] ?? null,
         ]);
 
       // return redirect()->route('admin.setup.patients')->with('success', 'Patient updated successfully!');
