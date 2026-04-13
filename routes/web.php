@@ -185,7 +185,8 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/districts', [PatientController::class, 'district']);
     Route::get('/states', [PatientController::class, 'state']);
     Route::get('/report/patient', [PatientReportController::class, 'patientReport'])->name('patient-report');
-    Route::get('/patient-report', [PatientReportController::class, 'patientReportApi']);    
+    Route::get('/patient-report', [PatientReportController::class, 'patientReportApi']);
+    Route::get('/departments', [PatientController::class, 'departments']);    
 
     
 

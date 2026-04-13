@@ -51,7 +51,8 @@ return new class extends Migration
             $table->date('disable_at')->nullable();
             $table->string('occupation', 255)->nullable();
             $table->string('police_station', 255)->nullable();
-                $table->string('pin_code', 20)->nullable();
+            $table->string('pin_code', 20)->nullable();
+            $table->string('department_name', 200)->nullable();
 
             $table->timestamp('created_at')->useCurrent()->useCurrentOnUpdate();
         });

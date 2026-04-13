@@ -54,13 +54,21 @@
                                 <input type="date" id="to_date">
                             </div>
 
+
+                            <div class="col-md-3">
+                                <label class="form-label">
+                                    Area <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="area">
+                            </div>
+
                             {{-- Export --}}
                             <div class="col-md-3">
                                 <button type="button" class="btn btn-success" onclick="exportAllData()">
                                     Export to Excel
                                 </button>
-                                <button class="btn btn-danger" onclick="exportToPDF('ipd-reports-table')">Export to
-                                    PDF</button>
+                                {{-- <button class="btn btn-danger" onclick="exportToPDF('ipd-reports-table')">Export to
+                                    PDF</button> --}}
                             </div>
 
                             {{-- Buttons --}}
@@ -97,21 +105,51 @@
                                                         <tr>
 
 
-                                                            <th>IPD No</th>
+                                                            <th>Id</th>
+                                                            <th>Admission Date</th>
                                                             <th>Patient Name</th>
                                                             <th>Age</th>
                                                             <th>Gender</th>
                                                             <th>Mobile Number</th>
-                                                            <th>Guardian Name</th>
+                                                            <th>Area</th>
                                                             <th>Doctor Name </th>
-                                                            <th>Status</th>
-                                                            <th>Date</th>
+                                                            <th>Location</th>
+                                                            <th>DISTRICT</th>
+                                                            <th>STATE</th>
+                                                            <th>M. Exe</th>
+                                                            <th>Department</th>
+                                                            <th>Language</th>
+                                                            <th>NEWS Paper</th>
+                                                            
                                                         </tr>
                                                     </thead>
                                                     <tbody>
 
+                                                     @foreach ($patients as $patient)
+                                                       <tr>
+                                                           <td>{{ $patient->id }}</td>
+                                                           <td>{{ $patient->created_at->format('Y-m-d') }}</td>
+                                                           <td>{{ $patient->patient_name }}</td>
+                                                           <td>{{ $patient->age }}</td>
+                                                           <td>{{ $patient->gender }}</td>
+                                                           <td>{{ $patient->mobileno }}</td>
+                                                           <td>{{ $patient->area }}</td>
+                                                           <td>
+                                                               @foreach($patient->ipds as $ipd)
+                                                                   {{ $ipd->doctor->name ?? 'N/A' }}<br>
+                                                               @endforeach
+                                                           </td>
+                                                           <td>{{ $patient->address }}</td>
+                                                           <td>{{ $patient->districtName->name ?? 'N/A' }}</td>
 
-
+                                                            <td>{{ $patient->stateName->name ?? 'N/A' }}</td>
+                                                           <td>{{ $patient->medical_executive }}</td>
+                                                           <td>{{ $patient->department_name }}</td>
+                                                           <td>{{ implode(', ', $patient->languages_speak ?? []) }}</td>
+                                                           <td>{{ $patient->newspaper_preference }}</td>
+                                                           
+                                                       </tr>
+                                                  @endforeach
 
                                                     </tbody>
                                                 </table>
@@ -194,9 +232,9 @@ function exportAllData() {
                 "UNDER DOCTOR",
                 "Location",
                 "DISTRICT",
-                "STATE",
-              //"Department",
+                "STATE", 
               "M. Exe",
+              "Department",
               "Language",
              "NEWS Paper",
              "MONTH"
@@ -242,6 +280,7 @@ function exportAllData() {
                             (item.district_name && item.district_name.name) ? item.district_name.name : item.district,
                             (item.state_name && item.state_name.name) ? item.state_name.name : item.state,
                             mExe,
+                            Array.isArray(item.department_name) ? item.ddepartment_name.join(', ') : item.department_name,
                             Array.isArray(item.languages_speak) ? item.languages_speak.join(', ') : item.languages_speak,
                             item.newspaper_preference,
                             monthName
@@ -270,6 +309,7 @@ function exportAllData() {
                         (item.district_name && item.district_name.name) ? item.district_name.name : item.district,
                         (item.state_name && item.state_name.name) ? item.state_name.name : item.state,
                         '', // mExe
+                        Array.isArray(item.department_name) ? item.department_name.join(', ') : item.department_name,
                         Array.isArray(item.languages_speak) ? item.languages_speak.join(', ') : item.languages_speak,
                         item.newspaper_preference,
                         monthName
