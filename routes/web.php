@@ -1208,3 +1208,10 @@ Route::get('/reports/hospital-reports', function () {
 })->name('hospital-reports');
 
     // Route::get('/hospital-reports', [PatientReportController::class, 'hospitalReport'])->name('hospital.hospital_reports');
+Route::get('/reports/doctor-reports-index', function () {
+    return view('admin.reports.doctor.index');
+})->name('doctor-reports-index');
+
+Route::get('/reports/doctor-reports', function () {
+    return view('admin.reports.doctor.doctor_reports');
+})->name('doctor-reports');
