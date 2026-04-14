@@ -12,6 +12,7 @@ use App\Models\Finding;
 use App\Models\IpdCharges;
 use App\Models\IpdDaywiseBedCharge;
 use App\Services\BedOccupancyService;
+use App\Support\BedBillingPeriod;
 use App\Models\IpdDetail;
 use App\Models\IpdMedicine;
 use App\Models\IpdPatient;
@@ -276,15 +277,11 @@ class IpdController extends Controller
 
                 // Always create daywise bed charge when a bed is selected (so estimate/final bill include bed charges)
                 $admissionDate = Carbon::parse($request->admission_date);
-                $chargeDate    = $admissionDate->format('Y-m-d');
-
-                // Start: Previous day 10:01 AM
-                $periodStart = $admissionDate->copy()->subDay()->setTime(10, 1, 0);
-                // End: Current day 10:01 AM
-                $periodEnd = $admissionDate->copy()->setTime(10, 1, 0);
-
-                $periodStartDate = $periodStart->format('Y-m-d');
-                $periodEndDate   = $periodEnd->format('Y-m-d');
+                $chargeDay     = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($admissionDate);
+                $chargeDate    = $chargeDay->format('Y-m-d');
+                $periodDates   = BedBillingPeriod::periodStorageDatesForChargeDay($chargeDay, $admissionDate);
+                $periodStartDate = $periodDates['period_start_date'];
+                $periodEndDate   = $periodDates['period_end_date'];
 
                 IpdDaywiseBedCharge::updateOrCreate(
                     [
@@ -1786,7 +1783,6 @@ class IpdController extends Controller
 
         // --- Create bed charge entry for transfer date ---
         $transferDate = Carbon::parse($request->released_date);
-        $chargeDate   = $transferDate->format('Y-m-d');
 
         // Use on-the-fly bed charge if provided, otherwise fall back to bed group master
         $bedGroup      = BedGroup::find($request->bed_group);
@@ -1794,14 +1790,11 @@ class IpdController extends Controller
             ? (float) $request->bed_charge
             : (float) ($bedGroup->bed_cost ?? 0);
 
-        // Calculate period (10:01 AM to next 10:01 AM)
-        // Start: Previous day 10:01 AM
-        $periodStart = $transferDate->copy()->subDay()->setTime(10, 1, 0);
-        // End: Current day 10:01 AM
-        $periodEnd = $transferDate->copy()->setTime(10, 1, 0);
-
-        $periodStartDate = $periodStart->format('Y-m-d');
-        $periodEndDate   = $periodEnd->format('Y-m-d');
+        $chargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($transferDate);
+        $chargeDate = $chargeDay->format('Y-m-d');
+        $periodDates = BedBillingPeriod::periodStorageDatesForChargeDay($chargeDay, $transferDate);
+        $periodStartDate = $periodDates['period_start_date'];
+        $periodEndDate   = $periodDates['period_end_date'];
 
         // Create or update bed charge entry for transfer date
         IpdDaywiseBedCharge::updateOrCreate(
@@ -1905,9 +1898,9 @@ class IpdController extends Controller
                 ? (float) $request->bed_charge
                 : (float) ($history->bedGroup->bed_cost ?? 0);
 
-            $chargeDate  = $fromDate->format('Y-m-d');
-            $periodStart = $fromDate->copy()->subDay()->setTime(10, 0, 0);
-            $periodEnd   = $fromDate->copy()->setTime(10, 0, 0);
+            $chargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($fromDate);
+            $chargeDate = $chargeDay->format('Y-m-d');
+            $periodDates = BedBillingPeriod::periodStorageDatesForChargeDay($chargeDay, $fromDate);
 
             IpdDaywiseBedCharge::updateOrCreate(
                 [
@@ -1919,8 +1912,8 @@ class IpdController extends Controller
                     'branch_id'         => $ipd->branch_id ?? null,
                     'case_reference_id' => $ipd->case_reference_id ?? null,
                     'patient_id'        => $ipd->patient_id,
-                    'period_start_date' => $periodStart->format('Y-m-d'),
-                    'period_end_date'   => $periodEnd->format('Y-m-d'),
+                    'period_start_date' => $periodDates['period_start_date'],
+                    'period_end_date'   => $periodDates['period_end_date'],
                     'bed_group_id'      => $request->bed_group,
                     'bed_id'            => $newBedId,
                     'bed_charge'        => $bedChargeRate,
@@ -1998,9 +1991,9 @@ class IpdController extends Controller
                 ? (float) $request->bed_charge
                 : (float) ($bed->bedGroup->bed_cost ?? 0);
 
-            $chargeDate  = $fromDate->format('Y-m-d');
-            $periodStart = $fromDate->copy()->subDay()->setTime(10, 1, 0);
-            $periodEnd   = $fromDate->copy()->setTime(10, 1, 0);
+            $chargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($fromDate);
+            $chargeDate = $chargeDay->format('Y-m-d');
+            $periodDates = BedBillingPeriod::periodStorageDatesForChargeDay($chargeDay, $fromDate);
 
             IpdDaywiseBedCharge::updateOrCreate(
                 [
@@ -2012,8 +2005,8 @@ class IpdController extends Controller
                     'branch_id'          => $ipd->branch_id ?? null,
                     'case_reference_id'  => $ipd->case_reference_id ?? null,
                     'patient_id'         => $ipd->patient_id,
-                    'period_start_date'  => $periodStart->format('Y-m-d'),
-                    'period_end_date'    => $periodEnd->format('Y-m-d'),
+                    'period_start_date'  => $periodDates['period_start_date'],
+                    'period_end_date'    => $periodDates['period_end_date'],
                     'bed_group_id'       => $request->bed_group,
                     'bed_id'             => $newBedId,
                     'bed_charge'         => $bedChargeRate,
