@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Doctor;
@@ -9,6 +9,7 @@ use App\Models\Doctor;
 class DashboardController extends Controller
 {
    public function index() {
+         $user = Auth::user();
         $doctorsCount = \App\Models\Doctor::count();
         $patientsCount = \App\Models\Patient::count();
         // $revenuesCount = \App\Models\Revenue::sum('amount');
@@ -48,7 +49,7 @@ class DashboardController extends Controller
     ->get();
     $appointments = \App\Models\Appointment::with(['patient','doctorUser'])->get();
     // return $doctors;
-        return view('admin.dashboard',compact('doctorsCount','patientsCount','appointmentsCount','rescheduledAppointmentsCount','cancelledAppointmentsCount','completedAppointmentsCount','doctors','appointments'));
+        return view('admin.dashboard',compact('doctorsCount','patientsCount','appointmentsCount','rescheduledAppointmentsCount','cancelledAppointmentsCount','completedAppointmentsCount','doctors','appointments','user'));
     }
 
 }

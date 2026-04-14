@@ -60,6 +60,14 @@
     .ck-editor__editable {
         min-height: 250px;
     }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem 1rem 0;
+        background: white;
+        justify-content: flex-end;
+    }
 </style>
 
 @section('content')
@@ -90,6 +98,8 @@
                     @method('PUT')
 
                     <input type="hidden" name="ipd_details_id" value="{{ $dischargeData->ipd_details_id }}">
+                    <input type="hidden" name="is_draft" value="{{ $dischargeData->is_draft == 1 ? 'true' : 'false' }}"
+                        id="is-Draft">
 
                     <!-- BASIC INFORMATION -->
 
@@ -98,9 +108,9 @@
                         Basic Information
                     </h5>
 
-                    <div class="row g-3">
+                    <div class="row g-3 align-items-center">
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Patient Name</label>
                             <input type="text" class="form-control" name="patient_name"
                                 value="{{ $dischargeData->patient_name }}" autocomplete="off" readonly>
@@ -108,16 +118,27 @@
                                 value="{{ $dischargeData->patient_id }}">
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Admission No</label>
                             <input type="text" class="form-control" name="admission_no"
                                 value="{{ $dischargeData->admission_no }}" autocomplete="off" readonly>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Discharge Contact</label>
                             <input type="text" class="form-control" name="discharge_contact"
                                 value="{{ $dischargeData->discharge_contact }}" autocomplete="off">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="discharge_department" class="form-label">
+                                <i class="bi bi-credit-card"></i>
+                                Department
+                            </label>
+                            <select multiple name="discharge_department[]" id="discharge_department_text"
+                                class="form-select p-0">
+                                <option>select</option>
+                            </select>
                         </div>
 
                         <div class="col-md-3">
@@ -539,11 +560,24 @@
                         </div>
                     </div>
                     <hr class="my-4">
-                    <div class="text-end w-100">
-                        <button type="submit" class="btn btn-primary">
-                            Update Discharge
-                        </button>
-                    </div>
+
+                    @if ($dischargeData->is_draft == 1)
+                        <div class="action-buttons d-flex justify-content-end gap-2">
+                            <button type="submit" class="btn btn-outline-secondary">
+                                Update Draft
+                            </button>
+
+                            <button type="submit" class="btn btn-primary" id="final-submit">
+                                Final Discharge
+                            </button>
+                        </div>
+                    @else
+                        <div class="text-end w-100">
+                            <button type="submit" class="btn btn-primary">
+                                Update Discharge
+                            </button>
+                        </div>
+                    @endif
 
                 </form>
 
@@ -558,6 +592,9 @@
 
         const doctorsList = @json($doctors);
         const selectedDoctors = @json($dischargeData->ot_done_by ?? []);
+
+        const departmentsList = @json($departments);
+        const selectedDepartments = @json($dischargeData->department_name ?? []);
 
         let medMaster = []
         let doseIntervals = []
@@ -590,6 +627,20 @@
             @json($dischargeData->reason_discharge) :
             '';
         dischargeReasonSelect.dispatchEvent(new Event('change'));
+
+        new TomSelect("#discharge_department_text", {
+            options: departmentsList.map(dep => ({
+                value: `${dep.department_name}`,
+                label: `${dep.department_name}`
+            })),
+            valueField: "value",
+            labelField: "label",
+            searchField: "label",
+            create: false,
+            persist: false,
+            placeholder: "Select Departments",
+            items: selectedDepartments // preselected values
+        });
 
         new TomSelect("#ot_done_by_text", {
             options: doctorsList.map(doc => ({
@@ -842,7 +893,8 @@
                     row.remove(); // remove empty row
                 }
             });
-
+            const isFinalSubmit = e.submitter && e.submitter.id === 'final-submit';
+            document.getElementById('is-Draft').value = isFinalSubmit ? "false" : "true";
             // ✅ IMPORTANT FIX
             const form = this;
             if (document.querySelectorAll('.med-row').length === 0) {

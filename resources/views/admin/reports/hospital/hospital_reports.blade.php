@@ -23,15 +23,15 @@
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Patient Report </h5>
+                        <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> Hospital Report </h5>
                         <a href="reports/patient-reports-index" class="text-white fw-bold"><i
                                 class="fa-solid fa-angles-left text-white"></i>
-                            Patient</a>
+                            Hospital</a>
                     </div>
                 </div>
 
                 <div class="card-body">
-                    <form action="{{ route('ipd.ipd_reports') }}" method="GET">
+                    <form action="" method="GET">
                         <div class="row align-items-center">
 
                             {{-- Date From --}}
@@ -54,21 +54,13 @@
                                 <input type="date" id="to_date">
                             </div>
 
-
-                            <div class="col-md-3">
-                                <label class="form-label">
-                                    Area <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" id="area">
-                            </div>
-
                             {{-- Export --}}
                             <div class="col-md-3">
                                 <button type="button" class="btn btn-success" onclick="exportAllData()">
                                     Export to Excel
                                 </button>
-                                {{-- <button class="btn btn-danger" onclick="exportToPDF('ipd-reports-table')">Export to
-                                    PDF</button> --}}
+                                <button class="btn btn-danger" onclick="exportToPDF('ipd-reports-table')">Export to
+                                    PDF</button>
                             </div>
 
                             {{-- Buttons --}}
@@ -105,51 +97,21 @@
                                                         <tr>
 
 
-                                                            <th>Id</th>
-                                                            <th>Admission Date</th>
+                                                            <th>IPD No</th>
                                                             <th>Patient Name</th>
                                                             <th>Age</th>
                                                             <th>Gender</th>
                                                             <th>Mobile Number</th>
-                                                            <th>Area</th>
+                                                            <th>Guardian Name</th>
                                                             <th>Doctor Name </th>
-                                                            <th>Location</th>
-                                                            <th>DISTRICT</th>
-                                                            <th>STATE</th>
-                                                            <th>M. Exe</th>
-                                                            <th>Department</th>
-                                                            <th>Language</th>
-                                                            <th>NEWS Paper</th>
-                                                            
+                                                            <th>Status</th>
+                                                            <th>Date</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
 
-                                                     @foreach ($patients as $patient)
-                                                       <tr>
-                                                           <td>{{ $patient->id }}</td>
-                                                           <td>{{ $patient->created_at->format('Y-m-d') }}</td>
-                                                           <td>{{ $patient->patient_name }}</td>
-                                                           <td>{{ $patient->age }}</td>
-                                                           <td>{{ $patient->gender }}</td>
-                                                           <td>{{ $patient->mobileno }}</td>
-                                                           <td>{{ $patient->area }}</td>
-                                                           <td>
-                                                               @foreach($patient->ipds as $ipd)
-                                                                   {{ $ipd->doctor->name ?? 'N/A' }}<br>
-                                                               @endforeach
-                                                           </td>
-                                                           <td>{{ $patient->address }}</td>
-                                                           <td>{{ $patient->districtName->name ?? 'N/A' }}</td>
 
-                                                            <td>{{ $patient->stateName->name ?? 'N/A' }}</td>
-                                                           <td>{{ $patient->medical_executive }}</td>
-                                                           <td>{{ $patient->department_name }}</td>
-                                                           <td>{{ implode(', ', $patient->languages_speak ?? []) }}</td>
-                                                           <td>{{ $patient->newspaper_preference }}</td>
-                                                           
-                                                       </tr>
-                                                  @endforeach
+
 
                                                     </tbody>
                                                 </table>
@@ -232,9 +194,9 @@ function exportAllData() {
                 "UNDER DOCTOR",
                 "Location",
                 "DISTRICT",
-                "STATE", 
+                "STATE",
+              //"Department",
               "M. Exe",
-              "Department",
               "Language",
              "NEWS Paper",
              "MONTH"
@@ -280,7 +242,6 @@ function exportAllData() {
                             (item.district_name && item.district_name.name) ? item.district_name.name : item.district,
                             (item.state_name && item.state_name.name) ? item.state_name.name : item.state,
                             mExe,
-                            Array.isArray(item.department_name) ? item.ddepartment_name.join(', ') : item.department_name,
                             Array.isArray(item.languages_speak) ? item.languages_speak.join(', ') : item.languages_speak,
                             item.newspaper_preference,
                             monthName
@@ -309,7 +270,6 @@ function exportAllData() {
                         (item.district_name && item.district_name.name) ? item.district_name.name : item.district,
                         (item.state_name && item.state_name.name) ? item.state_name.name : item.state,
                         '', // mExe
-                        Array.isArray(item.department_name) ? item.department_name.join(', ') : item.department_name,
                         Array.isArray(item.languages_speak) ? item.languages_speak.join(', ') : item.languages_speak,
                         item.newspaper_preference,
                         monthName

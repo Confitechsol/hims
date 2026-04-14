@@ -238,7 +238,7 @@ class ExcelImportController extends Controller
         // Category List
         $row = 1;
         foreach ($categories as $cat) {
-            $dropdown->setCellValue("A$row", $cat->category_name);
+            $dropdown->setCellValue("D$row", $cat->category_name);
             $row++;
         }
 
@@ -259,7 +259,7 @@ class ExcelImportController extends Controller
         // Parameters
         $row = 1;
         foreach ($parameters as $param) {
-            $dropdown->setCellValue("D$row", "{$param->id} - {$param->parameter_name}");
+            $dropdown->setCellValue("U$row", "{$param->id} - {$param->parameter_name}");
             $row++;
         }
 
@@ -268,7 +268,7 @@ class ExcelImportController extends Controller
         // ===============================
 
         // Category Name dropdown
-        $this->setDropdown($sheet, 'D2:D500', 'DropdownData', 'A', count($categories));
+        $this->setDropdown($sheet, 'D2:D500', 'DropdownData', 'D', count($categories));
 
         // // Charge Category dropdown
         // $this->setDropdown($sheet, 'H2:H500', 'DropdownData', 'B', count($chargeCats));
@@ -277,7 +277,7 @@ class ExcelImportController extends Controller
         // $this->setDropdown($sheet, 'I2:I500', 'DropdownData', 'C', count($charges));
 
         // Parameter dropdown
-        $this->setDropdown($sheet, 'A2:A500', 'DropdownData', 'D', count($parameters));
+        $this->setDropdown($sheet, 'U2:U500', 'DropdownData', 'U', count($parameters));
 
         // ===============================
         // 4. Final Excel Output

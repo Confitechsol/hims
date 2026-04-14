@@ -346,7 +346,7 @@
                                                 </div>
 
                                                 {{--state --}}
-                                               <div class="col-md-3">
+                                               <div class="col-md-4">
                                                     <label class="form-label">State</label>
                                                     <select id="stateDropdown" name="state_id" class="form-control">
                                                         <option value="">Select State</option>
@@ -354,7 +354,7 @@
                                                 </div>
                                                 
                                                 {{-- District --}}  
-                                                <div class="col-md-3">
+                                                <div class="col-md-4">
                                                    <label class="form-label">District</label>
                                                    <select id="districtDropdown" name="district_id" class="form-control">
                                                        <option value="">Select District</option>
@@ -393,9 +393,16 @@
                                                         class="form-control"
                                                         value="{{ old('national_id_number', $patient->national_id_number) }}" />
                                                 </div>
-                                                </div>
+
+                                                    {{-- Department Name --}}
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Department Name</label>
+                                                        <select id="departmentDropdown" name="department_name[]" class="form-control" multiple>
+                                                            <!-- Options will be loaded by JS -->
+                                                        </select>
+                                                   </div>
                                             </div>
-                                        </div>
+                
         
                                         <div class="form-section mb-4">
                                             <div class="section-header">

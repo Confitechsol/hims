@@ -11,8 +11,6 @@ use App\Models\Doctor;
 use App\Models\Finding;
 use App\Models\IpdCharges;
 use App\Models\IpdDaywiseBedCharge;
-use App\Services\BedOccupancyService;
-use App\Support\BedBillingPeriod;
 use App\Models\IpdDetail;
 use App\Models\IpdMedicine;
 use App\Models\IpdPatient;
@@ -34,6 +32,7 @@ use App\Models\RadiologyReport;
 use App\Models\Staff;
 use App\Models\Symptom;
 use App\Models\SymptomsClassification;
+use App\Services\BedOccupancyService;
 use App\Services\IpdPackageService;
 use App\Services\PmsBridgeService;
 use Carbon\Carbon;
@@ -50,14 +49,15 @@ class IpdController extends Controller
     public function index(Request $request)
     {
         // Search term and pagination
-        $search  = $request->get('search');
-        $fromDate = $request->get('from_date');
-        $toDate = $request->get('to_date');
-        $perPage = intval($request->input('per_page', 10));
+        $search      = $request->get('search');
+        $fromDate    = $request->get('from_date');
+        $toDate      = $request->get('to_date');
+        $draftFilter = $request->get('draft_filter');
+        $perPage     = intval($request->input('per_page', 50));
         if ($perPage <= 0) {
             $perPage = 10;
         }
-
+        // dd($draftFilter);
         // Determine tab
         $isIpdTab = $request->get('tab', 'ipd') == 'ipd';
 
@@ -108,7 +108,7 @@ class IpdController extends Controller
         } else {
             // Query for discharged IPDs
             $query = IpdDetail::with('patient', 'ipdPatients', 'doctor')
-                ->where('discharged', 'yes')
+                ->whereIn('discharged', ['yes', 'draft'])->orderByDesc('discharged_date')
                 ->when($fromDate || $toDate, function ($query) use ($fromDate, $toDate) {
                     // Discharge tab: filter by discharged_date
                     if ($fromDate) {
@@ -124,10 +124,17 @@ class IpdController extends Controller
                             ->orWhere('mobileno', 'LIKE', "%{$search}%")
                             ->orWhere('email', 'LIKE', "%{$search}%");
                     });
-                });
+                })->when($draftFilter, function ($query) use ($draftFilter) {
+                if ($draftFilter === 'yes') {
+                    $query->where('discharged', 'yes');
+                } elseif ($draftFilter === 'draft') {
+                    $query->where('discharged', 'draft');
+                }
+            });
 
             // Paginate
             $ipd = $query->paginate($perPage)->withQueryString();
+            // dd($ipd);
         }
 
         // Return view with paginated data
@@ -426,9 +433,9 @@ class IpdController extends Controller
             }
 
             if ($request->bed_number != $allotedBed) {
-                $newBedDetail          = Bed::where('id', $request->bed_number)->firstOrFail();
-                $allotedBedDetail      = Bed::where('id', $allotedBed)->firstOrFail();
-                $bedhistory            = PatientBedHistory::where('ipd_id', $id)->orderBy('from_date')->firstOrFail();
+                $newBedDetail             = Bed::where('id', $request->bed_number)->firstOrFail();
+                $allotedBedDetail         = Bed::where('id', $allotedBed)->firstOrFail();
+                $bedhistory               = PatientBedHistory::where('ipd_id', $id)->orderBy('from_date')->firstOrFail();
                 $bedhistory->bed_group_id = $request->bed_group;
                 $bedhistory->bed_id       = $request->bed_number;
                 $bedhistory->from_date    = $newAdmissionDate;
@@ -1725,13 +1732,13 @@ class IpdController extends Controller
             $query->where(function ($q) use ($occupiedBeds, $includeBedId) {
                 $q->where(function ($qq) use ($occupiedBeds) {
                     $qq->where('is_active', 'yes')
-                       ->whereNotIn('id', $occupiedBeds);
+                        ->whereNotIn('id', $occupiedBeds);
                 })->orWhere('id', $includeBedId);
             });
         } else {
             // For add: only active and not currently occupied beds
             $query->where('is_active', 'yes')
-                  ->whereNotIn('id', $occupiedBeds);
+                ->whereNotIn('id', $occupiedBeds);
         }
         $beds = $query->get();
         return response()->json($beds);
@@ -1931,25 +1938,25 @@ class IpdController extends Controller
         }
     }
 
-     /**
+    /**
      * Store a new bed history record from the Bed History popup (Add mode).
      * Uses the same modal UI as edit, without affecting existing edit behaviour.
      */
     public function storeBedHistory(Request $request, BedOccupancyService $bedOccupancyService)
     {
         $request->validate([
-            'ipd_id'    => 'required|exists:ipd_details,id',
-            'bed_group' => 'required|exists:bed_group,id',
-            'bed'       => 'required|exists:bed,id',
-            'from_date' => 'required|date',
-            'to_date'   => 'nullable|date|after_or_equal:from_date',
-            'bed_charge'=> 'nullable|numeric|min:0',
+            'ipd_id'     => 'required|exists:ipd_details,id',
+            'bed_group'  => 'required|exists:bed_group,id',
+            'bed'        => 'required|exists:bed,id',
+            'from_date'  => 'required|date',
+            'to_date'    => 'nullable|date|after_or_equal:from_date',
+            'bed_charge' => 'nullable|numeric|min:0',
         ]);
 
         $ipd = IpdDetail::findOrFail($request->ipd_id);
 
         $newBedId = (int) $request->bed;
-        $bed = Bed::findOrFail($newBedId);
+        $bed      = Bed::findOrFail($newBedId);
         if ((int) $bed->bed_group_id !== (int) $request->bed_group) {
             return redirect()->back()->with('error', 'Selected bed must belong to the selected bed group.');
         }
@@ -1973,17 +1980,17 @@ class IpdController extends Controller
         DB::beginTransaction();
         try {
             // Create new bed history entry (non-active by default to avoid changing current bed unexpectedly)
-            $history = new PatientBedHistory();
-            $history->hospital_id   = $ipd->hospital_id;
-            $history->branch_id     = $ipd->branch_id ?? null;
-            $history->ipd_id        = $ipd->id;
+            $history                    = new PatientBedHistory();
+            $history->hospital_id       = $ipd->hospital_id;
+            $history->branch_id         = $ipd->branch_id ?? null;
+            $history->ipd_id            = $ipd->id;
             $history->case_reference_id = $ipd->case_reference_id ?? null;
-            $history->bed_group_id  = $request->bed_group;
-            $history->bed_id        = $newBedId;
-            $history->from_date     = $fromDate;
-            $history->to_date       = $request->to_date ? $toDate : null;
-            $history->is_active     = 'no';
-            $history->created_at    = now();
+            $history->bed_group_id      = $request->bed_group;
+            $history->bed_id            = $newBedId;
+            $history->from_date         = $fromDate;
+            $history->to_date           = $request->to_date ? $toDate : null;
+            $history->is_active         = 'no';
+            $history->created_at        = now();
             $history->save();
 
             // Create / update daywise bed charge for the from_date so estimate/final bill consider it
@@ -2001,18 +2008,18 @@ class IpdController extends Controller
                     'charge_date' => $chargeDate,
                 ],
                 [
-                    'hospital_id'        => $ipd->hospital_id,
-                    'branch_id'          => $ipd->branch_id ?? null,
-                    'case_reference_id'  => $ipd->case_reference_id ?? null,
-                    'patient_id'         => $ipd->patient_id,
-                    'period_start_date'  => $periodDates['period_start_date'],
-                    'period_end_date'    => $periodDates['period_end_date'],
-                    'bed_group_id'       => $request->bed_group,
-                    'bed_id'             => $newBedId,
-                    'bed_charge'         => $bedChargeRate,
-                    'bed_charge_rate'    => $bedChargeRate,
-                    'no_of_days'         => 1,
-                    'is_active'          => 'yes',
+                    'hospital_id'       => $ipd->hospital_id,
+                    'branch_id'         => $ipd->branch_id ?? null,
+                    'case_reference_id' => $ipd->case_reference_id ?? null,
+                    'patient_id'        => $ipd->patient_id,
+                    'period_start_date' => $periodStart->format('Y-m-d'),
+                    'period_end_date'   => $periodEnd->format('Y-m-d'),
+                    'bed_group_id'      => $request->bed_group,
+                    'bed_id'            => $newBedId,
+                    'bed_charge'        => $bedChargeRate,
+                    'bed_charge_rate'   => $bedChargeRate,
+                    'no_of_days'        => 1,
+                    'is_active'         => 'yes',
                 ]
             );
 

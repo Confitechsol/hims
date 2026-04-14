@@ -185,7 +185,8 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/districts', [PatientController::class, 'district']);
     Route::get('/states', [PatientController::class, 'state']);
     Route::get('/report/patient', [PatientReportController::class, 'patientReport'])->name('patient-report');
-    
+    Route::get('/patient-report', [PatientReportController::class, 'patientReportApi']);
+    Route::get('/departments', [PatientController::class, 'departments']);    
 
     
 
@@ -1194,3 +1195,23 @@ Route::get('/reports/patient-reports', function () {
 })->name('patient-reports');
 
     Route::get('/patient-reports', [PatientReportController::class, 'patientReport'])->name('patient.patient_reports');
+
+
+    // Patient report view
+
+Route::get('/reports/hospital-reports-index', function () {
+    return view('admin.reports.hospital.index');
+})->name('hospital-reports-index');
+
+Route::get('/reports/hospital-reports', function () {
+    return view('admin.reports.hospital.hospital_reports');
+})->name('hospital-reports');
+
+    // Route::get('/hospital-reports', [PatientReportController::class, 'hospitalReport'])->name('hospital.hospital_reports');
+Route::get('/reports/doctor-reports-index', function () {
+    return view('admin.reports.doctor.index');
+})->name('doctor-reports-index');
+
+Route::get('/reports/doctor-reports', function () {
+    return view('admin.reports.doctor.doctor_reports');
+})->name('doctor-reports');

@@ -33,7 +33,7 @@
 
                         {{-- Name --}}
                         <div class="col-md-6">
-                            <label for="name" class="form-label">Name</label>
+                            <label for="name" class="form-label">Name*</label>
                             <input type="text" id="name" name="name"
                                 class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" />
                             @error('name')
@@ -109,7 +109,7 @@
 
                                 {{-- DOB --}}
                                 <div class="col-md-4">
-                                    <label for="birth_date" class="form-label">Date of Birth*</label>
+                                    <label for="birth_date" class="form-label">Date of Birth</label>
                                     <input type="date" id="birth_date" name="birth_date"
                                         class="form-control @error('birth_date') is-invalid @enderror"
                                         value="{{ old('birth_date') }}" />
@@ -295,7 +295,7 @@
 
                         {{-- Area --}}
                         <div class="col-md-3">
-                            <label for="area" class="form-label">Area</label>
+                            <label for="area" class="form-label">Area*</label>
                             <input type="text" id="area" name="area"
                                 class="form-control @error('area') is-invalid @enderror"
                                 value="{{ old('area') }}" />
@@ -325,7 +325,7 @@
                         
                         {{-- District --}}
                         <div class="col-md-3">
-                            <label class="form-label mt-3">District</label>
+                            <label class="form-label">District</label>
                             <select id="districtDropdown" name="district_id" class="form-control">
                             <option value="">Select District</option>
                         </select>
@@ -587,6 +587,15 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+
+                        {{-- Department --}}
+                        <div class="col-md-5">
+                            <label class="form-label">Department</label>
+                            <select id="departmentDropdown" name="department_ids[]" class="form-control" multiple>
+                                <option value="">Select Department</option>
+                            </select>
+                        </div>
+                       
 
                     </div>
 
@@ -900,6 +909,31 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error('Error fetching districts:', error);
                 districtDropdown.innerHTML = '<option value="">Error loading districts</option>';
             });
+    });
+});
+// Populate department dropdown every time the modal is shown
+$('#add_patient').on('shown.bs.modal', function() {
+    const dropdown = document.getElementById('departmentDropdown');
+    // Clear previous options except the placeholder
+    dropdown.innerHTML = '<option value="">Select Department</option>';
+    fetch('{{url('/')}}/departments')
+        .then(response => response.json())
+        .then(res => {
+            if(res.status) {
+                res.data.forEach(department => {
+                    const option = document.createElement('option');
+                    option.value = department.id;
+                    option.textContent = department.department_name;
+                    dropdown.appendChild(option);
+                });
+            }
+        })
+        .catch(error => console.error('Error fetching departments:', error));
+    // Re-initialize select2
+    $('#departmentDropdown').select2({
+        dropdownParent: $('#add_patient'),
+        placeholder: 'Select Department',
+        allowClear: true
     });
 });
 </script>

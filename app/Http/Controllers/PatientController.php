@@ -13,6 +13,7 @@ use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use Illuminate\Support\Facades\Validator;
 use App\Models\District;
 use \App\Models\State;
+use App\Models\Department;
 
 class PatientController extends Controller
 {
@@ -152,6 +153,7 @@ class PatientController extends Controller
             'occupation'            => 'nullable|string|max:255',
             'police_station'        => 'nullable|string|max:255',
             'pin_code'               => 'nullable|string|max:20',
+            'department_name'      =>  'nullable|string|max:255',
         ]);
 
       //  dd($validated);
@@ -175,6 +177,13 @@ class PatientController extends Controller
         // Create patient
         // dd($data['state_id']);
         
+        // Convert selected department IDs to names and save as comma-separated string
+        $departmentNames = [];
+        if ($request->has('department_ids')) {
+            $departmentNames = \App\Models\Department::whereIn('id', $request->input('department_ids'))->pluck('department_name')->toArray();
+        }
+        $departmentNameString = implode(',', $departmentNames);
+
         Patient::create([
             'patient_name'          => $data['name'],
             'guardian_name'         => $data['guardian_name'] ?? null,
@@ -216,6 +225,7 @@ class PatientController extends Controller
             'occupation'            => $data['occupation'] ?? null,
             'police_station'        => $data['police_station'] ?? null,
             'pin_code'             => $data['pin_code'] ?? null,
+            'department_name'      => $departmentNameString,
         ]);
 
         return redirect()->back()->with('success', 'Patient saved successfully!');
@@ -269,6 +279,7 @@ class PatientController extends Controller
             'national_id_number'    => 'nullable|string|max:50',
             'pin_code'               => 'nullable|string|max:20',
             'police_station'        => 'nullable|string|max:255',
+            'department_name'      => 'nullable|string|max:255',
         ]);
 
         if ($validated->fails()) {
@@ -329,6 +340,7 @@ class PatientController extends Controller
         'identification_number' => $data['national_id_number'] ?? null,
         'pin_code'             => $data['pin_code'] ?? null,
         'police_station'       => $data['police_station'] ?? null,
+        'department_name'      => $data['department_name'] ?? null,
         ]);
 
       // return redirect()->route('admin.setup.patients')->with('success', 'Patient updated successfully!');
@@ -689,6 +701,17 @@ class PatientController extends Controller
         return response()->json([
             'status' => true,
             'data' => $states
+        ]);
+
+       //  return view('patient.form', compact('states'));
+    }
+
+    public function departments() {
+        $departments = Department::all();
+
+        return response()->json([
+            'status' => true,
+            'data' => $departments
         ]);
 
        //  return view('patient.form', compact('states'));

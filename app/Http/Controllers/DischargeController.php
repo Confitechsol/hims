@@ -2,9 +2,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bed;
+use App\Models\Department;
 use App\Models\DischargeCard;
 use App\Models\Doctor;
 use App\Models\IpdDetail;
+use App\Models\Patient;
 use App\Models\PatientBedHistory;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -21,57 +23,60 @@ class DischargeController extends Controller
         // -------------------------------
         // dd($request->all());
         $validated = $request->validate([
-            'ipd_details_id'     => ['required', 'integer', 'exists:ipd_details,id'],
-            'patient_name'       => ['required', 'string', 'max:255'],
-            'patient_id'         => ['nullable', 'integer'],
-            'admission_no'       => ['nullable', 'string'],
-            'discharge_contact'  => ['nullable', 'string'],
-            'discharge_date'     => ['required', 'date'],
-            'discharge_time'     => ['nullable'],
-            'admission_date'     => ['nullable', 'date'],
-            'admit_time'         => ['nullable'],
-            'bed'                => ['nullable', 'string'],
-            'age'                => ['nullable', 'string'],
-            'gender'             => ['nullable', 'string'],
-            'phone'              => ['nullable', 'string'],
-            'marital_status'     => ['nullable', 'string'],
-            'address'            => ['nullable', 'string'],
-            'guardian'           => ['nullable', 'string'],
-            'relation'           => ['nullable', 'string'],
-            'nationality'        => ['nullable', 'string'],
-            'under_care_dr'      => ['nullable', 'string'],
-            'registration_no'    => ['nullable', 'string'],
-            'referral'           => ['nullable', 'string'],
-            'corporate'          => ['nullable', 'string'],
-            'reason_discharge'   => ['nullable', 'string'],
-            'ot_date'            => ['nullable', 'date'],
-            'ot_type'            => ['nullable', 'string'],
-            'ot_name'            => ['nullable', 'string'],
-            'ot_done'            => ['nullable', 'integer'],
-            'ot_done_by'         => ['nullable', 'array'],
-            'ot_done_by.*'       => ['string'],
-            'diagnosis'          => ['nullable', 'string'],
-            'ot_note'            => ['nullable', 'string'],
-            'discharge_advice'   => ['nullable', 'string'],
-            'investigation'      => ['nullable', 'string'],
-            'urgent_care'        => ['nullable', 'string'],
-            'diet_advice'        => ['nullable', 'string'],
-            'course_in_hospital' => ['nullable', 'string'],
-            'present_complaints' => ['nullable', 'string'],
-            'remarks'            => ['nullable', 'string'],
-            'meds'               => ['nullable', 'array'],
-            'meds.*'             => ['nullable', 'string'],
-            'med_types'          => ['nullable', 'array'],
-            'med_types.*'        => ['nullable', 'string'],
-            'med_interval'       => ['nullable', 'array'],
-            'med_interval.*'     => ['nullable', 'string'],
-            'med_duration'       => ['nullable', 'array'],
-            'med_duration.*'     => ['nullable', 'string'],
-            'med_date'           => ['nullable', 'array'],
-            'med_date.*'         => ['nullable', 'date'],
-            'doctor_advice'      => ['nullable', 'string'],
-            'discharged_by'      => ['nullable', 'string'],
-            'current_user'       => ['nullable', 'string'],
+            'ipd_details_id'         => ['required', 'integer', 'exists:ipd_details,id'],
+            'patient_name'           => ['required', 'string', 'max:255'],
+            'patient_id'             => ['nullable', 'integer'],
+            'admission_no'           => ['nullable', 'string'],
+            'discharge_contact'      => ['nullable', 'string'],
+            'discharge_date'         => ['required', 'date'],
+            'discharge_time'         => ['nullable'],
+            'admission_date'         => ['nullable', 'date'],
+            'admit_time'             => ['nullable'],
+            'bed'                    => ['nullable', 'string'],
+            'age'                    => ['nullable', 'string'],
+            'gender'                 => ['nullable', 'string'],
+            'phone'                  => ['nullable', 'string'],
+            'marital_status'         => ['nullable', 'string'],
+            'address'                => ['nullable', 'string'],
+            'guardian'               => ['nullable', 'string'],
+            'relation'               => ['nullable', 'string'],
+            'nationality'            => ['nullable', 'string'],
+            'under_care_dr'          => ['nullable', 'string'],
+            'registration_no'        => ['nullable', 'string'],
+            'referral'               => ['nullable', 'string'],
+            'corporate'              => ['nullable', 'string'],
+            'reason_discharge'       => ['nullable', 'string'],
+            'ot_date'                => ['nullable', 'date'],
+            'ot_type'                => ['nullable', 'string'],
+            'ot_name'                => ['nullable', 'string'],
+            'ot_done'                => ['nullable', 'integer'],
+            'ot_done_by'             => ['nullable', 'array'],
+            'ot_done_by.*'           => ['string'],
+            'diagnosis'              => ['nullable', 'string'],
+            'ot_note'                => ['nullable', 'string'],
+            'discharge_advice'       => ['nullable', 'string'],
+            'investigation'          => ['nullable', 'string'],
+            'urgent_care'            => ['nullable', 'string'],
+            'diet_advice'            => ['nullable', 'string'],
+            'course_in_hospital'     => ['nullable', 'string'],
+            'present_complaints'     => ['nullable', 'string'],
+            'remarks'                => ['nullable', 'string'],
+            'meds'                   => ['nullable', 'array'],
+            'meds.*'                 => ['nullable', 'string'],
+            'med_types'              => ['nullable', 'array'],
+            'med_types.*'            => ['nullable', 'string'],
+            'med_interval'           => ['nullable', 'array'],
+            'med_interval.*'         => ['nullable', 'string'],
+            'med_duration'           => ['nullable', 'array'],
+            'med_duration.*'         => ['nullable', 'string'],
+            'med_date'               => ['nullable', 'array'],
+            'med_date.*'             => ['nullable', 'date'],
+            'discharge_department'   => ['nullable', 'array'],
+            'discharge_department.*' => ['nullable', 'string'],
+            'doctor_advice'          => ['nullable', 'string'],
+            'discharged_by'          => ['nullable', 'string'],
+            'current_user'           => ['nullable', 'string'],
+            'isDraft'                => ['nullable', 'string'],
         ]);
 
         // dd($validated);
@@ -94,11 +99,12 @@ class DischargeController extends Controller
             // $intervals   = array_filter((array) $request->med_interval, fn($interval) => $interval !== null && $interval !== '');
             // $durations   = array_filter((array) $request->med_duration, fn($duration) => $duration !== null && $duration !== '');
 
-            $meds      = $request->meds ?? [];
-            $types     = $request->med_types ?? [];
-            $intervals = $request->med_interval ?? [];
-            $durations = $request->med_duration ?? [];
-            $dates     = $request->med_date ?? [];
+            $meds        = $request->meds ?? [];
+            $types       = $request->med_types ?? [];
+            $intervals   = $request->med_interval ?? [];
+            $durations   = $request->med_duration ?? [];
+            $dates       = $request->med_date ?? [];
+            $departments = $request->discharge_department ?? [];
 
             $finalMeds      = [];
             $finalTypes     = [];
@@ -125,12 +131,8 @@ class DischargeController extends Controller
             $implodedIntervals = ! empty($finalIntervals) ? implode(", ", $finalIntervals) : null;
             $implodedDurations = ! empty($finalDurations) ? implode("||", $finalDurations) : null;
             $implodedDates     = ! empty($finalDates) ? implode("||", $finalDates) : null;
-            // $durations         = array_filter((array) $request->med_duration, fn($d) => $d !== null && $d !== '');
-            // $implodedMeds      = implode(", ", $meds);
-            // $implodedMedTypes  = implode(", ", $medTypes);
-            // $implodedIntervals = implode(", ", $intervals);
-            // $implodedDurations = implode("||", $durations);
-            // $durationsJson     = json_encode(array_values($durations));
+
+            $implodedDepartments = ! empty($departments) ? implode(",", $departments) : null;
             // dd($implodedDates);
             $barcodePayload = [
                 'type'               => 'DISCHARGE',
@@ -245,10 +247,33 @@ class DischargeController extends Controller
                 'durations'          => $implodedDurations ?? null,
                 'med_dates'          => $implodedDates ?? null,
 
+                'department_name'    => $implodedDepartments ?? null,
+                'is_draft'           => $validated['isDraft'] === "true" ? 1 : 0,
+
                 'doctor_advice'      => $validated['doctor_advice'] ?? null,
                 'discharged_by'      => $validated['discharged_by'] ?? null,
                 'created_by'         => Auth::id(),
             ]);
+
+            // -------------------------------
+            // 🔹 Update Patient Departments
+            // -------------------------------
+            Patient::where('id', $validated['patient_id'])->update([
+                'department_name' => $implodedDepartments,
+            ]);
+
+            // -------------------------------
+            // 🔹 Mark Discharge as Draft in IPD
+            // -------------------------------
+            if ($validated['isDraft'] === "true") {
+                IpdDetail::where('id', $validated['ipd_details_id'])
+                    ->update(['discharged' => 'draft', 'discharged_date' => $validated['discharge_date']]);
+
+                DB::commit();
+                return redirect()
+                    ->back()
+                    ->with('success', 'Discharge details saved as draft.');
+            }
 
             // -------------------------------
             // 🔹 Close bed history & release bed(s) (same pattern as IPD bed transfer)
@@ -264,8 +289,8 @@ class DischargeController extends Controller
             // -------------------------------
             IpdDetail::where('id', $validated['ipd_details_id'])
                 ->update([
-                    'discharged'       => 'yes',
-                    'discharged_date'  => $validated['discharge_date'],
+                    'discharged'      => 'yes',
+                    'discharged_date' => $validated['discharge_date'],
                 ]);
 
             DB::commit();
@@ -291,8 +316,9 @@ class DischargeController extends Controller
         $dischargeData->med_interval = explode(',', $dischargeData->intervals ?? '');
         $dischargeData->med_dates    = explode('||', $dischargeData->med_dates ?? '');
         // $dischargeData->med_duration = explode("||", $dischargeData->durations ?? '');
-        $dischargeData->ot_done_by = explode(",", $dischargeData->ot_done_by ?? '');
-        $rawDurations              = $dischargeData->durations ?? '';
+        $dischargeData->ot_done_by      = explode(",", $dischargeData->ot_done_by ?? '');
+        $dischargeData->department_name = explode(",", $dischargeData->department_name ?? '');
+        $rawDurations                   = $dischargeData->durations ?? '';
 
         if (str_contains($rawDurations, '||')) {
             // New format (correct one)
@@ -337,10 +363,11 @@ class DischargeController extends Controller
                 ''
             );
         }
-        $doctors = Doctor::all();
+        $doctors     = Doctor::all();
+        $departments = Department::where('is_active', 'yes')->get();
         // $dischargeData->med_duration = explode(',', $dischargeData->durations ?? '');
 
-        return view("admin.ipd.edit-discharge", compact('dischargeData', 'doctors'));
+        return view("admin.ipd.edit-discharge", compact('dischargeData', 'doctors', 'departments'));
     }
 
     public function updateDischarge(Request $request, $id)
@@ -357,57 +384,60 @@ class DischargeController extends Controller
 
         // dd($request->all());
         $validated = $request->validate([
-            'ipd_details_id'     => ['required', 'integer', 'exists:ipd_details,id'],
-            'patient_name'       => ['required', 'string', 'max:255'],
-            'patient_id'         => ['nullable', 'integer'],
-            'admission_no'       => ['nullable', 'string'],
-            'discharge_contact'  => ['nullable', 'string'],
-            'discharge_date'     => ['required', 'date'],
-            'discharge_time'     => ['nullable'],
-            'admission_date'     => ['nullable', 'date'],
-            'admit_time'         => ['nullable'],
-            'bed'                => ['nullable', 'string'],
-            'age'                => ['nullable', 'string'],
-            'gender'             => ['nullable', 'string'],
-            'phone'              => ['nullable', 'string'],
-            'marital_status'     => ['nullable', 'string'],
-            'address'            => ['nullable', 'string'],
-            'guardian'           => ['nullable', 'string'],
-            'relation'           => ['nullable', 'string'],
-            'nationality'        => ['nullable', 'string'],
-            'under_care_dr'      => ['nullable', 'string'],
-            'registration_no'    => ['nullable', 'string'],
-            'referral'           => ['nullable', 'string'],
-            'corporate'          => ['nullable', 'string'],
-            'reason_discharge'   => ['nullable', 'string'],
-            'ot_date'            => ['nullable', 'date'],
-            'ot_type'            => ['nullable', 'string'],
-            'ot_name'            => ['nullable', 'string'],
-            'ot_done'            => ['nullable', 'integer'],
-            'ot_done_by'         => ['nullable', 'array'],
-            'ot_done_by.*'       => ['string'],
-            'diagnosis'          => ['nullable', 'string'],
-            'ot_note'            => ['nullable', 'string'],
-            'discharge_advice'   => ['nullable', 'string'],
-            'investigation'      => ['nullable', 'string'],
-            'urgent_care'        => ['nullable', 'string'],
-            'diet_advice'        => ['nullable', 'string'],
-            'course_in_hospital' => ['nullable', 'string'],
-            'present_complaints' => ['nullable', 'string'],
-            'remarks'            => ['nullable', 'string'],
-            'meds'               => ['nullable', 'array'],
-            'meds.*'             => ['nullable', 'string'],
-            'med_types'          => ['nullable', 'array'],
-            'med_types.*'        => ['nullable', 'string'],
-            'med_interval'       => ['nullable', 'array'],
-            'med_interval.*'     => ['nullable', 'string'],
-            'med_duration'       => ['nullable', 'array'],
-            'med_duration.*'     => ['nullable', 'string'],
-            'med_date'           => ['nullable', 'array'],
-            'med_date.*'         => ['nullable', 'date'],
-            'doctor_advice'      => ['nullable', 'string'],
-            'discharged_by'      => ['nullable', 'string'],
-            'current_user'       => ['nullable', 'string'],
+            'ipd_details_id'         => ['required', 'integer', 'exists:ipd_details,id'],
+            'patient_name'           => ['required', 'string', 'max:255'],
+            'patient_id'             => ['nullable', 'integer'],
+            'admission_no'           => ['nullable', 'string'],
+            'discharge_contact'      => ['nullable', 'string'],
+            'discharge_date'         => ['required', 'date'],
+            'discharge_time'         => ['nullable'],
+            'admission_date'         => ['nullable', 'date'],
+            'admit_time'             => ['nullable'],
+            'bed'                    => ['nullable', 'string'],
+            'age'                    => ['nullable', 'string'],
+            'gender'                 => ['nullable', 'string'],
+            'phone'                  => ['nullable', 'string'],
+            'marital_status'         => ['nullable', 'string'],
+            'address'                => ['nullable', 'string'],
+            'guardian'               => ['nullable', 'string'],
+            'relation'               => ['nullable', 'string'],
+            'nationality'            => ['nullable', 'string'],
+            'under_care_dr'          => ['nullable', 'string'],
+            'registration_no'        => ['nullable', 'string'],
+            'referral'               => ['nullable', 'string'],
+            'corporate'              => ['nullable', 'string'],
+            'reason_discharge'       => ['nullable', 'string'],
+            'ot_date'                => ['nullable', 'date'],
+            'ot_type'                => ['nullable', 'string'],
+            'ot_name'                => ['nullable', 'string'],
+            'ot_done'                => ['nullable', 'integer'],
+            'ot_done_by'             => ['nullable', 'array'],
+            'ot_done_by.*'           => ['string'],
+            'diagnosis'              => ['nullable', 'string'],
+            'ot_note'                => ['nullable', 'string'],
+            'discharge_advice'       => ['nullable', 'string'],
+            'investigation'          => ['nullable', 'string'],
+            'urgent_care'            => ['nullable', 'string'],
+            'diet_advice'            => ['nullable', 'string'],
+            'course_in_hospital'     => ['nullable', 'string'],
+            'present_complaints'     => ['nullable', 'string'],
+            'remarks'                => ['nullable', 'string'],
+            'meds'                   => ['nullable', 'array'],
+            'meds.*'                 => ['nullable', 'string'],
+            'med_types'              => ['nullable', 'array'],
+            'med_types.*'            => ['nullable', 'string'],
+            'med_interval'           => ['nullable', 'array'],
+            'med_interval.*'         => ['nullable', 'string'],
+            'med_duration'           => ['nullable', 'array'],
+            'med_duration.*'         => ['nullable', 'string'],
+            'med_date'               => ['nullable', 'array'],
+            'med_date.*'             => ['nullable', 'date'],
+            'discharge_department'   => ['nullable', 'array'],
+            'discharge_department.*' => ['nullable', 'string'],
+            'doctor_advice'          => ['nullable', 'string'],
+            'discharged_by'          => ['nullable', 'string'],
+            'current_user'           => ['nullable', 'string'],
+            'is_draft'               => ['nullable', 'string'],
         ]);
 
         // dd($validated);
@@ -424,11 +454,12 @@ class DischargeController extends Controller
             // dd($durations);
             // $durations         = array_filter((array) $request->med_duration, fn($d) => $d !== null && $d !== '');
 
-            $meds      = $request->meds ?? [];
-            $types     = $request->med_types ?? [];
-            $intervals = $request->med_interval ?? [];
-            $durations = $request->med_duration ?? [];
-            $medDates  = $request->med_date ?? [];
+            $meds        = $request->meds ?? [];
+            $types       = $request->med_types ?? [];
+            $intervals   = $request->med_interval ?? [];
+            $durations   = $request->med_duration ?? [];
+            $medDates    = $request->med_date ?? [];
+            $departments = $request->discharge_department ?? [];
 
             $finalMeds      = [];
             $finalTypes     = [];
@@ -450,11 +481,12 @@ class DischargeController extends Controller
                 $finalDates[]     = $medDates[$i] ?? "";
             }
 
-            $implodedMeds      = ! empty($finalMeds) ? implode(", ", $finalMeds) : null;
-            $implodedMedTypes  = ! empty($finalTypes) ? implode(", ", $finalTypes) : null;
-            $implodedIntervals = ! empty($finalIntervals) ? implode(", ", $finalIntervals) : null;
-            $implodedDurations = ! empty($finalDurations) ? implode("||", $finalDurations) : null;
-            $implodedDates     = ! empty($finalDates) ? implode("||", $finalDates) : null;
+            $implodedMeds        = ! empty($finalMeds) ? implode(", ", $finalMeds) : null;
+            $implodedMedTypes    = ! empty($finalTypes) ? implode(", ", $finalTypes) : null;
+            $implodedIntervals   = ! empty($finalIntervals) ? implode(", ", $finalIntervals) : null;
+            $implodedDurations   = ! empty($finalDurations) ? implode("||", $finalDurations) : null;
+            $implodedDates       = ! empty($finalDates) ? implode("||", $finalDates) : null;
+            $implodedDepartments = ! empty($departments) ? implode(",", $departments) : null;
             // $durationsJson     = json_encode(array_values($durations));
             // dd($implodedMeds);
             $barcodePayload = [
@@ -511,7 +543,7 @@ class DischargeController extends Controller
             $barcodeBinary = base64_decode($barcodePngBase64);
             // dd($barcodeBinary);
             // dd($validated);
-            $discharge = DischargeCard::findOrFail($id);
+            $discharge      = DischargeCard::findOrFail($id);
             $oldDischargeAt = $this->parseDischargeDateTimeForBedHistory(
                 $this->dischargeDateToString($discharge->discharge_date),
                 $discharge->discharge_time
@@ -571,8 +603,31 @@ class DischargeController extends Controller
                 'intervals'          => $implodedIntervals ?? null,
                 'durations'          => $implodedDurations ?? null,
                 'med_dates'          => $implodedDates ?? null,
+
+                'department_name'    => $implodedDepartments ?? null,
                 'doctor_advice'      => $validated['doctor_advice'] ?? null,
+                'is_draft'           => $validated['is_draft'] == "true" ? 1 : 0,
             ]);
+
+            // -------------------------------
+            // 🔹 Update Patient Departments
+            // -------------------------------
+            Patient::where('id', $validated['patient_id'])->update([
+                'department_name' => $implodedDepartments,
+            ]);
+
+            // -------------------------------
+            // 🔹 Mark Discharge as Draft in IPD
+            // -------------------------------
+            if ($validated['is_draft'] == "false") {
+                IpdDetail::where('id', $validated['ipd_details_id'])
+                    ->update(['discharged' => 'yes', 'discharged_date' => $validated['discharge_date']]);
+
+                DB::commit();
+                return redirect()
+                    ->route('ipd', ['tab' => 'discharge'])
+                    ->with('success', 'Patient discharged successfully.');
+            }
 
             $newDischargeAt = $this->parseDischargeDateTimeForBedHistory(
                 $validated['discharge_date'],
@@ -590,7 +645,7 @@ class DischargeController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('ipd')
+                ->route('ipd', ['tab' => 'discharge'])
                 ->with('success', 'Discharge Updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();

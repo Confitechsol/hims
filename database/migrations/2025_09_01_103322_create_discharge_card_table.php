@@ -77,11 +77,13 @@ return new class extends Migration
             $table->text('intervals')->nullable();
             $table->text('durations')->nullable();
             $table->string('med_dates', 255)->nullable();
+            $table->text('department_name')->nullable();
             $table->text('doctor_advice')->nullable();
 
             // 🔹 Meta
             $table->string('discharged_by', 255)->nullable()->index();
             $table->unsignedBigInteger('created_by')->nullable()->index();
+            $table->tinyInteger('is_draft')->nullable()->default(0);
 
             $table->timestamps();
         });

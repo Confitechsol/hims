@@ -666,7 +666,7 @@
                                     <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i>
                                         {{ $ipd->patient->patient_name }}
                                     </h5>
-                                    @if ($ipd->discharged == 'yes')
+                                    @if ($ipd->discharged == 'yes' || $ipd->discharged == 'draft')
                                         <button class="border-0 text-white"
                                             style="background-color: #750096;padding: 0.5rem;border-radius: 8px;"
                                             data-bs-toggle="modal" data-bs-target="#dischargePreviewModal"
@@ -678,6 +678,7 @@
                                         <button class="border-0 text-white" style="background-color: #750096;padding: 0.5rem;border-radius: 8px;" data-bs-toggle="modal"
                                             data-bs-target="#patientDischargeModal" data-ipd="{{ $ipd }}"
                                             data-doctors="{{ $doctors }}" data-user="{{ $currentUser }}"
+                                            data-departments="{{ $departments }}"
                                             data-outstanding={{ $billingSummary['outstanding'] ?? 0 }}><i
                                                 class="bi bi-clipboard-pulse text-white"></i> Discharge</button>
                                     @endif

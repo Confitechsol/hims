@@ -13,7 +13,7 @@
         <!-- Page Header -->
         <div class="d-flex align-items-sm-center justify-content-between flex-wrap gap-2 mb-4">
             <div>
-                <h4 class="fw-bold mb-0">Admin Dashboard </h4>
+                <h4 class="fw-bold mb-0"> <p><b>Hi </b>{{ $user->username }}</p></h4>
             </div>
             <div class="d-flex align-items-center flex-wrap gap-2">
                 <a href="new-appointment.html" class="btn btn-primary d-inline-flex align-items-center"><i

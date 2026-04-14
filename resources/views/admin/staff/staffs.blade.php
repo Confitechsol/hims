@@ -103,21 +103,28 @@
                                                                         class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill">
                                                                         <i class="ti ti-pencil"></i>
                                                                     </a>
-
-                                                                    
-
-                                                                    {{-- Enable / Disable Button --}}
-                                                                    @if($staff->is_active == '1')
-                                                                    <form action="{{ route('users.store.credentials', $staff->id) }}" 
-                                                                        method="POST" 
-                                                                        style="display:inline-block;">
-                                                                        @csrf
-                                                                        <button type="submit"
-                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
-                                                                            onclick="return confirm('Create login credentials for this staff?')">
+                                                                    @if($staff->user_id == '0')
+                                                                        <form action="{{ route('users.store.credentials', $staff->id) }}" 
+                                                                            method="POST" 
+                                                                            style="display:inline-block;">
+                                                                            @csrf
+                                                                            <button type="submit"
+                                                                                class="fs-18 p-1 btn btn-icon btn-sm btn-soft-primary rounded-pill"
+                                                                                onclick="return confirm('Create login credentials for this staff?')">
+                                                                                <i class="ti ti-key"></i>
+                                                                            </button>
+                                                                        </form>
+                                                                    @else
+                                                                        <button type="button"
+                                                                            class="fs-18 p-1 btn btn-icon btn-sm btn-soft-secondary rounded-pill"
+                                                                            disabled
+                                                                            title="Credentials already created">
                                                                             <i class="ti ti-key"></i>
                                                                         </button>
-                                                                    </form>
+                                                                    @endif
+                                                                    {{-- Enable / Disable Button --}}
+                                                                    @if($staff->is_active == '1')
+                                                                    
                                                                         <form action="{{ route('staff.disable', $staff->id) }}" method="POST" style="display:inline-block;">
                                                                             @csrf
                                                                             @method('PATCH')
