@@ -430,9 +430,9 @@
                         Basic Information
                     </h5>
 
-                    <div class="row g-3">
+                    <div class="row g-3 align-items-center">
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="patient_name" class="form-label">
                                 <i class="bi bi-person"></i>
                                 Patient Name <span class="required">*</span>
@@ -442,7 +442,7 @@
                             <input type="hidden" class="form-control" id="patient_id_text" name="patient_id" required>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="admission_no" class="form-label">
                                 <i class="bi bi-credit-card"></i>
                                 Admission No.
@@ -450,7 +450,7 @@
                             <input type="text" class="form-control" id="admission_no_text" name="admission_no"
                                 autocomplete="off">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="discharge_contact" class="form-label">
                                 <i class="bi bi-credit-card"></i>
                                 Discharge Contact No.
@@ -458,6 +458,18 @@
                             <input type="text" class="form-control" id="discharge_contact_text"
                                 name="discharge_contact" autocomplete="off">
                         </div>
+
+                        <div class="col-md-3">
+                            <label for="discharge_department" class="form-label">
+                                <i class="bi bi-credit-card"></i>
+                                Department
+                            </label>
+                            <select multiple name="discharge_department[]" id="discharge_department_text"
+                                class="form-select p-0">
+                                <option>select</option>
+                            </select>
+                        </div>
+
                         <div class="col-md-3">
                             <label for="bed" class="form-label">
                                 <i class="bi bi-hospital"></i>
@@ -1184,6 +1196,7 @@
             const ipd = JSON.parse(button.getAttribute('data-ipd') || '{}');
 
             const doctors = JSON.parse(button.getAttribute('data-doctors') || '[]');
+            const departments = JSON.parse(button.getAttribute('data-departments') || '[]');
             const currentUser = JSON.parse(button.getAttribute('data-user') || '{}')
             const outstanding = JSON.parse(button.getAttribute('data-outstanding') || 0)
             window.outstanding = outstanding
@@ -1203,8 +1216,10 @@
             // setValue('admit_time', ipd.admit_time);
 
             // 🔹 Patient Details
-            setValue('age_text',
-                `${ipd.patient?.age} Years ${ipd.patient?.month} Months ${ipd.patient?.day} Days`
+            setValue(
+                'age_text',
+                (`${ipd.patient?.age} Years${ipd.patient?.month ? ` ${ipd.patient.month} Months` : ''}
+                ${ipd.patient?.day ? ` ${ipd.patient.day} Days` : ''}`).trim()
             );
             setSelectValue('gender_text', ipd.patient?.gender);
             setValue('phone_text', ipd.patient?.mobileno);
@@ -1234,6 +1249,19 @@
             //     option.textContent = doc.name;
             //     otSelect.appendChild(option);
             // });
+            new TomSelect('#discharge_department_text', {
+                options: departments.map(dep => ({
+                    value: `${dep.department_name}`,
+                    label: `${dep.department_name}`
+                })),
+                valueField: 'value',
+                labelField: 'label',
+                searchField: 'label',
+                create: false,
+                persist: false,
+                placeholder: 'Select departments',
+            });
+
             new TomSelect('#ot_done_by_text', {
                 options: doctors.map(doc => ({
                     value: `${doc.name} ${doc.surname}`,

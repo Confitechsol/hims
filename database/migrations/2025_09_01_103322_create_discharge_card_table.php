@@ -77,6 +77,7 @@ return new class extends Migration
             $table->text('intervals')->nullable();
             $table->text('durations')->nullable();
             $table->string('med_dates', 255)->nullable();
+            $table->text('department_name')->nullable();
             $table->text('doctor_advice')->nullable();
 
             // 🔹 Meta

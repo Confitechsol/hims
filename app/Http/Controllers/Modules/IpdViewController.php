@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Modules;
 
 use App\Http\Controllers\Controller;
+use App\Models\Department;
 use App\Models\DischargeCard;
 use App\Models\Doctor;
 use App\Models\DoctorVisit;
@@ -227,8 +228,8 @@ class IpdViewController extends Controller
         // Billing summary for overview Finance section
         $billingController = app(\App\Http\Controllers\IpdBillingController::class);
         $billingSummary    = $billingController->getBillingSummaryForIpd($ipd->id);
-
-        // dd($ipd);
+        $departments       = Department::where('is_active', 'yes')->get();
+        // dd($departments);
         //dd($currentUser->username);
         return view('admin.ipd.ipd_view', compact(
             'ipd',
@@ -257,7 +258,8 @@ class IpdViewController extends Controller
             'vitals',
             'dosages',
             'currentUser',
-            'billingSummary'
+            'billingSummary',
+            'departments'
         ));
     }
     public function store(Request $request)

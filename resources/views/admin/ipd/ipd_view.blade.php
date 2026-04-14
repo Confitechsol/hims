@@ -678,6 +678,7 @@
                                         <button class="border-0 text-white" style="background-color: #750096;padding: 0.5rem;border-radius: 8px;" data-bs-toggle="modal"
                                             data-bs-target="#patientDischargeModal" data-ipd="{{ $ipd }}"
                                             data-doctors="{{ $doctors }}" data-user="{{ $currentUser }}"
+                                            data-departments="{{ $departments }}"
                                             data-outstanding={{ $billingSummary['outstanding'] ?? 0 }}><i
                                                 class="bi bi-clipboard-pulse text-white"></i> Discharge</button>
                                     @endif
