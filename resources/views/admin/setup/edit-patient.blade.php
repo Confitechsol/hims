@@ -402,43 +402,7 @@
                                                         </select>
                                                    </div>
                                             </div>
-                                            <!-- Department Dropdown Script -->
-                                            <script>
-                                            document.addEventListener('DOMContentLoaded', function() {
-                                                fetch('{{url('/')}}/departments')
-                                                    .then(response => response.json())
-                                                    .then(res => {
-                                                        let departments = [];
-                                                        if (res.status && Array.isArray(res.data)) {
-                                                            departments = res.data;
-                                                        } else if (Array.isArray(res)) {
-                                                            departments = res;
-                                                        }
-                                                        const dropdown = document.getElementById('departmentDropdown');
-                                                        const selectedNames = @json(old('department_name', $patient->department_name ?? ''))
-    .split(',')
-    .map(s => s.trim());
-                                                        departments.forEach(department => {
-                                                            const option = document.createElement('option');
-                                                            option.value = department.department_name;
-                                                            option.textContent = department.department_name;
-                                                            if (selectedNames.includes(department.department_name)) {
-                                                                option.selected = true;
-                                                            }
-                                                            dropdown.appendChild(option);
-                                                        });
-                                                        // Initialize select2 if available
-                                                        if (window.jQuery && typeof $(dropdown).select2 === 'function') {
-                                                            $(dropdown).select2({
-                                                                placeholder: 'Select Department',
-                                                                allowClear: true
-                                                            });
-                                                        }
-                                                    });
-                                            });
-                                            </script>
-                                            </div>
-                                        </div>
+                
         
                                         <div class="form-section mb-4">
                                             <div class="section-header">
