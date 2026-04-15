@@ -16,6 +16,7 @@ use App\Models\PatientBedHistory;
 use App\Models\BedGroup;
 use App\Models\Doctor;
 use App\Services\IpdPackageService;
+use App\Support\BedBillingPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -198,9 +199,17 @@ class IpdBillingController extends Controller
             return ['total' => 0, 'details' => []];
         }
 
-        $admissionDate = Carbon::parse($ipd->date)->startOfDay();
-        $endDate = $endDate ? Carbon::parse($endDate) : Carbon::now();
-        $endDate = $endDate->endOfDay();
+        $admissionAt = Carbon::parse($ipd->date);
+        // For non-discharged preview/breakup, calculate up to current moment.
+        // Date-only end values are treated as end-of-day; datetime values are respected.
+        if ($endDate === null) {
+            $endAt = Carbon::now();
+        } else {
+            $rawEnd = trim((string) $endDate);
+            $endAt = preg_match('/^\d{4}-\d{2}-\d{2}$/', $rawEnd)
+                ? Carbon::parse($rawEnd)->endOfDay()
+                : Carbon::parse($rawEnd);
+        }
 
         // Get all bed history records for this IPD (primary source)
         $bedHistories = PatientBedHistory::where('ipd_id', $ipdId)
@@ -222,7 +231,9 @@ class IpdBillingController extends Controller
         $totalCgst = 0;
         $totalSgst = 0;
         $details = [];
-        $currentDate = $admissionDate->copy();
+        $currentDate = Carbon::parse($ipd->date)->startOfDay();
+        $lastChargeDay = $this->resolveChargeLabelDayForMoment($endAt);
+        $admissionCalendarDay = $admissionAt->copy()->startOfDay();
 
         // Pre-compute the most recent custom bed charge for each bed group during its history periods
         // This ensures a custom charge set on admission/transfer applies to all subsequent days in that period
@@ -253,26 +264,37 @@ class IpdBillingController extends Controller
             }
         }
 
-        // Calculate charges for each day from admission to end date
-        while ($currentDate->lte($endDate)) {
+        // Calculate charges for each calendar day from admission to end date (charge_date = label day).
+        // Bed window: (prev day @ boundary, current day @ boundary] — see config/hims.php.
+        // Anchor clamp: no billing window before actual admission time (avoids "previous calendar day" start).
+        while ($currentDate->lte($lastChargeDay)) {
             $chargeDate = $currentDate->format('Y-m-d');
-            $chargeDateCarbon = $currentDate->copy();
 
-            // Period: 10:01 AM previous day to 10:01 AM current day (for "which bed was active")
-            $periodStart = $currentDate->copy()->subDay()->setTime(10, 1, 0);
-            $periodEnd = $currentDate->copy()->setTime(10, 1, 0);
+            [$periodStart, $periodEnd] = BedBillingPeriod::windowForChargeCalendarDay($currentDate->copy()->startOfDay());
+            // Business rule: never bill a window whose start date is before admission calendar date.
+            // If admitted on 6th 05:14, skip 5th->6th window; first billable window is 6th->7th.
+            if ($periodStart->copy()->startOfDay()->lt($admissionCalendarDay)) {
+                $currentDate->addDay();
+                continue;
+            }
+
+            $effective = BedBillingPeriod::effectiveWindow($periodStart, $periodEnd, $admissionAt);
+            if ($effective === null) {
+                $currentDate->addDay();
+                continue;
+            }
+            [$effectiveStart] = $effective;
 
             // Find which bed was assigned during this period using exact datetime overlap.
-            // Period is treated as [start, end): includes start, excludes end to avoid double-counting boundaries.
+            // Compare history to [effectiveStart, periodEnd) (admission-clamped window).
             $activeBed = null;
             $activeBedHistoryIndex = null;
             foreach ($bedHistories as $historyIndex => $history) {
                 $fromDate = Carbon::parse($history->from_date);
                 $toDate = $history->to_date ? Carbon::parse($history->to_date) : null;
 
-                // Overlap condition for [fromDate, toDate) with [periodStart, periodEnd)
-                if ($fromDate->lt($periodEnd) && (!$toDate || $toDate->gt($periodStart))) {
-                    if (!$activeBed || $fromDate->gt(Carbon::parse($activeBed->from_date))) {
+                if ($fromDate->lt($periodEnd) && (! $toDate || $toDate->gt($effectiveStart))) {
+                    if (! $activeBed || $fromDate->gt(Carbon::parse($activeBed->from_date))) {
                         $activeBed = $history;
                         $activeBedHistoryIndex = $historyIndex;
                     }
@@ -333,7 +355,7 @@ class IpdBillingController extends Controller
 
                 $detail = (object) [
                     'charge_date' => $chargeDate,
-                    'period_start_date' => $periodStart->format('Y-m-d'),
+                    'period_start_date' => $effectiveStart->format('Y-m-d'),
                     'period_end_date' => $periodEnd->format('Y-m-d'),
                     'bed_group_id' => $activeBed->bed_group_id,
                     'bed_id' => $activeBed->bed_id,
@@ -564,6 +586,21 @@ class IpdBillingController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Determine charge-label day (Y-m-d @ 00:00) for a moment.
+     * If the moment is after boundary time, it belongs to the next label day.
+     */
+    private function resolveChargeLabelDayForMoment(Carbon $moment): Carbon
+    {
+        $labelDay = $moment->copy()->startOfDay();
+        [, $boundaryEnd] = BedBillingPeriod::windowForChargeCalendarDay($labelDay);
+        if ($moment->gt($boundaryEnd)) {
+            $labelDay->addDay();
+        }
+
+        return $labelDay;
     }
 
     /**
@@ -1080,7 +1117,7 @@ class IpdBillingController extends Controller
      * Group day-wise bed charges by bed and contiguous date ranges for display.
      * Returns one row per (bed + contiguous date range): e.g. "SINGLE - 5 SINGLE @5000 | 5 Days | 17/01/2026 To 21/01/2026".
      *
-     * Uses period_start_date / period_end_date (10:01–10:01 hospital day) for the printed "Date Range".
+     * Uses period_start_date / period_end_date (bed billing boundary from config, default 11:00–11:00) for the printed "Date Range".
      * charge_date alone can repeat the same calendar day when the billing day label differs from the
      * occupancy window (e.g. admit 27 10:31 → one line with charge_date 28 but period 27→28).
      *
