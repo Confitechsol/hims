@@ -31,51 +31,25 @@
                 </div>
 
                 <div class="card-body">
-                    <form action="" method="GET">
-                        <div class="row align-items-center">
 
-                            {{-- Date From --}}
-                            <div class="col-md-3">
-                                <label class="form-label">
-                                    Date From <span class="text-danger">*</span>
-                                </label>
-                                {{-- <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}"
-                                    max="{{ now()->toDateString() }}"> --}}
-                                <input type="date" id="from_date">
-                            </div>
+                <form method="GET" action="{{ route('doctors.patient.count') }}">
+                <label>Select Year:</label>
+            
+                <select name="year">
+                    @for($y = date('Y'); $y >= date('Y') - 5; $y--)
+                        <option value="{{ $y }}" {{ $y == $year ? 'selected' : '' }}>
+                            {{ $y }}
+                        </option>
+                    @endfor
+                </select>
 
-                            {{-- Date To --}}
-                            <div class="col-md-3">
-                                <label class="form-label">
-                                    Date To <span class="text-danger">*</span>
-                                </label>
-                                {{-- <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}"
-                                    max="{{ now()->toDateString() }}"> --}}
-                                <input type="date" id="to_date">
-                            </div>
+                    <button class="btn btn-success" type="submit">Filter</button>
 
-                            {{-- Export --}}
-                            <div class="col-md-3">
-                                <button type="button" class="btn btn-success" onclick="exportAllData()">
-                                    Export to Excel
-                                </button>
-                                <button class="btn btn-danger" onclick="exportToPDF('ipd-reports-table')">Export to
-                                    PDF</button>
-                            </div>
-
-                            {{-- Buttons --}}
-                            <!-- <div class="col-md-12 mt-3">
-                                <button type="submit" class="btn btn-primary btn-sm">
-                                    Search
-                                </button>
-
-                                <a href="{{ route('ipd.ipd_reports') }}" class="btn btn-secondary btn-sm">
-                                    Reset
-                                </a>
-                            </div> -->
-
-                        </div>
-                    </form>
+                    <button class="btn btn-success" onclick="exportExcel()">
+                        Export Excel
+                    </button>
+                </form>
+                  
 
                 </div>
             </div>
@@ -95,24 +69,32 @@
                                                 <table class="table border" id="ipd-reports-table">
                                                     <thead class="thead-light">
                                                         <tr>
-
-
-                                                            <th>IPD No</th>
-                                                            <th>Patient Name</th>
-                                                            <th>Age</th>
-                                                            <th>Gender</th>
-                                                            <th>Mobile Number</th>
-                                                            <th>Guardian Name</th>
-                                                            <th>Doctor Name </th>
-                                                            <th>Status</th>
-                                                            <th>Date</th>
+                                                            <th>Doctor Name</th>
+                                                            <th>January</th>
+                                                            <th>February</th>
+                                                            <th>March</th>
+                                                            <th>April</th>
+                                                            <th>May</th>
+                                                            <th>June</th>
+                                                            <th>July</th>
+                                                            <th>August</th>
+                                                            <th>September</th>
+                                                            <th>October</th>
+                                                            <th>November</th>
+                                                            <th>December</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-
-
-
-
+                                                     @foreach($doctors as $doctor)
+                                                    <tr>
+                                                        <td>{{ $doctor->name }}</td>
+                                                    
+                                                        @for ($m = 1; $m <= 12; $m++)
+                                                            <td>{{ $doctorData[$doctor->id][$m] ?? 0 }}</td>
+                                                        @endfor
+                                                    
+                                                    </tr>
+                                                    @endforeach
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -320,6 +302,24 @@ function exportAllData() {
          
          }
          </script>
+
+         <script>
+function exportExcel() {
+    let table = document.getElementById("ipd-reports-table");
+
+    // Convert table to worksheet
+    let wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.table_to_sheet(table);
+
+    // Append sheet
+    XLSX.utils.book_append_sheet(wb, ws, "Doctor Report");
+
+    // Download Excel file
+    XLSX.writeFile(wb, "doctor-report.xlsx");
+}
+</script>
+
+         
          
          
 @endsection

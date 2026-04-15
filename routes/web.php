@@ -91,6 +91,7 @@ use App\Http\Controllers\VisitorsController;
 use App\Http\Controllers\VitalController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PatientReportController;
+use App\Http\Controllers\DoctorExportPatientCountController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -186,9 +187,14 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/states', [PatientController::class, 'state']);
     Route::get('/report/patient', [PatientReportController::class, 'patientReport'])->name('patient-report');
     Route::get('/patient-report', [PatientReportController::class, 'patientReportApi']);
-    Route::get('/departments', [PatientController::class, 'departments']);    
-
+    Route::get('/departments', [PatientController::class, 'departments']); 
     
+    
+    Route::get('/get-doctors/patients/count', [DoctorExportPatientCountController::class, 'getDoctorsPatientCount'])->name('get.doctors.patient.count'  );
+    Route::get('/doctors/patients/count', [DoctorExportPatientCountController::class, 'getDoctors'])->name('doctors.patient.count');
+
+//    http://localhost/hims/public/doctors/patients/count
+//    http://localhost/hims/public/reports/doctor-reports 
 
 
     Route::get('/languages', [LanguagesController::class, 'index'])->name('languages');
