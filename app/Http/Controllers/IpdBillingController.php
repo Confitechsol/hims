@@ -265,35 +265,42 @@ class IpdBillingController extends Controller
         }
 
         // Calculate charges for each calendar day from admission to end date (charge_date = label day).
-        // Bed window: (prev day @ boundary, current day @ boundary] — see config/hims.php.
-        // Anchor clamp: no billing window before actual admission time (avoids "previous calendar day" start).
+        // Billing cycle remains boundary-based (default 11:00 -> next day 11:00).
+        // We also clamp by actual discharge datetime so final bill does not over-count.
         while ($currentDate->lte($lastChargeDay)) {
             $chargeDate = $currentDate->format('Y-m-d');
 
             [$periodStart, $periodEnd] = BedBillingPeriod::windowForChargeCalendarDay($currentDate->copy()->startOfDay());
-            // Business rule: never bill a window whose start date is before admission calendar date.
-            // If admitted on 6th 05:14, skip 5th->6th window; first billable window is 6th->7th.
+
+            // Never bill a window whose start date is before admission calendar date.
+            // Example: admitted 22nd => skip 21st->22nd window.
             if ($periodStart->copy()->startOfDay()->lt($admissionCalendarDay)) {
                 $currentDate->addDay();
                 continue;
             }
 
-            $effective = BedBillingPeriod::effectiveWindow($periodStart, $periodEnd, $admissionAt);
-            if ($effective === null) {
+            // Respect requested end moment (discharge datetime for final bill).
+            if ($periodEnd->lte($admissionAt) || $periodStart->gte($endAt)) {
                 $currentDate->addDay();
                 continue;
             }
-            [$effectiveStart] = $effective;
+
+            $effectiveStart = $periodStart->copy()->max($admissionAt);
+            $effectiveEnd = $periodEnd->copy()->min($endAt);
+            if ($effectiveStart->gte($effectiveEnd)) {
+                $currentDate->addDay();
+                continue;
+            }
 
             // Find which bed was assigned during this period using exact datetime overlap.
-            // Compare history to [effectiveStart, periodEnd) (admission-clamped window).
+            // Compare history to [effectiveStart, effectiveEnd) (admission/discharge-clamped window).
             $activeBed = null;
             $activeBedHistoryIndex = null;
             foreach ($bedHistories as $historyIndex => $history) {
                 $fromDate = Carbon::parse($history->from_date);
                 $toDate = $history->to_date ? Carbon::parse($history->to_date) : null;
 
-                if ($fromDate->lt($periodEnd) && (! $toDate || $toDate->gt($effectiveStart))) {
+                if ($fromDate->lt($effectiveEnd) && (! $toDate || $toDate->gt($effectiveStart))) {
                     if (! $activeBed || $fromDate->gt(Carbon::parse($activeBed->from_date))) {
                         $activeBed = $history;
                         $activeBedHistoryIndex = $historyIndex;
@@ -356,7 +363,7 @@ class IpdBillingController extends Controller
                 $detail = (object) [
                     'charge_date' => $chargeDate,
                     'period_start_date' => $effectiveStart->format('Y-m-d'),
-                    'period_end_date' => $periodEnd->format('Y-m-d'),
+                    'period_end_date' => $effectiveEnd->format('Y-m-d'),
                     'bed_group_id' => $activeBed->bed_group_id,
                     'bed_id' => $activeBed->bed_id,
                     'bed_charge' => $bedCost,
@@ -1837,14 +1844,18 @@ class IpdBillingController extends Controller
             
             $dischargeDate = $dischargeCard->discharge_date;
             $dischargeTime = $dischargeCard->discharge_time;
+            $billingEndAt = !empty($dischargeTime)
+                ? Carbon::parse($dischargeDate . ' ' . $dischargeTime)->format('Y-m-d H:i:s')
+                : Carbon::parse($dischargeDate)->endOfDay()->format('Y-m-d H:i:s');
             
             \Log::info('Discharge information retrieved', [
                 'discharge_date' => $dischargeDate,
-                'discharge_time' => $dischargeTime
+                'discharge_time' => $dischargeTime,
+                'billing_end_at' => $billingEndAt,
             ]);
 
             \Log::info('Calculating breakup');
-            $breakup = $this->calculateBreakup($ipdId, $dischargeDate);
+            $breakup = $this->calculateBreakup($ipdId, $billingEndAt);
             \Log::info('Breakup calculated', ['total_charges' => $breakup['total_charges']]);
 
             // Get payment details
@@ -1857,7 +1868,7 @@ class IpdBillingController extends Controller
 
             // Get detailed breakdown - Calculate dynamically from PatientBedHistory up to discharge date (omit from display when package applied)
             \Log::info('Getting bed charges details');
-            $bedChargesData = $this->calculateBedChargesFromHistory($ipdId, $dischargeDate);
+            $bedChargesData = $this->calculateBedChargesFromHistory($ipdId, $billingEndAt);
             $bedChargesDetails = collect($bedChargesData['details']);
             $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
             $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
