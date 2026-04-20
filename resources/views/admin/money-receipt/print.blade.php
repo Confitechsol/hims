@@ -400,10 +400,13 @@
             <div class="payment_section">
                 @php
                     $amount = (float) ($receipt->amount ?? 0);
+                    $discount = (float) ($receipt->discount ?? 0);
+                    $tds = (float) ($receipt->tds ?? 0);
+                    $finalAmount = max(0, $amount - $discount - $tds);
                     $amountInWords = '';
-                    if ($amount > 0 && class_exists(\App\Helpers\NumberToWords::class)) {
+                    if ($finalAmount > 0 && class_exists(\App\Helpers\NumberToWords::class)) {
                         try {
-                            $amountInWords = \App\Helpers\NumberToWords::convert($amount);
+                            $amountInWords = \App\Helpers\NumberToWords::convert($finalAmount);
                         } catch (\Exception $e) {
                             $amountInWords = '';
                         }
@@ -423,18 +426,24 @@
                 @endphp
                 <div class="payment_amount">
                     @if($isRefund)
-                        Refunded Amount of Rs. {{ number_format($amount, 2) }}
+                        Refunded Final Amount of Rs. {{ number_format($finalAmount, 2) }}
                         @if($amountInWords)
                             ({{ $amountInWords }})
                         @endif
                         For Patient {{ strtoupper($receipt->patient->patient_name ?? '-') }}
                     @else
-                        Received With Thanks The Amount of Rs. {{ number_format($amount, 2) }}
+                        Received With Thanks The Final Amount of Rs. {{ number_format($finalAmount, 2) }}
                         @if($amountInWords)
                             ({{ strtolower($amountInWords) }})
                         @endif
                         For Patient {{ $receipt->patient->patient_name ?? '-' }}
                     @endif
+                </div>
+                <div style="margin-top:6px; font-size: 9px;">
+                    Gross: Rs. {{ number_format($amount, 2) }} |
+                    Discount: Rs. {{ number_format($discount, 2) }} |
+                    TDS: Rs. {{ number_format($tds, 2) }} |
+                    Final: Rs. {{ number_format($finalAmount, 2) }}
                 </div>
                 <div class="payment_nature">
                     <strong>Payment Nature:</strong> Payment Vide {{ $paymentModeDisplay }}

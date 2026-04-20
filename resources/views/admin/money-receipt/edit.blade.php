@@ -175,9 +175,21 @@
                                         value="{{ old('amount', $receipt->amount) }}" placeholder="0.00" required>
                                 </div>
                                 <div class="col-md-3">
+                                    <label class="form-label">Discount (₹)</label>
+                                    <input type="number" step="0.01" min="0" name="discount" class="form-control"
+                                        value="{{ old('discount', $receipt->discount ?? 0) }}" placeholder="0.00">
+                                </div>
+                                <div class="col-md-3">
                                     <label class="form-label">TDS (₹)</label>
                                     <input type="number" step="0.01" min="0" name="tds" class="form-control" 
                                         value="{{ old('tds', $receipt->tds ?? 0) }}" placeholder="0.00">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Final Amount (₹)</label>
+                                    <input type="text" id="final_amount_display" class="form-control"
+                                        value="{{ number_format(max(0, (float)($receipt->amount ?? 0) - (float)($receipt->discount ?? 0) - (float)($receipt->tds ?? 0)), 2, '.', '') }}"
+                                        readonly>
+                                    <small class="text-muted">Amount - Discount - TDS</small>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Remarks</label>
@@ -327,6 +339,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Payment Mode change - show/hide cheque, UPI/Online/Transfer fields
     const paymentModeSelect = document.getElementById('payment_mode');
+    const amountInput = document.querySelector('input[name="amount"]');
+    const discountInput = document.querySelector('input[name="discount"]');
+    const tdsInput = document.querySelector('input[name="tds"]');
+    const finalAmountDisplay = document.getElementById('final_amount_display');
     const chequeFields = document.getElementById('chequeFields');
     const upiTransferFields = document.getElementById('upiTransferFields');
     const transferBankNameCol = document.getElementById('transferBankNameCol');
@@ -350,6 +366,23 @@ document.addEventListener('DOMContentLoaded', function() {
         paymentModeSelect.addEventListener('change', togglePaymentExtraFields);
         togglePaymentExtraFields();
     }
+
+    function updateFinalAmountDisplay() {
+        if (!finalAmountDisplay) return;
+        const amount = parseFloat(amountInput?.value || 0) || 0;
+        const discount = parseFloat(discountInput?.value || 0) || 0;
+        const tds = parseFloat(tdsInput?.value || 0) || 0;
+        const finalAmount = Math.max(0, amount - discount - tds);
+        finalAmountDisplay.value = finalAmount.toFixed(2);
+    }
+
+    [amountInput, discountInput, tdsInput].forEach((el) => {
+        if (el) {
+            el.addEventListener('input', updateFinalAmountDisplay);
+            el.addEventListener('change', updateFinalAmountDisplay);
+        }
+    });
+    updateFinalAmountDisplay();
 
     // Receipt Type change - show/hide case/prescription number field
     const receiptTypeSelect = document.querySelector('select[name="receipt_type"]');

@@ -37,6 +37,7 @@ class Transaction extends Model
         'attachment_name',
         'amount_type',
         'amount',
+        'discount',
         'payment_mode',
         'cheque_no',
         'cheque_date',

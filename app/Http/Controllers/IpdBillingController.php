@@ -1450,10 +1450,14 @@ class IpdBillingController extends Controller
     /**
      * Export Estimate/Breakup Bill PDF
      */
-    public function exportEstimate($ipdId)
+    public function exportEstimate($ipdId, Request $request)
     {
         try {
              $logged_user = auth()->user()->username ?? '';  
+            $viewMode = strtolower((string) $request->query('view_mode', 'detailed'));
+            if (!in_array($viewMode, ['brief', 'detailed'], true)) {
+                $viewMode = 'detailed';
+            }
 
             \Log::info('exportEstimate started', ['ipd_id' => $ipdId]);
             
@@ -1688,6 +1692,7 @@ class IpdBillingController extends Controller
 
             // Date-wise pathology and radiology for detail table
             $investigationDatewise = $this->getPathologyRadiologyDatewise($ipd);
+            $investigationBrief = $this->buildInvestigationBriefSummary($pathologyDetails, $radiologyDetails, (float) $pathologyTotal, (float) $radiologyTotal);
 
             \Log::info('Loading PDF view', [
                 'pathology_tests' => count($pathologyTestNames),
@@ -1703,7 +1708,7 @@ class IpdBillingController extends Controller
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
                 'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'doctorVisitGroupedByVisitType', 'packageDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
-                'investigationDatewise',
+                'investigationDatewise', 'investigationBrief', 'viewMode',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
                 'hospital', 'logged_user'
             ));
@@ -1744,7 +1749,7 @@ class IpdBillingController extends Controller
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
                 'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'doctorVisitGroupedByVisitType', 'packageDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
-                'investigationDatewise',
+                'investigationDatewise', 'investigationBrief', 'viewMode',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
                 'hospital', 'totalPages', 'gstChargesGrouped', 'logged_user'
             ));
@@ -1770,6 +1775,57 @@ class IpdBillingController extends Controller
             // Return error response
             abort(500, 'Error generating PDF: ' . $e->getMessage() . ' (Check logs for details)');
         }
+    }
+
+    /**
+     * Build compact investigation summary for brief estimate mode.
+     */
+    private function buildInvestigationBriefSummary($pathologyDetails, $radiologyDetails, float $pathologyTotal, float $radiologyTotal): array
+    {
+        $billNumbers = collect();
+
+        $pathologyBillNumbers = collect($pathologyDetails)->map(function ($bill) {
+            if (!empty($bill->bill_no)) {
+                return (string) $bill->bill_no;
+            }
+            if (!empty($bill->bill_number)) {
+                return (string) $bill->bill_number;
+            }
+            if (!empty($bill->billing_no)) {
+                return (string) $bill->billing_no;
+            }
+            return isset($bill->id) ? ('PATB' . str_pad((string) $bill->id, 2, '0', STR_PAD_LEFT)) : null;
+        })->filter();
+
+        $radiologyBillNumbers = collect($radiologyDetails)->map(function ($bill) {
+            if (!empty($bill->bill_no)) {
+                return (string) $bill->bill_no;
+            }
+            if (!empty($bill->bill_number)) {
+                return (string) $bill->bill_number;
+            }
+            if (!empty($bill->billing_no)) {
+                return (string) $bill->billing_no;
+            }
+            return isset($bill->id) ? ('RADB' . str_pad((string) $bill->id, 2, '0', STR_PAD_LEFT)) : null;
+        })->filter();
+
+        $billNumbers = $pathologyBillNumbers
+            ->merge($radiologyBillNumbers)
+            ->unique()
+            ->values();
+
+        $grossTotal = round($pathologyTotal + $radiologyTotal, 2);
+        // Keep existing behavior unless diagnostic-advance logic is introduced explicitly.
+        $receivedInDiagnosis = 0.00;
+        $netTotal = max(0, round($grossTotal - $receivedInDiagnosis, 2));
+
+        return [
+            'bill_numbers_text' => $billNumbers->implode(', '),
+            'gross_total' => $grossTotal,
+            'received_in_diagnosis' => $receivedInDiagnosis,
+            'net_total' => $netTotal,
+        ];
     }
 
     /**

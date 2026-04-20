@@ -76,9 +76,14 @@
                         <h6 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Payment Detail</h6>
                     </div>
                     <div class="card-body">
+                        @php
+                            $finalAmount = max(0, (float)($receipt->amount ?? 0) - (float)($receipt->discount ?? 0) - (float)($receipt->tds ?? 0));
+                        @endphp
                         <div class="row">
                             <div class="col-md-3"><strong>Amount:</strong> ₹ {{ number_format($receipt->amount ?? 0, 2) }}</div>
+                            <div class="col-md-3"><strong>Discount:</strong> ₹ {{ number_format($receipt->discount ?? 0, 2) }}</div>
                             <div class="col-md-3"><strong>TDS:</strong> ₹ {{ number_format($receipt->tds ?? 0, 2) }}</div>
+                            <div class="col-md-3"><strong>Final Amount:</strong> ₹ {{ number_format($finalAmount, 2) }}</div>
                             <div class="col-md-3"><strong>Payment Mode:</strong> {{ $receipt->payment_mode ?? '-' }}</div>
                             <div class="col-md-3"><strong>Remarks:</strong> {{ $receipt->remarks ?? '-' }}</div>
                             <div class="col-md-4"><strong>Paid By:</strong> {{ $receipt->paid_by ?? '-' }}</div>

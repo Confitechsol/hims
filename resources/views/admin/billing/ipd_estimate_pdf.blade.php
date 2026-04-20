@@ -612,6 +612,29 @@
         </table>
         @endif
 
+        @if(($viewMode ?? 'detailed') === 'brief')
+        @if(isset($investigationBrief) && (($investigationBrief['gross_total'] ?? 0) > 0 || !empty($investigationBrief['bill_numbers_text'] ?? '')))
+        <table class="charges-table">
+            <tbody>
+                <tr>
+                    <td style="width: 28%; font-weight: 700; text-transform: uppercase;">Investigation Charges</td>
+                    <td style="width: 52%;">
+                        @php
+                            $briefBills = trim((string) ($investigationBrief['bill_numbers_text'] ?? ''));
+                            $briefBillsWrapped = $briefBills !== '' ? wordwrap($briefBills, 70, "<br>", true) : 'N/A';
+                        @endphp
+                        Total Amount of Bills ({{ $briefBillsWrapped }})<br>
+                        Rs- {{ number_format($investigationBrief['gross_total'] ?? 0, 2) }}
+                        And Less Adv Recvd in Diagnostic Rs- {{ number_format($investigationBrief['received_in_diagnosis'] ?? 0, 2) }}
+                    </td>
+                    <td class="text-right" style="width: 20%; font-weight: 700;">
+                        {{ number_format($investigationBrief['net_total'] ?? 0, 2) }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        @endif
+        @else
         <!-- Pathology Section (Date wise details) -->
         @if(isset($investigationDatewise) && $investigationDatewise->where('type', 'pathology')->count() > 0)
         <div class="section-title">Pathology Details</div>
@@ -686,6 +709,7 @@
                 </tr>
             </tbody>
         </table>
+        @endif
         @endif
 
         <!-- Doctor Visit Charges (grouped by visit type, then by doctor) -->

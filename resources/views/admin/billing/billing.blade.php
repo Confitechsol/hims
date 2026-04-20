@@ -316,7 +316,25 @@
                     });
                     return;
                 }
-                window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-estimate', '_blank');
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Choose Estimate Format',
+                    text: 'Do you want Brief or Detailed estimate bill?',
+                    showCancelButton: true,
+                    showDenyButton: true,
+                    confirmButtonText: 'Detailed',
+                    denyButtonText: 'Brief',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#750096',
+                    denyButtonColor: '#0d6efd',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-estimate?view_mode=detailed', '_blank');
+                    } else if (result.isDenied) {
+                        window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-estimate?view_mode=brief', '_blank');
+                    }
+                });
             });
 
             document.getElementById('exportFinalBtn').addEventListener('click', function() {

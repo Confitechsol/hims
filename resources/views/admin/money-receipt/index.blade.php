@@ -84,6 +84,8 @@
                                 <th>Patient Name</th>
                                 <th>Final Bill No.</th>
                                 <th>Amount (₹)</th>
+                                <th>Discount (₹)</th>
+                                <th>Final Amount (₹)</th>
                                 <th>Payment Mode</th>
                                 <th>Received By</th>
                                 <th>Action</th>
@@ -100,6 +102,8 @@
                                     <td>{{ $receipt->patient->patient_name ?? '-' }}</td>
                                     <td>{{ $receipt->final_bill_no ?? '-' }}</td>
                                     <td><strong>₹ {{ number_format($receipt->amount ?? 0, 2) }}</strong></td>
+                                    <td>₹ {{ number_format($receipt->discount ?? 0, 2) }}</td>
+                                    <td><strong>₹ {{ number_format(max(0, (float)($receipt->amount ?? 0) - (float)($receipt->discount ?? 0) - (float)($receipt->tds ?? 0)), 2) }}</strong></td>
                                     <td>{{ $receipt->payment_mode ?? '-' }}</td>
                                     <td>{{ $receipt->receiver->username ?? '-' }}</td>
                                     <td>
@@ -129,7 +133,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="text-center py-4 text-muted">
+                                    <td colspan="11" class="text-center py-4 text-muted">
                                         No money receipts found.
                                     </td>
                                 </tr>
