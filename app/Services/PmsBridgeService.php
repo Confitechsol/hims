@@ -105,6 +105,13 @@ class PmsBridgeService
                 ->acceptJson()
                 ->post($url, $payload);
 
+            Log::info('PMS bridge request sent', [
+                'url' => $url,
+                'prescription_id' => $prescription->id ?? null,
+                'tests' => $testsPayload,
+                'status' => $response->status(),
+            ]);
+
             if (!$response->successful()) {
                 Log::error('PMS bridge error', [
                     'status' => $response->status(),
