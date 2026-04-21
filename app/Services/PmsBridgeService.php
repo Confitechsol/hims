@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\IpdPrescription;
 use App\Models\IpdPrescriptionTest;
 use App\Models\Pathology;
+use App\Models\PathologyParameterDetail;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -53,13 +54,40 @@ class PmsBridgeService
                 ->get(['id', 'test_name', 'short_name'])
                 ->keyBy('id');
 
-            $testsPayload = collect($pathologyTestIds)->map(function ($testId) use ($pathologyMap) {
+            // Fetch parameter metadata (reference range + unit) for each pathology test.
+            $parameterDetailsByPathology = PathologyParameterDetail::with(['parameter.unitRelation'])
+                ->whereIn('pathology_id', $pathologyTestIds)
+                ->get()
+                ->groupBy('pathology_id');
+
+            $testsPayload = collect($pathologyTestIds)->map(function ($testId) use ($pathologyMap, $parameterDetailsByPathology) {
                 $pathology = $pathologyMap->get((int) $testId);
+                $parameterRows = collect();
+                if (isset($parameterDetailsByPathology[(int) $testId])) {
+                    $parameterRows = collect($parameterDetailsByPathology[(int) $testId])->map(function ($detail) {
+                        $parameter = $detail->parameter;
+                        return [
+                            'parameter_name' => $parameter->parameter_name ?? null,
+                            'reference_interval' => $parameter->reference_range ?? null,
+                            'unit' => $parameter->unitRelation->unit_name ?? null,
+                        ];
+                    })->filter(function ($row) {
+                        return !empty($row['parameter_name']) || !empty($row['reference_interval']) || !empty($row['unit']);
+                    })->values();
+                }
+
+                $referenceIntervals = $parameterRows->pluck('reference_interval')->filter()->unique()->values()->all();
+                $units = $parameterRows->pluck('unit')->filter()->unique()->values()->all();
 
                 return [
                     'external_test_id' => (string) $testId,
                     'external_test_name' => $pathology->test_name ?? ('HIMS test '.$testId),
                     'external_test_short_name' => $pathology->short_name ?? null,
+                    // Test-level convenience fields for PMS UI.
+                    'reference_interval' => !empty($referenceIntervals) ? implode(', ', $referenceIntervals) : null,
+                    'unit' => !empty($units) ? implode(', ', $units) : null,
+                    // Parameter-wise metadata for structured entry in PMS.
+                    'parameters' => $parameterRows->all(),
                 ];
             })->values()->all();
 
