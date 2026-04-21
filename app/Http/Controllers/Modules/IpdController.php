@@ -1014,12 +1014,31 @@ class IpdController extends Controller
                 }
 
                 // Send pathology tests to PMS (if any and PMS is configured)
-                if (! empty($pathology_ids) && config('services.pms.base_url')) {
-                    try {
-                        $pmsBridge = app(PmsBridgeService::class);
-                        $pmsBridge->sendIpdPathologyOrder($prescription);
-                    } catch (\Throwable $e) {
-                        \Log::error('Error sending IPD pathology order to PMS: ' . $e->getMessage(), [
+                if (! empty($pathology_ids)) {
+                    $pmsBaseUrl = config('services.pms.base_url');
+                    if ($pmsBaseUrl) {
+                        try {
+                            $pmsBridge = app(PmsBridgeService::class);
+                            $pmsResult = $pmsBridge->sendIpdPathologyOrder($prescription);
+                            if (!empty($pmsResult['success'])) {
+                                \Log::info('IPD pathology order synced to PMS', [
+                                    'prescription_id' => $prescription->id ?? null,
+                                    'message' => $pmsResult['message'] ?? null,
+                                ]);
+                            } else {
+                                \Log::warning('IPD pathology PMS sync failed', [
+                                    'prescription_id' => $prescription->id ?? null,
+                                    'message' => $pmsResult['message'] ?? null,
+                                    'data' => $pmsResult['data'] ?? null,
+                                ]);
+                            }
+                        } catch (\Throwable $e) {
+                            \Log::error('Error sending IPD pathology order to PMS: ' . $e->getMessage(), [
+                                'prescription_id' => $prescription->id ?? null,
+                            ]);
+                        }
+                    } else {
+                        \Log::warning('PMS sync skipped: services.pms.base_url is empty', [
                             'prescription_id' => $prescription->id ?? null,
                         ]);
                     }
