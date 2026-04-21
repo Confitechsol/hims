@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\IpdDetail;
 use App\Models\IpdPrescription;
 use App\Models\IpdPrescriptionTest;
+use App\Models\Pathology;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -32,21 +32,36 @@ class PmsBridgeService
             }
 
             // Collect pathology test IDs from normalized tests table
-            $pathologyTests = IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)
+            $pathologyTestIds = IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)
                 ->whereNotNull('pathology_id')
                 ->pluck('pathology_id')
-                ->map(fn ($id) => (string) $id)
+                ->map(fn ($id) => (int) $id)
                 ->unique()
                 ->values()
                 ->all();
 
-            if (empty($pathologyTests)) {
+            if (empty($pathologyTestIds)) {
                 return [
                     'success' => false,
                     'message' => 'No pathology tests to send for prescription '.$prescription->id,
                     'data' => null,
                 ];
             }
+
+            // Include names as well so PMS does not need to rely only on ID mapping.
+            $pathologyMap = Pathology::whereIn('id', $pathologyTestIds)
+                ->get(['id', 'test_name', 'short_name'])
+                ->keyBy('id');
+
+            $testsPayload = collect($pathologyTestIds)->map(function ($testId) use ($pathologyMap) {
+                $pathology = $pathologyMap->get((int) $testId);
+
+                return [
+                    'external_test_id' => (string) $testId,
+                    'external_test_name' => $pathology->test_name ?? ('HIMS test '.$testId),
+                    'external_test_short_name' => $pathology->short_name ?? null,
+                ];
+            })->values()->all();
 
             $patient = $ipd->patient;
             $doctor = $ipd->doctor;
@@ -70,7 +85,7 @@ class PmsBridgeService
                     'external_doctor_id' => $doctor ? (string) $doctor->id : null,
                     'name' => $doctor ? trim(($doctor->name ?? '').' '.($doctor->surname ?? '')) : null,
                 ],
-                'tests' => array_map(fn ($hid) => ['external_test_id' => (string) $hid], $pathologyTests),
+                'tests' => $testsPayload,
             ];
 
             $baseUrl = rtrim(config('services.pms.base_url', env('PMS_BASE_URL')), '/');
@@ -94,6 +109,7 @@ class PmsBridgeService
                 Log::error('PMS bridge error', [
                     'status' => $response->status(),
                     'body' => $response->body(),
+                    'tests_payload' => $testsPayload,
                 ]);
 
                 return [
