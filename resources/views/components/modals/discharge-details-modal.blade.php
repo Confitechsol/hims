@@ -457,6 +457,7 @@
 
                                       <div class="bottom_box">
                                           <div class="contact_box">
+                                          <p><b>Your health matters: Book your appointment by contacting us at the number below:***+919836292167</b></p>
                                               <p>DATE : {{ \Carbon\Carbon::now()->format('d-m-Y') }}</p>
                                           </div>
                                           <div class="d-flex flex-column align-items-center">
