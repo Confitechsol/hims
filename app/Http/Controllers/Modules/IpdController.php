@@ -285,8 +285,8 @@ class IpdController extends Controller
 
                 // Always create daywise bed charge when a bed is selected (so estimate/final bill include bed charges)
                 $admissionDate = Carbon::parse($request->admission_date);
-                // $chargeDay     = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($admissionDate);
-                $chargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($admissionDate);
+                $chargeDay     = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($admissionDate);
+                // $chargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($admissionDate);
                 $chargeDate    = $chargeDay->format('Y-m-d');
                 $periodDates   = BedBillingPeriod::periodStorageDatesForChargeDay($chargeDay, $admissionDate);
                 $periodStartDate = $periodDates['period_start_date'];
