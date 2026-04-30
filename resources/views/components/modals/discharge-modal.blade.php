@@ -649,13 +649,15 @@
                             </label>
                             <select class="form-select" id="reason_discharge_text" name="reason_discharge" required>
                                 <option value="">Select</option>
-                                <option value="DORB">DORB</option>
+                                <option value="DORB">Discharge on Risk Bond</option>
                                 <option value="Transfer To Higher Setup">Transfer To Higher Setup</option>
                                 <option value="Discharge On Request">Discharge On Request</option>
-                                <option value="Doctor Refer">Doctor Refer</option>
                                 <option value="Normal Discharge">Normal Discharge</option>
-                                <option value="Expire">Expire</option>
-                            </select>
+                                <option value="Expired">Expire</option>
+                                <option value="Lama">LAMA</option>
+                                <option value="referred">Referred</option>
+                                <option value="DAMA">Discharge Against Medical Advice</option>
+                                <option value="LADA">Left Against Advice</option>
                         </div>
 
                         <div class="col-md-4">
