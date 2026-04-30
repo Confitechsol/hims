@@ -654,6 +654,7 @@
                                 <option value="Discharge On Request">Discharge On Request</option>
                                 <option value="Doctor Refer">Doctor Refer</option>
                                 <option value="Normal Discharge">Normal Discharge</option>
+                                <option value="Expire">Expire</option>
                             </select>
                         </div>
 
