@@ -42,7 +42,33 @@
                             <div class="card">
 
                                 <div class="card-body">
-                                    <x-table-actions.actions id="charges" name="Charges" />
+
+                                 <div class="d-flex justify-content-between align-items-center mb-3">
+
+        {{-- 🔍 SEARCH FORM --}}
+        <form method="GET" action="{{ route('charges') }}" class="d-flex">
+            <input type="text"
+                   name="search"
+                   class="form-control me-2"
+                   placeholder="Search Charges..."
+                   value="{{ request('search') }}">
+
+            <button type="submit" class="btn btn-primary">
+                Search
+            </button>
+        </form>
+
+        {{-- ➕ ADD CHARGES BUTTON --}}
+        <button type="button"
+                class="btn btn-success"
+                data-bs-toggle="modal"
+                data-bs-target="#createModal">
+            + Add Charges
+        </button>
+
+    </div>
+
+                                    {{-- <x-table-actions.actions id="charges" name="Charges" />
                                     @if ($errors->any())
                                         @foreach ($errors->all() as $error)
                                             <div class="alert alert-danger">
@@ -63,7 +89,7 @@
                                         <div class="alert alert-success">
                                             {{ session('success') }}
                                         </div>
-                                    @endif
+                                    @endif --}}
                                     <!-- Modal -->
                                     <div class="modal fade" id="createModal" tabindex="-1"
                                         aria-labelledby="addSpecializationLabel" aria-hidden="true">
