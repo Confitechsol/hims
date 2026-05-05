@@ -28,15 +28,26 @@ class HospitalChargesController extends Controller
             $perPage = 10;
         }
 
-        if ($request->has('search')) {
-         $search_term = $request->search;
-            $charges->where(function ($query) use ($search_term) {
-                $query->where('name', 'like', "%{$search_term}%");
-            });
-         $charges = $charges->with('category.chargeType','unit','taxCategory')->paginate($perPage);
-         return ["result" => $charges];
+    //     if ($request->has('search')) {
+    //      $search_term = $request->search;
+    //         $charges->where(function ($query) use ($search_term) {
+    //             $query->where('name', 'like', "%{$search_term}%");
+    //         });
+    //      $charges = $charges->with('category.chargeType','unit','taxCategory')->paginate($perPage);
+    //      return ["result" => $charges];
+    // }
+    //  $charges = $charges->paginate($perPage);
+    // ✅ SEARCH FILTER (NO JSON RETURN)
+    if ($request->filled('search')) {
+        $search_term = $request->search;
+
+        $charges->where('name', 'like', "%{$search_term}%");
     }
-     $charges = $charges->paginate($perPage);
+
+    // ✅ ALWAYS RETURN RELATIONS + VIEW
+    $charges = $charges->with('category.chargeType', 'unit', 'taxCategory')
+                       ->paginate($perPage)
+                       ->withQueryString();
 
      return view('admin.setup.charges',compact('charges','charge_types','charge_unit','charge_tax_category_id','organisation_names','chargeCategories','organisation_charges'));
 

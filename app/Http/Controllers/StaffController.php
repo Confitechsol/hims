@@ -144,40 +144,43 @@ class StaffController extends Controller
 
         $staff->employee_id = $request->employee_id;
         $staff->role_id = $request->role;
-        $staff->staff_designation_id = $request->designation;
-        $staff->department_id = $request->department;
-        $staff->specialist = $request->specialist ?? null;
+        $staff->lang_id = $request->lang_id ?? $staff->lang_id;
+        $staff->department_id = $request->department ?? $staff->department_id;
+        $staff->staff_designation_id = $request->designation ?? $staff->staff_designation_id;
+        $staff->specialist = $request->specialist ?? $staff->specialist;
+        $staff->qualification = $request->qualification ?? $staff->qualification;
+        $staff->work_exp = $request->work_exp ?? $staff->work_exp;
+        $staff->specialization = $request->specialization ?? $staff->specialization;
         $staff->name = $request->name;
-        $staff->surname = $request->surname;
-        $staff->father_name = $request->father_name;
-        $staff->mother_name = $request->mother_name;
-        $staff->gender = $request->gender;
-        $staff->marital_status = $request->marital_status;
-        $staff->blood_group = $request->blood_group;
-        $staff->dob = $request->dob;
-        $staff->date_of_joining = $request->date_of_joining;
-        $staff->contact_no = $request->contactno;
-        $staff->emergency_contact_no = $request->emgcontactno;
-        $staff->email = $request->email;
-        $staff->local_address = $request->address;
-        $staff->permanent_address = $request->permanent_address;
-        $staff->qualification = $request->qualification;
-        $staff->work_exp = $request->work_exp;
-        $staff->specialization = $request->specialization;
-        $staff->note = $request->note;
-        $staff->pan_number = $request->pan_number;
-        $staff->identification_number = $request->identification_number;
-        $staff->local_identification_number = $request->local_identification_number;
-        // Do not change password or user_id during update unless required
-        $staff->is_active = $request->is_active ?? $staff->is_active;
-
+        $staff->surname = $request->surname ?? $staff->surname;
+        $staff->father_name = $request->father_name ?? $staff->father_name;
+        $staff->mother_name = $request->mother_name ?? $staff->mother_name;
+        $staff->contact_no = $request->contactno ?? $request->contact_no ?? $staff->contact_no;
+        $staff->dob = $request->dob ?? $staff->dob;
+        $staff->marital_status = $request->marital_status ?? $staff->marital_status ?? $staff->marital_status;
+        $staff->date_of_joining = $request->date_of_joining ?? $staff->date_of_joining;
+        $staff->date_of_leaving = $request->date_of_leaving ?? $staff->date_of_leaving;
+        $staff->local_address = $request->address ?? $request->local_address ?? $staff->local_address;
+        $staff->permanent_address = $request->permanent_address ?? $staff->permanent_address ?? $staff->permanent_address;
+        $staff->note = $request->note ?? $staff->note ?? $staff->note;
+        $staff->gender = $request->gender ?? $staff->gender ?? $staff->gender;
+        $staff->blood_group = is_array($request->blood_group) ? ($request->blood_group['name'] ?? $staff->blood_group) : ($request->blood_group ?? $staff->blood_group);
+        $staff->account_title = $request->account_title ?? $staff->account_title ?? $staff->account_title;
+        $staff->bank_account_no = $request->bank_account_no ?? $staff->bank_account_no ?? $staff->bank_account_no;
+        $staff->bank_name = $request->bank_name ?? $staff->bank_name ?? $staff->bank_name;
+        $staff->ifsc_code = $request->ifsc_code ?? $staff->ifsc_code ?? $staff->ifsc_code;
+        $staff->bank_branch = $request->bank_branch ?? $staff->bank_branch ?? $staff->bank_branch;
+        $staff->payscale = $request->payscale ?? $staff->payscale ?? $staff->payscale;
+        $staff->basic_salary = $request->basic_salary ?? $staff->basic_salary ?? $staff->basic_salary;
+        $staff->epf_no = $request->epf_no ?? $staff->epf_no ?? $staff->epf_no;
+        $staff->contract_type = $request->contract_type ?? $staff->contract_type ?? $staff->contract_type;
+        $staff->shift = $request->shift ?? $staff->shift ?? $staff->shift;
+        $staff->location = $request->location ?? $staff->location ?? $staff->location;
         // Handle photo upload
         if ($request->file('file')) {
-            // Delete old photo
             if ($staff->photo && file_exists(public_path('uploads/staff/' . $staff->photo))) {
                 unlink(public_path('uploads/staff/' . $staff->photo));
             }
-
             $file = $request->file('file');
             $filename = time() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/staff'), $filename);
@@ -186,7 +189,7 @@ class StaffController extends Controller
 
         $staff->save();
 
-        return back()->with('success', 'Staff details updated successfully!');
+        return redirect()->route('staffs.index')->with('success', 'Staff details updated successfully!');
     }
 
     public function bulkDelete(Request $request)

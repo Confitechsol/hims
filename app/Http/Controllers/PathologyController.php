@@ -130,13 +130,35 @@ class PathologyController extends Controller
 
         return redirect()->back()->with('success', 'Pathology Unit deleted successfully.');
     }
-    public function pathologyParameters()
-    {
-                                                                       // Fetch only pathology parameters
-        $parameters = PathologyParameter::with('unitRelation')->get(); // or Unit::where('unit_type','PathologyParameter')->get();
-        $units      = Unit::where('unit_type', 'Pathology')->get();
-        return view('admin.setup.pathology_parameter', compact('parameters', 'units'));
-    }
+
+
+
+         public function pathologyParameters(Request $request)
+     {
+         $query = PathologyParameter::with('unitRelation');
+     
+         $perPage = intval($request->input('perPage', 10));
+         if ($perPage <= 0) {
+             $perPage = 10;
+         }
+     
+         // ✅ SEARCH
+         if ($request->filled('search')) {
+             $search = $request->search;
+     
+             $query->where(function ($q) use ($search) {
+                 $q->where('parameter_name', 'like', "%{$search}%")
+                   ->orWhere('parameter_name', 'like', "%{$search}%");
+             });
+         }
+     
+         // ✅ PAGINATION
+         $parameters = $query->paginate($perPage);
+     
+         $units = Unit::where('unit_type', 'Pathology')->get();
+     
+         return view('admin.setup.pathology_parameter', compact('parameters', 'units'));
+     }
 
     public function storeParameter(Request $request)
     {
