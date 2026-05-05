@@ -371,6 +371,12 @@ class IpdController extends Controller
         $bedGroups  = BedGroup::with('floorDetail')->get();
         $bedNumbers = Bed::where('bed_group_id', $ipd->bed_group_id)->where('is_active', 'yes')->get();
         $patients   = Patient::with('organisation', 'bloodGroup')->get();
+        $currentBedCharge = IpdDaywiseBedCharge::where('ipd_id', $ipd->id)
+            ->orderBy('charge_date')
+            ->value('bed_charge_rate');
+        if ($currentBedCharge === null) {
+            $currentBedCharge = $ipd->bedGroup->bed_cost ?? null;
+        }
         // dd($patients);
         $appliedPackage = $ipd->ipdPackages()
             ->where('status', 'applied')
@@ -387,7 +393,8 @@ class IpdController extends Controller
             'bedGroups',
             'bedNumbers',
             'patients',
-            'appliedPackage'
+            'appliedPackage',
+            'currentBedCharge'
         ));
 
     }
@@ -403,8 +410,10 @@ class IpdController extends Controller
             'date'           => 'nullable|date',
             'package_id'     => 'nullable|exists:packages,id',
             'package_rate'   => 'nullable|numeric|min:0',
+            'bed_charge'     => 'nullable|numeric|min:0',
         ]);
         try {
+            DB::beginTransaction();
             // $symptomTitle         = array_filter($request->symptoms_title, fn($title) => $title !== null && $title !== '');
             $symptomTitle         = array_filter($request->symptoms_title ?? [], fn($title) => $title !== null && $title !== '');
             $symptomType          = array_filter($request->symptoms_type ?? [], fn($type) => $type !== null && $type !== '');
@@ -487,6 +496,35 @@ class IpdController extends Controller
             $ipdPatient->doctor3_id = $request->consultant_doctor3 ?? null;
             $ipdPatient->doctor4_id = $request->consultant_doctor4 ?? null;
             $ipdPatient->save();
+
+            // Persist edited bed charge for admission period so estimate/final bill uses the updated value.
+            $bedChargeRate = $request->bed_charge !== null && $request->bed_charge !== ''
+                ? (float) $request->bed_charge
+                : (float) (optional($ipd->bedGroup)->bed_cost ?? 0);
+            $chargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($newAdmissionDate);
+            $chargeDate = $chargeDay->format('Y-m-d');
+            $periodDates = BedBillingPeriod::periodStorageDatesForChargeDay($chargeDay, $newAdmissionDate);
+
+            IpdDaywiseBedCharge::updateOrCreate(
+                [
+                    'ipd_id'      => $ipd->id,
+                    'charge_date' => $chargeDate,
+                ],
+                [
+                    'hospital_id'       => $ipd->hospital_id,
+                    'branch_id'         => $ipd->branch_id ?? null,
+                    'case_reference_id' => $ipd->case_reference_id ?? null,
+                    'patient_id'        => $ipd->patient_id,
+                    'period_start_date' => $periodDates['period_start_date'],
+                    'period_end_date'   => $periodDates['period_end_date'],
+                    'bed_group_id'      => $request->bed_group,
+                    'bed_id'            => $request->bed_number,
+                    'bed_charge'        => $bedChargeRate,
+                    'bed_charge_rate'   => $bedChargeRate,
+                    'no_of_days'        => 1,
+                    'is_active'         => 'yes',
+                ]
+            );
 
             // Package update during admission edit:
             // - If there is an applied package, update its amount (per patient) when package_rate provided.

@@ -842,7 +842,7 @@
                                                     <input type="number" class="form-control" name="bed_charge"
                                                         id="bed_charge_input_edit" step="0.01" min="0"
                                                         placeholder="0.00"
-                                                        value="{{ old('bed_charge') }}">
+                                                        value="{{ old('bed_charge', $currentBedCharge) }}">
                                                     <small class="text-muted">Auto-filled from bed group (editable)</small>
                                                 </div>
                                                 <div class="field-group">
