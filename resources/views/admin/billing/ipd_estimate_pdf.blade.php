@@ -340,7 +340,7 @@
                         <strong>Estimate Date</strong> : {{ \Carbon\Carbon::now()->format('d/m/Y') }}
                     </td>
                     <td style="text-align: right; width: 33.34%; padding: 3px 4px;">
-                        <strong>Estimate Time</strong> : {{ \Carbon\Carbon::now()->format('H:i:s') }}
+                        <strong>Estimate Time</strong> : {{ \Carbon\Carbon::now('Asia/Kolkata')->format('H:i:s') }}
                     </td>
                 </tr>
             </table>
