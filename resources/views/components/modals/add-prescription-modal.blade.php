@@ -713,19 +713,41 @@
                                                 <option value="{{ $doctor->id }}">{{ $doctor->name }} ({{ $doctor->doctor_id ?? 'N/A' }})</option>
                                             @endforeach
                                         </select> --}}
-                                        <select class="form-control select2" style="width: 100%" name="prescribe_by" id="prescribe_by" required>
-                                          <option value="">Select Doctor</option>
-                                      
-                                          @php
-                                              $doctors = \App\Models\Doctor::all();
-                                          @endphp
-                                      
-                                          @foreach($doctors as $doctor)
-                                              <option value="{{ $doctor->id }}">
-                                                  {{ $doctor->name }} {{ $doctor->surname }} ({{ $doctor->doctor_id ?? 'N/A' }})
-                                              </option>
-                                          @endforeach
-                                      </select>
+                                          <select class="form-control" style="width: 100%" name="prescribe_by" id="prescribe_by" required>
+                                              <option value="">Select Doctor</option>
+                                              @php
+                                                  $doctors = \App\Models\Doctor::all();
+                                              @endphp 
+                                              {{-- @foreach($doctors as $doctor)
+                                                  <option value="{{ $doctor->id }}">
+                                                      {{ $doctor->name }} {{ $doctor->surname }} ({{ $doctor->doctor_id ?? 'N/A' }})
+                                                  </option>
+                                              @endforeach --}}
+                                          </select>
+    <!-- Ensure Select2 JS and CSS are loaded in your layout or before this script -->
+   <script>
+   
+document.addEventListener('DOMContentLoaded', function () {
+
+    const doctordata = @json(
+        $doctors
+    );
+
+    new TomSelect('#prescribe_by', {
+        options: doctordata.map(doc => ({
+            value: doc.id,
+            label: `${doc.name} ${doc.surname} (${doc.doctor_id ?? 'N/A'})`
+        })),
+        valueField: 'value',
+        labelField: 'label',
+        searchField: 'label',
+        create: false,
+        persist: false,
+        placeholder: 'Select doctors'
+    });
+
+});
+</script>
                                     </div>
                                 </div>
                                 <div class="col-sm-12 mt-3">
