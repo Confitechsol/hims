@@ -483,6 +483,8 @@
                                 <option value="">Select your nationality</option>
                                 <option value="Indian" {{ old('nationality') == 'Indian' ? 'selected' : '' }}>Indian
                                 </option>
+                                <option value="Bangladeshi" {{ old('nationality') == 'Bangladeshi' ? 'selected' : '' }}>Bangladeshi
+                                </option>
                                 <option value="American" {{ old('nationality') == 'American' ? 'selected' : '' }}>
                                     American</option>
                                 <option value="British" {{ old('nationality') == 'British' ? 'selected' : '' }}>
