@@ -14,6 +14,7 @@ class Organisation extends Model
     protected $fillable = [
         'hospital_id',
         'branch_id',
+        'insurance_company_id',
         'organisation_name',
         'code',
         'contact_no',
@@ -26,4 +27,9 @@ class Organisation extends Model
     ];
 
     public $timestamps = false;
+
+    public function insuranceCompany()
+    {
+        return $this->belongsTo(InsuranceCompany::class, 'insurance_company_id');
+    }
 }

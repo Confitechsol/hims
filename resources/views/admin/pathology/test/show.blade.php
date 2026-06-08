@@ -106,112 +106,34 @@
                         </div>
                     @endif
 
-                    <!-- TPA Charges Section -->
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                            {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
                     <div class="row mt-4">
                         <div class="col-12">
                             <div class="card shadow-sm border-0">
-                                <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
+                                <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                                     <h5 class="mb-0" style="color: #750096">
-                                        <i class="fas fa-building me-2"></i>TPA Charges
+                                        <i class="ti ti-shield-check me-2"></i>Insurance Panel Rates
                                     </h5>
+                                    <a href="{{ route('pathology.test.edit', $test->id) }}" class="btn btn-sm btn-primary">Edit rates</a>
                                 </div>
                                 <div class="card-body">
-                                    @if(session('success'))
-                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                            {{ session('success') }}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                        </div>
-                                    @endif
-                                    @if(session('error'))
-                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                            {{ session('error') }}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                        </div>
-                                    @endif
-
-                                    @if($groupedTpaCharges && $groupedTpaCharges->count() > 0)
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered">
-                                                <thead class="thead-light">
-                                                    <tr>
-                                                        <th>TPA Organization</th>
-                                                        <th>Standard Charge IPD (INR)</th>
-                                                        <th>TPA Charge IPD (INR)</th>
-                                                        <th>Standard Charge OPD (INR)</th>
-                                                        <th>TPA Charge OPD (INR)</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($groupedTpaCharges as $orgId => $charges)
-                                                        @php
-                                                            $organisation = $charges['organisation'];
-                                                            $ipdCharge = $charges['ipd_charge'];
-                                                            $opdCharge = $charges['opd_charge'];
-                                                        @endphp
-                                                        <tr>
-                                                            <td>
-                                                                <strong>{{ $organisation->organisation_name ?? '-' }}</strong>
-                                                                @if($organisation && $organisation->code)
-                                                                    <br><small class="text-muted">Code: {{ $organisation->code }}</small>
-                                                                @endif
-                                                            </td>
-                                                            <td>₹{{ number_format($test->standard_charge_ipd ?? 0, 2) }}</td>
-                                                            <td>
-                                                                @if($ipdCharge)
-                                                                    ₹{{ number_format($ipdCharge->org_charge ?? 0, 2) }}
-                                                                @else
-                                                                    <span class="text-muted">-</span>
-                                                                @endif
-                                                            </td>
-                                                            <td>₹{{ number_format($test->standard_charge_opd ?? 0, 2) }}</td>
-                                                            <td>
-                                                                @if($opdCharge)
-                                                                    ₹{{ number_format($opdCharge->org_charge ?? 0, 2) }}
-                                                                @else
-                                                                    <span class="text-muted">-</span>
-                                                                @endif
-                                                            </td>
-                                                            <td>
-                                                                <div class="d-flex gap-1">
-                                                                    @if($ipdCharge)
-                                                                        <button
-                                                                            class="btn btn-sm btn-soft-success rounded-pill edit-tpa-charge-btn"
-                                                                            data-id="{{ $ipdCharge->id }}"
-                                                                            data-org_charge="{{ $ipdCharge->org_charge }}"
-                                                                            data-org_name="{{ $organisation->organisation_name ?? 'TPA' }}"
-                                                                            data-charge-type="IPD"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#editTpaChargeModal"
-                                                                            title="Edit IPD Charge">
-                                                                            <i class="ti ti-pencil"></i> IPD
-                                                                        </button>
-                                                                    @endif
-                                                                    @if($opdCharge)
-                                                                        <button
-                                                                            class="btn btn-sm btn-soft-info rounded-pill edit-tpa-charge-btn"
-                                                                            data-id="{{ $opdCharge->id }}"
-                                                                            data-org_charge="{{ $opdCharge->org_charge }}"
-                                                                            data-org_name="{{ $organisation->organisation_name ?? 'TPA' }}"
-                                                                            data-charge-type="OPD"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#editTpaChargeModal"
-                                                                            title="Edit OPD Charge">
-                                                                            <i class="ti ti-pencil"></i> OPD
-                                                                        </button>
-                                                                    @endif
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    @else
-                                        <div class="alert alert-info">
-                                            <i class="ti ti-info-circle me-2"></i>No TPA charges found for this pathology test. TPA charges are automatically created when you create a pathology test.
-                                        </div>
-                                    @endif
+                                    @include('admin.insurance.partials.test_panel_rates', [
+                                        'panelRates' => $panelRates,
+                                        'testType' => 'pathology',
+                                        'editable' => false,
+                                    ])
                                 </div>
                             </div>
                         </div>
@@ -221,70 +143,5 @@
         </div>
     </div>
 
-    <!-- Edit TPA Charge Modal -->
-    <div class="modal fade" id="editTpaChargeModal" tabindex="-1" aria-labelledby="editTpaChargeModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editTpaChargeModalLabel">Edit TPA Charge</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form action="{{ route('pathology.test.update-tpa-charge') }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" name="id" id="tpa_charge_id">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">TPA Organization</label>
-                            <input type="text" class="form-control" id="tpa_org_name" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Charge Type</label>
-                            <input type="text" class="form-control" id="tpa_charge_type_display" readonly>
-                            <input type="hidden" name="charge_type" id="tpa_charge_type">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Standard Charge (INR)</label>
-                            <input type="text" class="form-control" id="tpa_standard_charge" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">TPA Charge (INR) <span class="text-danger">*</span></label>
-                            <input type="number" name="org_charge" id="tpa_org_charge" class="form-control" step="0.01" min="0" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Update TPA Charge</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle edit TPA charge button click
-            document.querySelectorAll('.edit-tpa-charge-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const id = this.getAttribute('data-id');
-                    const orgCharge = this.getAttribute('data-org_charge');
-                    const orgName = this.getAttribute('data-org_name');
-                    const chargeType = this.getAttribute('data-charge-type');
-                    
-                    document.getElementById('tpa_charge_id').value = id;
-                    document.getElementById('tpa_org_charge').value = orgCharge;
-                    document.getElementById('tpa_org_name').value = orgName;
-                    document.getElementById('tpa_charge_type').value = chargeType;
-                    document.getElementById('tpa_charge_type_display').value = chargeType;
-                    
-                    // Set standard charge based on type
-                    const standardCharge = chargeType === 'IPD' 
-                        ? {{ $test->standard_charge_ipd ?? 0 }}
-                        : {{ $test->standard_charge_opd ?? 0 }};
-                    document.getElementById('tpa_standard_charge').value = '₹' + standardCharge.toFixed(2);
-                });
-            });
-        });
-    </script>
 @endsection
 

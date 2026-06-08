@@ -265,6 +265,8 @@
 }
 </style>
 
+@include('admin.billing.partials.tpa_insurance_js')
+
 <script>
 let testRowCount = {{ count($bill->reports) }};
 let patientData = @json($patients);
@@ -340,14 +342,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const organisationId = tpaDropdown ? tpaDropdown.value : null;
             
             if (activateTpa && organisationId) {
-                const url = `{{ url('/radiology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}`;
+                const url = BillingTpaInsurance.appendInsuranceParams(
+                    `{{ url('/radiology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}`
+                );
                 fetch(url)
                     .then(response => response.json())
                     .then(data => {
-                        const amountToUse = (data.tpa_charge !== null && data.tpa_charge !== undefined && data.tpa_charge !== '') 
-                            ? parseFloat(data.tpa_charge) 
+                        const amountToUse = (data.tpa_charge !== null && data.tpa_charge !== undefined && data.tpa_charge !== '')
+                            ? parseFloat(data.tpa_charge)
                             : standardAmount;
                         row.find('.test_amount').val(amountToUse.toFixed(2));
+                        BillingTpaInsurance.applyRateSourceHint(row[0], data);
                         calculateTotals();
                     })
                     .catch(error => {
@@ -622,8 +627,7 @@ function loadPatientTpas(patientId) {
                 data.forEach(tpa => {
                     if (tpa && tpa.id) {
                         const option = document.createElement('option');
-                        option.value = tpa.id;
-                        option.textContent = tpa.name + (tpa.code ? ' (' + tpa.code + ')' : '');
+                        BillingTpaInsurance.setTpaOption(option, tpa);
                         tpaDropdown.appendChild(option);
                     }
                 });
@@ -700,7 +704,9 @@ function applyTpaCharges(organisationId) {
                 originalCharges[testId] = parseFloat(amountInput.value) || 0;
             }
 
-            const url = `{{ url('/radiology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}`;
+            const url = BillingTpaInsurance.appendInsuranceParams(
+                `{{ url('/radiology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}`
+            );
             const promise = fetch(url)
                 .then(response => response.json())
                 .then(data => {
@@ -710,6 +716,7 @@ function applyTpaCharges(organisationId) {
                     } else {
                         amountInput.value = parseFloat(data.standard_charge).toFixed(2);
                     }
+                    BillingTpaInsurance.applyRateSourceHint(row, data);
                     calculateTotals();
                 })
                 .catch(error => {
@@ -726,6 +733,7 @@ function applyTpaCharges(organisationId) {
 }
 
 function revertToStandardCharges() {
+    BillingTpaInsurance.clearRateSourceHints();
     const testRows = document.querySelectorAll('.test-row');
     
     testRows.forEach((row) => {

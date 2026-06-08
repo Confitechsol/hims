@@ -90,65 +90,11 @@
                             </div>
                         </div>
 
-                        <!-- TPA Charges Section -->
                         <div class="row mb-3">
                             <div class="col-12">
-                                <h6 class="mb-3">
-                                    <i class="fas fa-building me-2"></i>TPA Charges (Optional - Leave blank to use Standard Charge)
-                                </h6>
-                                <div class="card border">
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered table-sm">
-                                                <thead>
-                                                    <tr>
-                                                        <th width="30%">TPA Organization</th>
-                                                        <th width="30%">TPA Charge IPD (INR)</th>
-                                                        <th width="30%">TPA Charge OPD (INR)</th>
-                                                        <th width="10%">Code</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($organisations as $organisation)
-                                                        <tr>
-                                                            <td>
-                                                                <strong>{{ $organisation->organisation_name }}</strong>
-                                                            </td>
-                                                            <td>
-                                                                <input type="number" 
-                                                                       name="tpa_charge_ipd_{{ $organisation->id }}" 
-                                                                       id="tpa_charge_ipd_{{ $organisation->id }}"
-                                                                       class="form-control form-control-sm tpa-charge-input" 
-                                                                       step="0.01" 
-                                                                       min="0" 
-                                                                       placeholder="Auto: Standard IPD"
-                                                                       data-org-id="{{ $organisation->id }}"
-                                                                       data-charge-type="IPD">
-                                                            </td>
-                                                            <td>
-                                                                <input type="number" 
-                                                                       name="tpa_charge_opd_{{ $organisation->id }}" 
-                                                                       id="tpa_charge_opd_{{ $organisation->id }}"
-                                                                       class="form-control form-control-sm tpa-charge-input" 
-                                                                       step="0.01" 
-                                                                       min="0" 
-                                                                       placeholder="Auto: Standard OPD"
-                                                                       data-org-id="{{ $organisation->id }}"
-                                                                       data-charge-type="OPD">
-                                                            </td>
-                                                            <td>
-                                                                <small class="text-muted">{{ $organisation->code ?? '-' }}</small>
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <small class="text-muted">
-                                            <i class="ti ti-info-circle me-1"></i>
-                                            If TPA charge is not specified, Standard Charge will be used automatically.
-                                        </small>
-                                    </div>
+                                <div class="alert alert-info mb-0">
+                                    <i class="ti ti-shield-check me-1"></i>
+                                    Insurance panel rates (GIPSA, ICICI, Star, etc.) can be added after saving this test on the edit screen.
                                 </div>
                             </div>
                         </div>
@@ -179,33 +125,6 @@
                     console.log('Select2 initialized for radiology dropdowns');
                 }
             }, 500);
-
-            // Update TPA charge placeholders when standard charges change
-            const standardChargeIpdInput = document.getElementById('standard_charge_ipd');
-            const standardChargeOpdInput = document.getElementById('standard_charge_opd');
-
-            function updateTpaPlaceholders() {
-                const ipdValue = standardChargeIpdInput.value || '0';
-                const opdValue = standardChargeOpdInput.value || '0';
-                
-                jQuery('.tpa-charge-input[data-charge-type="IPD"]').each(function() {
-                    jQuery(this).attr('placeholder', 'Auto: ₹' + parseFloat(ipdValue).toFixed(2));
-                });
-                
-                jQuery('.tpa-charge-input[data-charge-type="OPD"]').each(function() {
-                    jQuery(this).attr('placeholder', 'Auto: ₹' + parseFloat(opdValue).toFixed(2));
-                });
-            }
-
-            if (standardChargeIpdInput) {
-                standardChargeIpdInput.addEventListener('input', updateTpaPlaceholders);
-            }
-            if (standardChargeOpdInput) {
-                standardChargeOpdInput.addEventListener('input', updateTpaPlaceholders);
-            }
-
-            // Initialize placeholders on page load
-            updateTpaPlaceholders();
         });
     </script>
 @endsection

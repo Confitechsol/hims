@@ -36,7 +36,7 @@
                                     @endif
                                 <div
                                     class="d-flex align-items-sm-center justify-content-between flex-sm-row flex-column gap-2 mb-3 pb-3 border-bottom">
-                                            <div class="d-flex align-items-center">
+                                            <div class="d-flex align-items-center flex-wrap gap-2">
                                                 <div class="input-icon-start position-relative me-2">
                                                     <span class="input-icon-addon">
                                                         <i class="ti ti-search"></i>
@@ -45,7 +45,14 @@
                                                          class="form-control shadow-sm"
                                                         placeholder="Search">
                                                 </div>
-                                               
+                                                <form method="GET" action="{{ route('tpamanagement') }}" class="d-flex align-items-center gap-2">
+                                                    <select name="insurance_company_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                        <option value="">All Insurance Companies</option>
+                                                        @foreach($insuranceCompanies as $id => $name)
+                                                            <option value="{{ $id }}" {{ (string)$selectedInsuranceId === (string)$id ? 'selected' : '' }}>{{ $name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </form>
                                             </div>
                 
                                     <div class="d-flex align-items-center flex-wrap gap-2">
@@ -65,6 +72,7 @@
                                     <table class="table" id="table">
                                         <thead class="thead-light">
                                             <tr>
+                                                <th>Insurance Company</th>
                                                 <th>Name</th>
                                                 <th>Code</th>
                                                 <th>Phone</th>
@@ -80,6 +88,7 @@
                                         <tbody>
                                             @foreach ($organisations->sortByDesc('id') as $item)
                                             <tr>
+                                                <td>{{ $item->insuranceCompany->name ?? 'N/A' }}</td>
                                                 <td>{{$item->organisation_name}}</td>
                                                 <td>{{$item->code}}</td>   
                                                 <td>{{$item->contact_no}}</td>
@@ -119,6 +128,7 @@
                                                         <button
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
                                                             data-id="{{ $item["id"] }}"
+                                                            data-insurance_company_id="{{ $item->insurance_company_id }}"
                                                             data-organisation_name="{{$item->organisation_name}}"
                                                             data-code="{{$item->code}}"
                                                             data-contact_no="{{$item->contact_no}}"
@@ -201,6 +211,7 @@
     </div>
 </div>
 <x-modals.form-modal type="add" id="add_tpa" title="Add TPA" action="{{route('tpamanagement.store')}}" :fields="[
+        ['name' => 'insurance_company_id', 'label' => 'Insurance Company', 'type' => 'select', 'required' => true, 'options' => $insuranceCompanies->toArray(), 'size' => '12'],
         ['name' => 'organisation_name', 'label' => 'organisation Name', 'type' => 'text', 'required' => true,'size'=>'5'],
         ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true,'size'=>'3'],
         ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true,'size'=>'4'],
@@ -211,9 +222,10 @@
         ['name' => 'e_card_no', 'label' => 'E Card No', 'type' => 'text', 'required' => true,'size'=>'6'],
         ['name' => 'e_card_upload', 'label' => 'E Card Upload', 'type' => 'file', 'required' => true,'size'=>'12'],
         ]" :columns="3" />
- <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Company Name"
+ <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit TPA"
     action="{{route('tpamanagement.update')}}" :fields="[
         ['name' => 'id', 'type' => 'hidden', 'required' => true],
+        ['name' => 'insurance_company_id', 'label' => 'Insurance Company', 'type' => 'select', 'required' => true, 'options' => $insuranceCompanies->toArray(), 'size' => '12'],
         ['name' => 'organisation_name', 'label' => 'organisation Name', 'type' => 'text', 'required' => true,'size'=>'5'],
         ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true,'size'=>'3'],
         ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true,'size'=>'4'],
@@ -242,6 +254,7 @@
 data.result.forEach((item)=>{
  const row = document.createElement('tr');
  row.innerHTML = `
+ <td>${item.insurance_company ? item.insurance_company.name : 'N/A'}</td>
  <td>${item.organisation_name}</td>
  <td>${item.code}</td>
  <td>${item.contact_no}</td>
@@ -257,6 +270,7 @@ data.result.forEach((item)=>{
                                                         <button
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
                                                             data-id="${item.id}"
+                                                            data-insurance_company_id="${item.insurance_company_id ?? ''}"
                                                             data-organisation_name="${item.organisation_name}"
                                                             data-code="${item.code}"
                                                             data-contact_no="${item.contact_no}"

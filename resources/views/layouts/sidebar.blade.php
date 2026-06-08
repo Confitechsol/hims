@@ -366,8 +366,20 @@
                                 </a>
                             </li> -->
                     <li>
+                        <a href="{{ route('insurance.management') }}"
+                            class="{{ request()->routeIs('insurance.management*') ? 'active' : '' }}">
+                            <i class="ti ti-shield"></i><span>Insurance Management</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('insurance.rate-panels') }}"
+                            class="{{ request()->routeIs('insurance.rate-panels*') || request()->routeIs('insurance.test-mapping*') ? 'active' : '' }}">
+                            <i class="ti ti-file-invoice"></i><span>Insurance Test Rates</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ route('tpamanagement') }}"
-                            class="{{ request()->routeIs('tpamanagement') ? 'active' : '' }}">
+                            class="{{ request()->routeIs('tpamanagement*') || request()->routeIs('tpa_details*') ? 'active' : '' }}">
                             <i class="ti ti-map-pin"></i><span>TPA Management</span>
                         </a>
                     </li>

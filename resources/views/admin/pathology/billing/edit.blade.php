@@ -246,6 +246,8 @@
 }
 </style>
 
+@include('admin.billing.partials.tpa_insurance_js')
+
 <script>
 let testRowCount = {{ count($bill->reports) }};
 let patientData = @json($patients);
@@ -303,7 +305,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const organisationId = tpaDropdown ? tpaDropdown.value : null;
             
             if (activateTpa && organisationId) {
-                const url = `{{ url('/pathology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}`;
+                const url = BillingTpaInsurance.appendInsuranceParams(
+                    `{{ url('/pathology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}`
+                );
                 console.log('Fetching TPA charge for test', testId, 'and org', organisationId);
                 fetch(url)
                     .then(response => {
@@ -322,6 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             console.log('No TPA charge found, using standard charge:', standardAmount);
                         }
                         row.find('.test_amount').val(amountToUse.toFixed(2));
+                        BillingTpaInsurance.applyRateSourceHint(row[0], data);
                         calculateTotals();
                     })
                     .catch(error => {
@@ -606,8 +611,7 @@ function loadPatientTpas(patientId) {
                 data.forEach(tpa => {
                     if (tpa && tpa.id) {
                         const option = document.createElement('option');
-                        option.value = tpa.id;
-                        option.textContent = tpa.name + (tpa.code ? ' (' + tpa.code + ')' : '');
+                        BillingTpaInsurance.setTpaOption(option, tpa);
                         tpaDropdown.appendChild(option);
                     }
                 });
@@ -706,7 +710,9 @@ function applyTpaCharges(organisationId) {
                 originalCharges[testId] = parseFloat(amountInput.value) || 0;
             }
 
-            const url = `{{ url('/pathology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}`;
+            const url = BillingTpaInsurance.appendInsuranceParams(
+                `{{ url('/pathology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}`
+            );
             console.log('Fetching TPA charge from:', url);
             const promise = fetch(url)
                 .then(response => {
@@ -725,6 +731,7 @@ function applyTpaCharges(organisationId) {
                         amountInput.value = parseFloat(data.standard_charge).toFixed(2);
                         console.log('No TPA charge found, using standard charge:', data.standard_charge);
                     }
+                    BillingTpaInsurance.applyRateSourceHint(row, data);
                     calculateTotals();
                 })
                 .catch(error => {
@@ -741,6 +748,7 @@ function applyTpaCharges(organisationId) {
 }
 
 function revertToStandardCharges() {
+    BillingTpaInsurance.clearRateSourceHints();
     const testRows = document.querySelectorAll('.test-row');
     
     testRows.forEach((row) => {
