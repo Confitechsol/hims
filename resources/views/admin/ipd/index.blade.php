@@ -269,12 +269,12 @@
                                                                     </span>
                                                                 @endif
                                                             </td>
-                                                            <td>{{ $ipdDetails->patient->patient_name }}
+                                                            <td>{{ optional($ipdDetails->patient)->patient_name ?? '-' }}
                                                             </td>
-                                                            <td>{{ $ipdDetails->patient->mobileno }}</td>
-                                                            <td>{{ $ipdDetails->patient->email }}</td>
-                                                            <td>{{ $ipdDetails->patient->address }}</td>
-                                                            <td>{{ $ipdDetails->patient->gender }}</td>
+                                                            <td>{{ optional($ipdDetails->patient)->mobileno ?? '-' }}</td>
+                                                            <td>{{ optional($ipdDetails->patient)->email ?? '-' }}</td>
+                                                            <td>{{ optional($ipdDetails->patient)->address ?? '-' }}</td>
+                                                            <td>{{ optional($ipdDetails->patient)->gender ?? '-' }}</td>
                                                             <td>{{ $ipdDetails->doctor->name ?? '-' }}</td>
                                                             <td>{{ \Carbon\Carbon::parse($ipdDetails->discharged_date)->format('d-M-Y') ?? '-' }}
                                                             </td>
