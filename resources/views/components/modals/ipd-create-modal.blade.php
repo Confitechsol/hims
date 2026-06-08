@@ -807,7 +807,7 @@
                                 <input type="text" class="form-control" name="case">
                             </div> -->
                             <div class="col-md-4">
-                                <label class="form-label">Patient Type</label>
+                                <label class="form-label">Patient Type<span class="required">*</span></label>
                                 <select class="form-select" name="patient_type">
                                     <option value="">Select Patient Type</option>
                                     <option value="Old Patient">Old Patient</option>
@@ -829,7 +829,7 @@
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Reference</label>
+                                <label class="form-label">Reference<span class="required">*</span></label>
                                 {{-- <input type="text" class="form-control" name="reference"
                                     placeholder="Enter reference"> --}}
                                 <select name="reference" id="" class="form-select">
@@ -878,7 +878,7 @@
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label">Credit Limit (INR) <span class="required">*</span></label>
+                                <label class="form-label">Credit Limit (INR)</label>
                                 <input type="number" class="form-control" name="credit_limit" id="credit_limit"
                                     value="20000" placeholder="0.00">
                             </div>

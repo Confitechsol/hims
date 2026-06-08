@@ -43,7 +43,7 @@
 
                         {{-- Guardian Name --}}
                         <div class="col-md-6">
-                            <label for="guardian_name" class="form-label">Guardian Name</label>
+                            <label for="guardian_name" class="form-label">Guardian Name*</label>
                             <input type="text" id="guardian_name" name="guardian_name"
                                 class="form-control @error('guardian_name') is-invalid @enderror"
                                 value="{{ old('guardian_name') }}" />
@@ -54,7 +54,7 @@
 
                         {{-- Guardian Phone --}}
                         <div class="col-md-6">
-                            <label for="guardian_phone" class="form-label">Guardian Phone No.</label>
+                            <label for="guardian_phone" class="form-label">Guardian Phone No.*</label>
                             <input type="text" id="guardian_phone" name="guardian_phone"
                                 class="form-control @error('guardian_phone') is-invalid @enderror"
                                 value="{{ old('guardian_phone') }}" />
@@ -65,7 +65,7 @@
 
                         {{-- Guardian Relation --}}
                         <div class="col-md-6">
-                            <label for="guardian_relation" class="form-label">Guardian Relationship</label>
+                            <label for="guardian_relation" class="form-label">Guardian Relationship*</label>
                             <input type="text" id="guardian_relation" name="guardian_relation"
                                 class="form-control @error('guardian_relation') is-invalid @enderror"
                                 value="{{ old('guardian_relation') }}" />
@@ -76,7 +76,7 @@
 
                         {{-- Emergency Contact --}}
                         <div class="col-md-6">
-                            <label for="emergency_contact_no" class="form-label">Emergency Contact No.</label>
+                            <label for="emergency_contact_no" class="form-label">Emergency Contact No.*</label>
                             <input type="text" id="emergency_contact_no" name="emergency_contact_no"
                                 class="form-control @error('emergency_contact_no') is-invalid @enderror"
                                 value="{{ old('emergency_contact_no') }}" />
@@ -121,7 +121,7 @@
 
                                 {{-- Age --}}
                                 <div class="col-sm-5">
-                                    <label class="form-label">Age
+                                    <label class="form-label">Age*
                                         (yy-mm-dd)</label>
                                     <div style="clear: both; overflow: hidden;">
                                         <input type="numeric" name="age[year]" id="age_year" placeholder="YY"
@@ -255,7 +255,7 @@
 
                         {{-- Address --}}
                         <div class="col-md-3">
-                            <label for="address" class="form-label">Address</label>
+                            <label for="address" class="form-label">Address*</label>
                             <input type="text" id="address" name="address"
                                 class="form-control @error('address') is-invalid @enderror"
                                 value="{{ old('address') }}" />
@@ -284,7 +284,7 @@
 
                          {{-- police_station --}}
                         <div class="col-md-3">
-                            <label for="police_station" class="form-label">Police Station</label>
+                            <label for="police_station" class="form-label">Police Station*</label>
                             <input type="text" id="police_station" name="police_station"
                                 class="form-control @error('police_station') is-invalid @enderror"
                                 value="{{ old('police_station') }}" />
@@ -306,7 +306,7 @@
 
                         {{-- Area --}}
                         <div class="col-md-3">
-                            <label for="pin_code" class="form-label">Pin Code</label>
+                            <label for="pin_code" class="form-label">Pin Code*</label>
                             <input type="text" id="pin_code" name="pin_code"
                                 class="form-control @error('pin_code') is-invalid @enderror"
                                 value="{{ old('pin_code') }}" />
@@ -317,7 +317,7 @@
 
                        {{-- State --}}
                         <div class="col-md-3">
-                            <label class="form-label">State</label>
+                            <label class="form-label">State*</label>
                             <select id="stateDropdown" name="state_id" class="form-control">
                             <option value="">Select State</option>
                         </select>
@@ -325,7 +325,7 @@
                         
                         {{-- District --}}
                         <div class="col-md-3">
-                            <label class="form-label">District</label>
+                            <label class="form-label">District*</label>
                             <select id="districtDropdown" name="district_id" class="form-control">
                             <option value="">Select District</option>
                         </select>
@@ -398,7 +398,7 @@
 
                         {{-- Languages Speak --}}
                         <div class="col-md-3">
-                            <label for="languages_speak" class="form-label">Languages Known</label>
+                            <label for="languages_speak" class="form-label">Languages Known*</label>
                             {{-- <input type="text" id="languages_speak" name="languages_speak"
                                 class="form-control @error('languages_speak') is-invalid @enderror"
                                 value="{{ old('languages_speak') }}" /> --}}
@@ -425,7 +425,7 @@
 
                         {{-- Newspaper Preference --}}
                         <div class="col-md-3">
-                            <label for="newspaper_preference" class="form-label">Newspaper Preference</label>
+                            <label for="newspaper_preference" class="form-label">Newspaper Preference*</label>
                             <input type="text" id="newspaper_preference" name="newspaper_preference"
                                 class="form-control @error('newspaper_preference') is-invalid @enderror"
                                 value="{{ old('newspaper_preference') }}" />
@@ -477,7 +477,7 @@
                         </div>
 
                         <div class="col-md-4">
-                            <label for="nationality" class="form-label">Nationality</label>
+                            <label for="nationality" class="form-label">Nationality*</label>
                             <select id="nationality" class="form-select @error('nationality') is-invalid @enderror"
                                 name="nationality">
                                 <option value="">Select your nationality</option>
