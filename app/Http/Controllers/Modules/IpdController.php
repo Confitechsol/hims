@@ -1695,10 +1695,26 @@ class IpdController extends Controller
 
     public function addIpdCharge(Request $request)
     {
-                                               // dd($request->charge_category);         // dd($request->all());
         $count = count($request->charge_type); // Number of rows
+        
+        // Get the IPD patient admission record for the requested IPD
+        $ipdPatient = IpdPatient::where('ipd_id', $request->ipd_id)
+            ->orderBy('id', 'asc')
+            ->first();
+
+        $admissionDate = null;
+        if ($ipdPatient && $ipdPatient->created_at) {
+            $admissionDate = Carbon::parse($ipdPatient->created_at)->format('Y-m-d');
+        }
 
         for ($i = 0; $i < $count; $i++) {
+            // Use provided date or fallback to admission date
+            $chargeDate = $request->charge_date[$i] ?? $admissionDate;
+            
+            // Ensure date is never null
+            if (!$chargeDate) {
+                return redirect()->back()->with('error', 'Date is required for all charges and admission date is not set.');
+            }
 
             IpdCharges::create([
                 'ipd_id'              => $request->ipd_id ?? null,
@@ -1713,7 +1729,7 @@ class IpdController extends Controller
                 'tax'                 => $request->tax[$i],
                 'net_amount'          => $request->net_amount[$i],
                 'charge_note'         => $request->charge_note[$i],
-                'date'                => $request->charge_date[$i],
+                'date'                => $chargeDate,
             ]);
         }
 

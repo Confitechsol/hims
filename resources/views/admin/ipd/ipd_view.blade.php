@@ -5933,6 +5933,16 @@
                 if (previewWrapper) previewWrapper.classList.remove('d-none');
                 if (modalFooterBtn) modalFooterBtn.textContent = 'Save';
 
+                // Auto-set admission date in charge_date field
+                const ipdContext = document.getElementById('ipdViewContext');
+                const chargeDate = document.getElementById('charge_date');
+                if (ipdContext && chargeDate && ipdContext.hasAttribute('data-admission-date')) {
+                    const admissionDate = ipdContext.getAttribute('data-admission-date');
+                    if (admissionDate) {
+                        chargeDate.value = admissionDate;
+                    }
+                }
+
                 // Reset form action back to create route and remove PUT override
                 const form = document.getElementById('addChargeForm');
                 if (form) {
@@ -5991,6 +6001,9 @@
 
                 chargeSelect.innerHTML = `<option value="">Select</option>`;
 
+                const selectedChargeTypeText = chargeTypeSelect.selectedOptions[0]?.text || '';
+                const selectedCategoryText = chargeCategorySelect.selectedOptions[0]?.text || '';
+
                 if (!this.value) return;
 
                 fetch("{{ route('getCharges', ['id' => 'ID']) }}".replace('ID', this.value))
@@ -6002,8 +6015,92 @@
                         <option value="${charge.id}">${charge.name}</option>
                     `;
                         });
+
+                        if (data.length > 0) {
+                            chargeSelect.value = data[0].id;
+                            refreshSelect2(chargeSelect);
+                        }
+
+                        if (isOneTimeWardSelection(selectedChargeTypeText, selectedCategoryText)) {
+                            autoAddAllCharges(data);
+                        }
                     });
             });
+
+            function refreshSelect2(selectElement) {
+                if (window.jQuery && window.jQuery(selectElement).hasClass('select2-hidden-accessible')) {
+                    try {
+                        window.jQuery(selectElement).trigger('change.select2');
+                    } catch (e) {
+                        console.warn('Select2 refresh failed', e);
+                    }
+                }
+            }
+
+            function isOneTimeWardSelection(chargeTypeText, categoryText) {
+                const normalizedChargeType = String(chargeTypeText).toLowerCase().trim();
+                // Only trigger auto-add for "OneTimeCharges" charge type
+                return normalizedChargeType === 'onetimecharges';
+            }
+
+            function autoAddAllCharges(charges) {
+                const chargeTypeText = chargeTypeSelect.selectedOptions[0]?.text || '';
+                const categoryText = chargeCategorySelect.selectedOptions[0]?.text || '';
+                const note = document.getElementById('edit_note').value || '';
+                
+                // Get admission date from the hidden ipdViewContext element
+                const ipdContext = document.getElementById('ipdViewContext');
+                let date = document.getElementById('charge_date').value || '';
+                if (ipdContext && ipdContext.hasAttribute('data-admission-date')) {
+                    date = ipdContext.getAttribute('data-admission-date') || date;
+                    // Also update the date field so user can see it
+                    document.getElementById('charge_date').value = date;
+                }
+
+                charges.forEach(charge => {
+                    const standardCharge = parseFloat(charge.standard_charge || 0).toFixed(2);
+                    const tpaCharge = '0.00';
+                    const qty = 1;
+                    const total = standardCharge;
+                    const taxPerc = parseFloat(charge.tax_category?.percentage || 0) || 0;
+                    const taxAmount = (parseFloat(total) * (taxPerc / 100)).toFixed(2);
+                    const discountAmount = '0.00';
+                    const netAmount = (parseFloat(total) + parseFloat(taxAmount)).toFixed(2);
+
+                    const row = `
+                        <tr>
+                            <td>${date}</td>
+                            <td>${chargeTypeText}</td>
+                            <td>${categoryText}</td>
+                            <td>${charge.name}<br><small>${note}</small></td>
+                            <td class="text-right">${standardCharge}</td>
+                            <td class="text-right">${tpaCharge}</td>
+                            <td class="text-right">${qty}</td>
+                            <td class="text-right">${total}</td>
+                            <td class="text-right">${discountAmount}</td>
+                            <td class="text-right">${taxAmount}</td>
+                            <td class="text-right">${netAmount}</td>
+                            <td class="text-right">
+                                <button type="button" class="btn btn-danger btn-sm delete-charge-row">X</button>
+                            </td>
+                            <input type="hidden" name="charge_type[]" value="${chargeTypeSelect.value}">
+                            <input type="hidden" name="charge_category[]" value="${chargeCategorySelect.value}">
+                            <input type="hidden" name="charge_id[]" value="${charge.id}">
+                            <input type="hidden" name="standard_charge[]" value="${standardCharge}">
+                            <input type="hidden" name="tpa_charge[]" value="${tpaCharge}">
+                            <input type="hidden" name="qty[]" value="${qty}">
+                            <input type="hidden" name="total[]" value="${total}">
+                            <input type="hidden" name="discount_percentage[]" value="${discountAmount}">
+                            <input type="hidden" name="tax[]" value="${taxAmount}">
+                            <input type="hidden" name="net_amount[]" value="${netAmount}">
+                            <input type="hidden" name="charge_note[]" value="${note}">
+                            <input type="hidden" name="charge_date[]" value="${date}">
+                        </tr>
+                    `;
+
+                    previewBody.insertAdjacentHTML('beforeend', row);
+                });
+            }
 
             /*--------------------------------------------------
              | AUTO-FILL ON CHARGE SELECT (ONCE)
@@ -6063,9 +6160,23 @@
                     return;
                 }
 
+                // Capture date before any operations
+                const chargeDate = document.getElementById('charge_date').value;
+                if (!chargeDate) {
+                    alert("Please select a date");
+                    return;
+                }
+
+                // Verify date is in correct format (YYYY-MM-DD)
+                const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+                if (!dateRegex.test(chargeDate)) {
+                    alert("Date must be in YYYY-MM-DD format");
+                    return;
+                }
+
                 const row = `
         <tr>
-            <td>${document.getElementById("charge_date").value}</td>
+            <td>${chargeDate}</td>
             <td>${chargeTypeSelect.selectedOptions[0].text}</td>
             <td>${chargeCategorySelect.selectedOptions[0].text}</td>
             <td>${chargeSelect.selectedOptions[0].text}<br>
@@ -6093,14 +6204,29 @@
             <input type="hidden" name="tax[]" value="${taxAmtInp.value}">
             <input type="hidden" name="net_amount[]" value="${netAmountInp.value}">
             <input type="hidden" name="charge_note[]" value="${document.getElementById("edit_note").value}">
-            <input type="hidden" name="charge_date[]" value="${document.getElementById("charge_date").value}">
+            <input type="hidden" name="charge_date[]" value="${chargeDate}">
         </tr>
         `;
 
                 previewBody.insertAdjacentHTML("beforeend", row);
 
+                // Store date before reset
+                const ipdContext = document.getElementById('ipdViewContext');
+                const admissionDate = ipdContext ? ipdContext.getAttribute('data-admission-date') : chargeDate;
+
                 document.getElementById("addChargeForm").reset();
-                totalInp.value = discountAmtInp.value = taxAmtInp.value = netAmountInp.value = 0;
+                
+                // Restore date and clear fields after reset
+                document.getElementById("charge_date").value = admissionDate;
+                chargeTypeSelect.innerHTML = `<option value="">Select</option>`;
+                chargeCategorySelect.innerHTML = `<option value="">Select</option>`;
+                chargeSelect.innerHTML = `<option value="">Select</option>`;
+                totalInp.value = '0.00';
+                discountAmtInp.value = '0.00';
+                taxAmtInp.value = '0.00';
+                netAmountInp.value = '0.00';
+                
+                console.log('✅ Charge added. Date captured:', chargeDate);
             });
 
             /*--------------------------------------------------
@@ -6119,11 +6245,22 @@
 
             function resetChargeModal() {
                 const form = document.getElementById('addChargeForm');
+                
+                // Store admission date before form reset
+                const ipdContext = document.getElementById('ipdViewContext');
+                const admissionDate = ipdContext ? ipdContext.getAttribute('data-admission-date') : '';
+                
                 if (form) {
                     form.reset();
                     const methodInput = form.querySelector('input[name="_method"]');
                     if (methodInput) methodInput.remove();
                     form.action = "{{ route('ipd.addIpdCharge') }}";
+                }
+
+                // Restore admission date after form reset
+                const chargeDate = document.getElementById('charge_date');
+                if (chargeDate && admissionDate) {
+                    chargeDate.value = admissionDate;
                 }
 
                 // Clear dynamic preview rows
