@@ -224,12 +224,15 @@ class IpdPackageService
                 'status' => 'cancelled',
             ]);
 
-            // Create transaction record for reversal
-            Transaction::where('reference_type', 'package_application')
-                ->where('reference_id', $ipdPackageId)
+            // Update the matching package application transaction using existing Transaction fields
+            $packageNote = "Package '{$ipdPackage->package->name}' applied on {$ipdPackage->applied_date}";
+            Transaction::where('ipd_id', $ipdId)
+                ->where('type', 'package')
+                ->where('section', 'ipd')
+                ->where('note', $packageNote)
                 ->update([
                     'amount' => -abs($ipdPackage->final_amount),
-                    'description' => "Package cancelled - " . $ipdPackage->package->name,
+                    'note' => "Package cancelled - " . $ipdPackage->package->name,
                 ]);
 
             DB::commit();
