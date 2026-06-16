@@ -29,7 +29,7 @@
 
                         {{-- Name --}}
                         <div class="col-md-6">
-                            <label class="form-label">Name</label>
+                            <label class="form-label">Name*</label>
                             <input type="text" name="name"
                                 class="form-control @error('name') is-invalid @enderror"
                                 value="{{ old('name', $patient->patient_name) }}" />
@@ -37,7 +37,7 @@
 
                         {{-- Guardian Name --}}
                         <div class="col-md-6">
-                            <label class="form-label">Guardian Name</label>
+                            <label class="form-label">Guardian Name*</label>
                             <input type="text" name="guardian_name"
                                 class="form-control @error('guardian_name') is-invalid @enderror"
                                 value="{{ old('guardian_name', $patient->guardian_name) }}" />
@@ -49,7 +49,7 @@
 
                                 {{-- Gender --}}
                                 <div class="col-md-3">
-                                    <label class="form-label">Gender</label>
+                                    <label class="form-label">Gender*</label>
                                     <select name="gender" class="form-control @error('gender') is-invalid @enderror">
                                         <option value="">Select</option>
                                         <option value="Male" {{ old('gender', $patient->gender) == 'Male' ? 'selected' : '' }}>Male</option>
@@ -59,7 +59,7 @@
 
                                 {{-- DOB --}}
                                 <div class="col-md-4">
-                                    <label class="form-label">Date of Birth</label>
+                                    <label class="form-label">Date of Birth*</label>
                                     <input type="date" name="birth_date"
                                         class="form-control @error('birth_date') is-invalid @enderror"
                                         value="{{ old('birth_date', $patient->dob) }}" />
@@ -67,7 +67,7 @@
 
                                 {{-- Age --}}
                                 <div class="col-md-5">
-                                    <label class="form-label">Age (yy-mm-dd)</label>
+                                    <label class="form-label">Age (yy-mm-dd)*</label>
 
                                     <div style="clear: both; overflow: hidden;">
                                         <input type="text" name="age[year]" id="edit_age_year_{{ $patient->id }}"
@@ -113,7 +113,7 @@
 
                                 {{-- Marital Status --}}
                                 <div class="col-md-3">
-                                    <label class="form-label">Marital Status</label>
+                                    <label class="form-label">Marital Status*</label>
                                     <select name="marital_status" class="form-control">
                                         <option value="">Select</option>
                                         @foreach (['Single','Married','Widowed','Separated','Not Specified'] as $status)
@@ -159,7 +159,7 @@
 
                         {{-- Address --}}
                         <div class="col-md-6">
-                            <label class="form-label">Address</label>
+                            <label class="form-label">Address*</label>
                             <input type="text" name="address" class="form-control"
                                 value="{{ old('address', $patient->address) }}" />
                         </div>
@@ -205,7 +205,7 @@
 
                         {{-- National ID --}}
                         <div class="col-md-4">
-                            <label class="form-label">National ID</label>
+                            <label class="form-label">National ID*</label>
                             <input type="text" name="national_id_number"
                                 class="form-control"
                                 value="{{ old('national_id_number', $patient->national_id_number) }}" />

@@ -153,16 +153,16 @@ class IpdController extends Controller
             'patient_type'         => 'string',
             'case'                 => 'nullable|numeric',
             'casualty'             => 'string',
-            'reference'            => 'nullable|string',
+            'reference'            => 'required|string',
             'doctor_id'            => 'nullable|exists:doctor,id',
             'doctor2_id'           => 'nullable|exists:doctor,id',
             'doctor3_id'           => 'nullable|exists:doctor,id',
             'doctor4_id'           => 'nullable|exists:doctor,id',
             'credit_limit'         => 'nullable|numeric|min:0',
             'live_consultation'    => 'nullable|string|max:100',
-            'bed_group'            => 'nullable|exists:bed_group,id',
-            'bed_number'           => 'nullable|exists:bed,id',
-            'bed_charge'           => 'nullable|numeric|min:0',
+            'bed_group'            => 'required|exists:bed_group,id',
+            'bed_number'           => 'required|exists:bed,id',
+            'bed_charge'           => 'required|numeric|min:0',
             'package_id'           => 'nullable|exists:packages,id',
             'package_rate'         => 'nullable|numeric|min:0',
             'symptoms_type'        => 'nullable|array',
@@ -410,7 +410,20 @@ class IpdController extends Controller
             'date'           => 'nullable|date',
             'package_id'     => 'nullable|exists:packages,id',
             'package_rate'   => 'nullable|numeric|min:0',
-            'bed_charge'     => 'nullable|numeric|min:0',
+            'bed_charge'     => 'required|numeric|min:0',
+            'reference'            => 'required|string',
+             'consultant_doctor'    => 'nullable|exists:doctor,id',
+             'consultant_doctor2'   => 'nullable|exists:doctor,id',
+             'consultant_doctor3'   => 'nullable|exists:doctor,id',
+             'consultant_doctor4'   => 'nullable|exists:doctor,id',
+             'bed_group'           => 'required|exists:bed_group,id',
+             'bed_number'          => 'required|exists:bed,id',
+             'symptoms_type'       => 'nullable|array',
+             'symptoms_type.*'     => 'string',
+             'symptoms_title'      => 'array',
+             'symptoms_title.*'    => 'string',
+             'symptoms_description'=> 'nullable|string',
+             'note'                => 'nullable|string',
         ]);
         try {
             DB::beginTransaction();
@@ -1682,10 +1695,26 @@ class IpdController extends Controller
 
     public function addIpdCharge(Request $request)
     {
-                                               // dd($request->charge_category);         // dd($request->all());
         $count = count($request->charge_type); // Number of rows
+        
+        // Get the IPD patient admission record for the requested IPD
+        $ipdPatient = IpdPatient::where('ipd_id', $request->ipd_id)
+            ->orderBy('id', 'asc')
+            ->first();
+
+        $admissionDate = null;
+        if ($ipdPatient && $ipdPatient->created_at) {
+            $admissionDate = Carbon::parse($ipdPatient->created_at)->format('Y-m-d');
+        }
 
         for ($i = 0; $i < $count; $i++) {
+            // Use provided date or fallback to admission date
+            $chargeDate = $request->charge_date[$i] ?? $admissionDate;
+            
+            // Ensure date is never null
+            if (!$chargeDate) {
+                return redirect()->back()->with('error', 'Date is required for all charges and admission date is not set.');
+            }
 
             IpdCharges::create([
                 'ipd_id'              => $request->ipd_id ?? null,
@@ -1700,7 +1729,7 @@ class IpdController extends Controller
                 'tax'                 => $request->tax[$i],
                 'net_amount'          => $request->net_amount[$i],
                 'charge_note'         => $request->charge_note[$i],
-                'date'                => $request->charge_date[$i],
+                'date'                => $chargeDate,
             ]);
         }
 

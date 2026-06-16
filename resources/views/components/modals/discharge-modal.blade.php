@@ -706,7 +706,7 @@
                         <div class="col-md-12">
                             <label for="remarks" class="form-label">
                                 <i class="bi bi-chat-left-text"></i>
-                                Remarks
+                                Remarks/Follow Up
                             </label>
                             <textarea class="form-control" id="remarks_text" name="remarks" rows="6"></textarea>
                         </div>
