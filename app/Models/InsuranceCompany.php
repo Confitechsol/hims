@@ -23,7 +23,12 @@ class InsuranceCompany extends Model
 
     public function tpas()
     {
-        return $this->hasMany(Organisation::class, 'insurance_company_id');
+        return $this->belongsToMany(
+            Organisation::class,
+            'insurance_company_organisation',
+            'insurance_company_id',
+            'organisation_id'
+        )->withTimestamps();
     }
 
     public function ratePanels()

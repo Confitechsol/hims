@@ -28,8 +28,34 @@ class Organisation extends Model
 
     public $timestamps = false;
 
+    /**
+     * Primary / default insurance company (legacy column on organisation).
+     */
     public function insuranceCompany()
     {
         return $this->belongsTo(InsuranceCompany::class, 'insurance_company_id');
+    }
+
+    /**
+     * All insurance companies linked to this TPA (many-to-many).
+     */
+    public function insuranceCompanies()
+    {
+        return $this->belongsToMany(
+            InsuranceCompany::class,
+            'insurance_company_organisation',
+            'organisation_id',
+            'insurance_company_id'
+        )->withTimestamps();
+    }
+
+    public function syncPrimaryInsuranceCompany(): void
+    {
+        if (!$this->exists) {
+            return;
+        }
+
+        $firstId = $this->insuranceCompanies()->orderBy('insurance_companies.id')->value('insurance_companies.id');
+        $this->update(['insurance_company_id' => $firstId]);
     }
 }
