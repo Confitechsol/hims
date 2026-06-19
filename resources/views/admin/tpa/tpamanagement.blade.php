@@ -88,7 +88,7 @@
                                         <tbody>
                                             @foreach ($organisations->sortByDesc('id') as $item)
                                             <tr>
-                                                <td>{{ $item->insuranceCompany->name ?? 'N/A' }}</td>
+                                                <td>{{ $item->insurance_company_name ?? ($item->insuranceCompany->name ?? 'N/A') }}</td>
                                                 <td>{{$item->organisation_name}}</td>
                                                 <td>{{$item->code}}</td>   
                                                 <td>{{$item->contact_no}}</td>
@@ -254,7 +254,7 @@
 data.result.forEach((item)=>{
  const row = document.createElement('tr');
  row.innerHTML = `
- <td>${item.insurance_company ? item.insurance_company.name : 'N/A'}</td>
+ <td>${item.insurance_company_name || (item.insurance_company ? item.insurance_company.name : 'N/A')}</td>
  <td>${item.organisation_name}</td>
  <td>${item.code}</td>
  <td>${item.contact_no}</td>

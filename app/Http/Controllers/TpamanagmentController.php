@@ -12,36 +12,44 @@ use App\Models\OrganisationsCharge;
 
 class TpamanagmentController extends Controller
 {
+    protected function tpaListingQuery()
+    {
+        return Organisation::query()
+            ->leftJoin('insurance_companies as ic', 'organisation.insurance_company_id', '=', 'ic.id')
+            ->select('organisation.*', 'ic.name as insurance_company_name');
+    }
+
     function index(Request $request)
     {
         $perPage = (int) $request->input('perPage', 10);
-    if ($perPage <= 0) {
-        $perPage = 10;
-    }
-        $query = Organisation::with('insuranceCompany');
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+
+        $query = $this->tpaListingQuery();
 
         if ($request->filled('insurance_company_id')) {
-            $query->where('insurance_company_id', $request->input('insurance_company_id'));
+            $query->where('organisation.insurance_company_id', $request->input('insurance_company_id'));
         }
 
         if ($request->has("search")) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
-                $q->where('organisation_name', 'like', "%{$search}%")
-                    ->orWhere('code', 'like', "%{$search}%")
-                    ->orWhere('contact_no', 'like', "%{$search}%")
-                    ->orWhere('contact_person_name', 'like', "%{$search}%")
-                    ->orWhere('contact_person_phone', 'like', "%{$search}%");
+                $q->where('organisation.organisation_name', 'like', "%{$search}%")
+                    ->orWhere('organisation.code', 'like', "%{$search}%")
+                    ->orWhere('organisation.contact_no', 'like', "%{$search}%")
+                    ->orWhere('organisation.contact_person_name', 'like', "%{$search}%")
+                    ->orWhere('organisation.contact_person_phone', 'like', "%{$search}%")
+                    ->orWhere('ic.name', 'like', "%{$search}%");
             });
-            $data = $query->with('insuranceCompany')->get();
+            $data = $query->get();
             return array(
                 "status" => 200,
                 "result" => $data,
                 "total" => count($data)
             );
         }
-       // $organisations = $query->get();
-        
+
         $organisations = $query->paginate($perPage);
         $insuranceCompanies = InsuranceCompany::orderBy('name')->pluck('name', 'id');
         $selectedInsuranceId = $request->input('insurance_company_id');
