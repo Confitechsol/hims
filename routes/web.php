@@ -84,6 +84,9 @@ use App\Http\Controllers\Setup\UnitController;
 use App\Http\Controllers\Setup\UsersController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\SymptomController;
+use App\Http\Controllers\InsuranceCompanyController;
+use App\Http\Controllers\InsuranceRatePanelController;
+use App\Http\Controllers\InsuranceTestMappingController;
 use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionReportController;
@@ -344,6 +347,22 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/medicine-categories/store-multiple', [MedicineCategoryController::class, 'storeMultiple'])->name('medicine-categories.storeMultiple');
     Route::put('/medicine-categories/{id}', [MedicineCategoryController::class, 'update'])->name('medicine-categories.update');
     Route::delete('/medicine-categories/destroy', [MedicineCategoryController::class, 'destroy'])->name('medicine-categories.destroy');
+
+    Route::get('/insurance-management', [InsuranceCompanyController::class, 'index'])->name('insurance.management');
+    Route::post('/insurance-management/store', [InsuranceCompanyController::class, 'store'])->name('insurance.management.store');
+    Route::put('/insurance-management/update', [InsuranceCompanyController::class, 'update'])->name('insurance.management.update');
+    Route::delete('/insurance-management/destroy', [InsuranceCompanyController::class, 'destroy'])->name('insurance.management.destroy');
+
+    Route::get('/insurance-rate-panels', [InsuranceRatePanelController::class, 'index'])->name('insurance.rate-panels');
+    Route::put('/insurance-rate-panels/companies', [InsuranceRatePanelController::class, 'updateCompanies'])->name('insurance.rate-panels.companies.update');
+    Route::post('/insurance-rate-panels/import-pathology', [InsuranceRatePanelController::class, 'importPathology'])->name('insurance.rate-panels.import.pathology');
+    Route::post('/insurance-rate-panels/import-radiology', [InsuranceRatePanelController::class, 'importRadiology'])->name('insurance.rate-panels.import.radiology');
+    Route::get('/insurance-test-mapping', [InsuranceTestMappingController::class, 'index'])->name('insurance.test-mapping');
+    Route::post('/insurance-test-mapping/map', [InsuranceTestMappingController::class, 'map'])->name('insurance.test-mapping.map');
+    Route::post('/insurance-test-mapping/auto-map', [InsuranceTestMappingController::class, 'autoMapAll'])->name('insurance.test-mapping.auto-map');
+    Route::get('/insurance-test-mapping/suggestions', [InsuranceTestMappingController::class, 'suggestions'])->name('insurance.test-mapping.suggestions');
+    Route::get('/insurance-test-mapping/match-count', [InsuranceTestMappingController::class, 'matchCount'])->name('insurance.test-mapping.match-count');
+    Route::post('/insurance-test-mapping/bulk-map', [InsuranceTestMappingController::class, 'bulkMap'])->name('insurance.test-mapping.bulk-map');
 
     Route::get('/tpamanagement', [TpamanagmentController::class, 'index'])->name('tpamanagement');
     Route::post('/tpamanagement/store', [TpamanagmentController::class, 'store'])->name('tpamanagement.store');
@@ -943,7 +962,6 @@ Route::prefix('pathology/test')->group(function () {
     Route::get('/', [PathologyTestController::class, 'index'])->name('pathology.test.index');
     Route::get('/create', [PathologyTestController::class, 'create'])->name('pathology.test.create');
     Route::post('/store', [PathologyTestController::class, 'store'])->name('pathology.test.store');
-    Route::put('/tpa-charge/update', [PathologyTestController::class, 'updateTpaCharge'])->name('pathology.test.update-tpa-charge');
     Route::get('/{id}', [PathologyTestController::class, 'show'])->name('pathology.test.show');
     Route::get('/{id}/edit', [PathologyTestController::class, 'edit'])->name('pathology.test.edit');
     Route::put('/{id}', [PathologyTestController::class, 'update'])->name('pathology.test.update');
@@ -978,7 +996,6 @@ Route::prefix('radiology/test')->group(function () {
     Route::get('/', [RadiologyTestController::class, 'index'])->name('radiology.test.index');
     Route::get('/create', [RadiologyTestController::class, 'create'])->name('radiology.test.create');
     Route::post('/store', [RadiologyTestController::class, 'store'])->name('radiology.test.store');
-    Route::put('/tpa-charge/update', [RadiologyTestController::class, 'updateTpaCharge'])->name('radiology.test.update-tpa-charge');
     Route::get('/{id}', [RadiologyTestController::class, 'show'])->name('radiology.test.show');
     Route::get('/{id}/edit', [RadiologyTestController::class, 'edit'])->name('radiology.test.edit');
     Route::put('/{id}', [RadiologyTestController::class, 'update'])->name('radiology.test.update');

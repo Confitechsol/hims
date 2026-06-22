@@ -12,6 +12,8 @@ use App\Models\CaseReference;
 use App\Models\OpdDetail;
 use App\Models\Organisation;
 use App\Models\OrganisationsCharge;
+use App\Services\BillingTpaHelper;
+use App\Services\InsuranceBillingRateResolver;
 use App\Models\IpdPrescription;
 use App\Models\IpdDetail;
 use App\Models\IpdPrescriptionTest;
@@ -490,33 +492,21 @@ class PathologyBillingController extends Controller
             $tpas = collect();
             
             // FIRST: Get TPA directly from Patient record (this is the primary source)
-            $patient = Patient::with('organisation')->find($patientId);
+            $patient = Patient::with('organisation.insuranceCompany')->find($patientId);
             if ($patient && $patient->organisation_id && $patient->organisation) {
-                $tpas->push([
-                    'id' => $patient->organisation_id,
-                    'name' => $patient->organisation->organisation_name ?? 'Unknown TPA',
-                    'code' => $patient->organisation->code ?? null,
-                ]);
+                $tpas->push(BillingTpaHelper::formatTpa($patient->organisation));
                 \Log::info('TPA from Patient record: ' . ($patient->organisation->organisation_name ?? 'N/A'));
             }
             
             // Get TPAs from previous pathology bills
             $pathologyTpas = PathologyBilling::where('patient_id', $patientId)
                 ->whereNotNull('organisation_id')
-                ->with('organisation')
+                ->with('organisation.insuranceCompany')
                 ->select('organisation_id')
                 ->distinct()
                 ->get()
-                ->filter(function($billing) {
-                    return $billing->organisation !== null;
-                })
-                ->map(function($billing) {
-                    return [
-                        'id' => $billing->organisation_id,
-                        'name' => $billing->organisation->organisation_name ?? 'Unknown TPA',
-                        'code' => $billing->organisation->code ?? null,
-                    ];
-                });
+                ->map(fn ($billing) => BillingTpaHelper::formatTpa($billing->organisation))
+                ->filter();
             
             $tpas = $tpas->merge($pathologyTpas);
             \Log::info('TPAs from pathology bills: ' . $pathologyTpas->count());
@@ -524,20 +514,12 @@ class PathologyBillingController extends Controller
             // Get TPAs from IPD records
             $ipdTpas = IpdDetail::where('patient_id', $patientId)
                 ->whereNotNull('organisation_id')
-                ->with('organisation')
+                ->with('organisation.insuranceCompany')
                 ->select('organisation_id')
                 ->distinct()
                 ->get()
-                ->filter(function($ipd) {
-                    return $ipd->organisation !== null; // Filter out null organisations
-                })
-                ->map(function($ipd) {
-                    return [
-                        'id' => $ipd->organisation_id,
-                        'name' => $ipd->organisation->organisation_name ?? 'Unknown TPA',
-                        'code' => $ipd->organisation->code ?? null,
-                    ];
-                });
+                ->map(fn ($ipd) => BillingTpaHelper::formatTpa($ipd->organisation))
+                ->filter();
             
             $tpas = $tpas->merge($ipdTpas);
             \Log::info('TPAs from IPD records: ' . $ipdTpas->count());
@@ -547,25 +529,22 @@ class PathologyBillingController extends Controller
                     $query->where('patient_id', $patientId)
                           ->whereNotNull('organisation_id');
                 })
-                ->with('ipd.organisation')
+                ->with('ipd.organisation.insuranceCompany')
                 ->get()
-                ->map(function($prescription) {
+                ->map(function ($prescription) {
                     if ($prescription->ipd && $prescription->ipd->organisation) {
-                        return [
-                            'id' => $prescription->ipd->organisation_id,
-                            'name' => $prescription->ipd->organisation->organisation_name ?? 'Unknown TPA',
-                            'code' => $prescription->ipd->organisation->code ?? null,
-                        ];
+                        return BillingTpaHelper::formatTpa($prescription->ipd->organisation);
                     }
+
                     return null;
                 })
-                ->filter(); // Remove nulls
+                ->filter();
             
             $tpas = $tpas->merge($ipdPrescriptionTpas);
             \Log::info('TPAs from IPD Prescriptions: ' . $ipdPrescriptionTpas->count());
             
             // Remove duplicates based on ID
-            $uniqueTpas = $tpas->unique('id')->values();
+            $uniqueTpas = $tpas->filter()->unique('id')->values();
             \Log::info('Total unique TPAs: ' . $uniqueTpas->count());
             
             return response()->json($uniqueTpas);
@@ -580,7 +559,11 @@ class PathologyBillingController extends Controller
      */
     public function getPrescriptionTests($prescriptionId)
     {
-        $prescription = IpdPrescription::with(['tests.pathology', 'ipd.patient.organisation', 'ipd.organisation'])
+        $prescription = IpdPrescription::with([
+            'tests.pathology',
+            'ipd.patient.organisation.insuranceCompany',
+            'ipd.organisation.insuranceCompany',
+        ])
             ->find($prescriptionId);
         
         if (!$prescription) {
@@ -625,19 +608,9 @@ class PathologyBillingController extends Controller
         if ($prescription->ipd && $prescription->ipd->patient) {
             // First check patient's TPA (primary source)
             if ($prescription->ipd->patient->organisation_id && $prescription->ipd->patient->organisation) {
-                $tpa = [
-                    'id' => $prescription->ipd->patient->organisation_id,
-                    'name' => $prescription->ipd->patient->organisation->organisation_name,
-                    'code' => $prescription->ipd->patient->organisation->code,
-                ];
-            }
-            // Fallback to IPD's TPA if patient doesn't have one
-            elseif ($prescription->ipd->organisation_id && $prescription->ipd->organisation) {
-                $tpa = [
-                    'id' => $prescription->ipd->organisation_id,
-                    'name' => $prescription->ipd->organisation->organisation_name,
-                    'code' => $prescription->ipd->organisation->code,
-                ];
+                $tpa = BillingTpaHelper::formatTpa($prescription->ipd->patient->organisation);
+            } elseif ($prescription->ipd->organisation_id && $prescription->ipd->organisation) {
+                $tpa = BillingTpaHelper::formatTpa($prescription->ipd->organisation);
             }
         }
         
@@ -666,53 +639,45 @@ class PathologyBillingController extends Controller
     /**
      * API: Get TPA charge for a specific test and TPA
      */
-    public function getTpaCharge(Request $request)
+    public function getTpaCharge(Request $request, InsuranceBillingRateResolver $rateResolver)
     {
         $testId = $request->input('test_id');
         $organisationId = $request->input('organisation_id');
-        $customerType = $request->input('customer_type', 'OPD'); // Default to OPD
-        
-        if (!$testId || !$organisationId) {
-            return response()->json(['error' => 'Test ID and Organisation ID are required'], 400);
+        $insuranceCompanyId = BillingTpaHelper::resolveInsuranceCompanyId(
+            $organisationId ? (int) $organisationId : null,
+            $request->input('insurance_company_id') ? (int) $request->input('insurance_company_id') : null
+        );
+        $customerType = $request->input('customer_type', 'OPD');
+
+        if (!$testId) {
+            return response()->json(['error' => 'Test ID is required'], 400);
         }
-        
+
         $test = Pathology::find($testId);
-        
         if (!$test) {
             return response()->json(['error' => 'Test not found'], 404);
         }
-        
-        // Determine which standard charge to use based on customer type
-        $standardCharge = ($customerType === 'IPD') ? ($test->standard_charge_ipd ?? 0) : ($test->standard_charge_opd ?? 0);
-        
-        // Look for TPA charge for this pathology, organization, and charge type
-        $tpaCharge = OrganisationsCharge::where('pathology_id', $test->id)
-            ->where('org_id', $organisationId)
-            ->where('charge_type', $customerType)
-            ->first();
-        
-        \Log::info("TPA charge lookup - Test: {$testId}, Org: {$organisationId}, Type: {$customerType}, Found: " . ($tpaCharge ? 'Yes' : 'No'));
-        
-        if ($tpaCharge && $tpaCharge->org_charge !== null) {
-            \Log::info("TPA charge found: {$tpaCharge->org_charge}");
-            return response()->json([
-                'tpa_charge_ipd' => ($customerType === 'IPD') ? (float)$tpaCharge->org_charge : null,
-                'tpa_charge_opd' => ($customerType === 'OPD') ? (float)$tpaCharge->org_charge : null,
-                'standard_charge_ipd' => $test->standard_charge_ipd ?? 0,
-                'standard_charge_opd' => $test->standard_charge_opd ?? 0,
-                'tpa_charge' => (float)$tpaCharge->org_charge,
-                'standard_charge' => $standardCharge,
-            ]);
-        }
-        
-        \Log::info("No TPA charge found, returning standard charge: {$standardCharge}");
+
+        $resolved = $rateResolver->resolvePathology(
+            (int) $testId,
+            $insuranceCompanyId ? (int) $insuranceCompanyId : null,
+            $organisationId ? (int) $organisationId : null,
+            $customerType
+        );
+
+        $charge = (float) $resolved['rate'];
+        $standardCharge = (float) ($resolved['standard_rate'] ?? 0);
+
         return response()->json([
-            'tpa_charge_ipd' => null,
-            'tpa_charge_opd' => null,
+            'tpa_charge_ipd' => ($customerType === 'IPD') ? $charge : null,
+            'tpa_charge_opd' => ($customerType === 'OPD') ? $charge : null,
             'standard_charge_ipd' => $test->standard_charge_ipd ?? 0,
             'standard_charge_opd' => $test->standard_charge_opd ?? 0,
-            'tpa_charge' => null,
+            'tpa_charge' => $charge,
             'standard_charge' => $standardCharge,
+            'rate_source' => $resolved['source'],
+            'insurer_test_name' => $resolved['insurer_test_name'],
+            'insurance_test_rate_id' => $resolved['insurance_test_rate_id'],
         ]);
     }
 }

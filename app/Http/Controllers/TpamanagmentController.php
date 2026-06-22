@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Organisation;
+use App\Models\InsuranceCompany;
 use App\Models\ChargeTypeMaster;
 use App\Models\Charge;
 use App\Models\ChargeCategory;
@@ -11,21 +12,35 @@ use App\Models\OrganisationsCharge;
 
 class TpamanagmentController extends Controller
 {
+    protected function tpaListingQuery()
+    {
+        return Organisation::query()
+            ->leftJoin('insurance_companies as ic', 'organisation.insurance_company_id', '=', 'ic.id')
+            ->select('organisation.*', 'ic.name as insurance_company_name');
+    }
+
     function index(Request $request)
     {
         $perPage = (int) $request->input('perPage', 10);
-    if ($perPage <= 0) {
-        $perPage = 10;
-    }
-        $query = Organisation::query();
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+
+        $query = $this->tpaListingQuery();
+
+        if ($request->filled('insurance_company_id')) {
+            $query->where('organisation.insurance_company_id', $request->input('insurance_company_id'));
+        }
+
         if ($request->has("search")) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
-                $q->where('organisation_name', 'like', "%{$search}%")
-                    ->orWhere('code', 'like', "%{$search}%")
-                    ->orWhere('contact_no', 'like', "%{$search}%")
-                    ->orWhere('contact_person_name', 'like', "%{$search}%")
-                    ->orWhere('contact_person_phone', 'like', "%{$search}%");
+                $q->where('organisation.organisation_name', 'like', "%{$search}%")
+                    ->orWhere('organisation.code', 'like', "%{$search}%")
+                    ->orWhere('organisation.contact_no', 'like', "%{$search}%")
+                    ->orWhere('organisation.contact_person_name', 'like', "%{$search}%")
+                    ->orWhere('organisation.contact_person_phone', 'like', "%{$search}%")
+                    ->orWhere('ic.name', 'like', "%{$search}%");
             });
             $data = $query->get();
             return array(
@@ -34,16 +49,19 @@ class TpamanagmentController extends Controller
                 "total" => count($data)
             );
         }
-       // $organisations = $query->get();
-        
+
         $organisations = $query->paginate($perPage);
-        return view('admin.tpa.tpamanagement', compact('organisations','perPage'));
+        $insuranceCompanies = InsuranceCompany::orderBy('name')->pluck('name', 'id');
+        $selectedInsuranceId = $request->input('insurance_company_id');
+
+        return view('admin.tpa.tpamanagement', compact('organisations', 'perPage', 'insuranceCompanies', 'selectedInsuranceId'));
 
     }
 
     function store(Request $request)
     {
         $request->validate([
+            'insurance_company_id' => 'required|exists:insurance_companies,id',
             'organisation_name' => 'required|string|max:255',
             'code' => 'required|string|max:100|unique:organisation,code',
             'contact_no' => 'required|string|max:15|different:contact_person_phone',
@@ -56,6 +74,7 @@ class TpamanagmentController extends Controller
         ]);
 
         $organisation = new Organisation();
+        $organisation->insurance_company_id = $request->insurance_company_id;
         $organisation->organisation_name = $request->organisation_name;
         $organisation->code = $request->code;
         $organisation->contact_no = $request->contact_no;
@@ -81,6 +100,7 @@ class TpamanagmentController extends Controller
     {
         $request->validate([
             'id' => 'required|exists:organisation,id',
+            'insurance_company_id' => 'required|exists:insurance_companies,id',
             'organisation_name' => 'required|string|max:255',
             'code' => 'required|string|max:100|unique:organisation,code,' . $request->id,
             'contact_no' => 'required|string|max:15|different:contact_person_phone',
@@ -95,6 +115,7 @@ class TpamanagmentController extends Controller
         $organisation = Organisation::findOrFail($request->id);
 
         $organisation->update([
+            'insurance_company_id' => $request->insurance_company_id,
             'organisation_name' => $request->organisation_name,
             'code' => $request->code,
             'contact_no' => $request->contact_no,

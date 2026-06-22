@@ -258,6 +258,8 @@
 }
 </style>
 
+@include('admin.billing.partials.tpa_insurance_js')
+
 <script>
 let testRowCount = 1;
 let patientData = @json($patients);
@@ -335,16 +337,19 @@ document.addEventListener('DOMContentLoaded', function() {
             // Check if TPA is active and get TPA charge
             if (activateTpa && organisationId) {
                 // Fetch TPA charge with customer_type parameter
-                const url = `{{ url('/radiology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}&customer_type=${customerType}`;
+                const url = BillingTpaInsurance.appendInsuranceParams(
+                    `{{ url('/radiology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}&customer_type=${customerType}`
+                );
                 console.log('Fetching TPA charge from:', url);
                 fetch(url)
                     .then(response => response.json())
                     .then(data => {
                         const tpaCharge = (customerType === 'IPD') ? data.tpa_charge_ipd : data.tpa_charge_opd;
-                        const amountToUse = (tpaCharge !== null && tpaCharge !== undefined && tpaCharge !== '') 
-                            ? tpaCharge 
-                            : standardAmount;
+                        const amountToUse = (tpaCharge !== null && tpaCharge !== undefined && tpaCharge !== '')
+                            ? tpaCharge
+                            : (data.tpa_charge ?? standardAmount);
                         row.find('.test_amount').val(parseFloat(amountToUse).toFixed(2));
+                        BillingTpaInsurance.applyRateSourceHint(row[0], data);
                         calculateTotals();
                     })
                     .catch(error => {
@@ -631,8 +636,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data && data.length > 0) {
                     data.forEach(tpa => {
                         const option = document.createElement('option');
-                        option.value = tpa.id;
-                        option.textContent = tpa.name + (tpa.code ? ' (' + tpa.code + ')' : '');
+                        BillingTpaInsurance.setTpaOption(option, tpa);
                         tpaDropdown.appendChild(option);
                     });
                     helpText.textContent = `${data.length} TPA(s) found for this patient`;
@@ -710,7 +714,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // Fetch TPA charge for this test with customer_type
-                const url = `{{ url('/radiology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}&customer_type=${customerType}`;
+                const url = BillingTpaInsurance.appendInsuranceParams(
+                    `{{ url('/radiology/billing/api/tpa-charge') }}?test_id=${testId}&organisation_id=${organisationId}&customer_type=${customerType}`
+                );
                 console.log('Fetching TPA charge from:', url, 'for customer type:', customerType);
                 const promise = fetch(url)
                     .then(response => {
@@ -726,11 +732,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (tpaCharge !== null && tpaCharge !== undefined && tpaCharge !== '') {
                             amountInput.value = parseFloat(tpaCharge).toFixed(2);
                             console.log('Applied TPA charge:', tpaCharge);
+                        } else if (data.tpa_charge) {
+                            amountInput.value = parseFloat(data.tpa_charge).toFixed(2);
                         } else {
-                            // If no TPA charge found, use standard charge
                             amountInput.value = parseFloat(data.standard_charge).toFixed(2);
                             console.log('No TPA charge found, using standard charge:', data.standard_charge);
                         }
+                        BillingTpaInsurance.applyRateSourceHint(row, data);
                         calculateTotals();
                     })
                     .catch(error => {
@@ -747,6 +755,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function revertToStandardCharges() {
+        BillingTpaInsurance.clearRateSourceHints();
         const testRows = document.querySelectorAll('.test-row');
         const customerType = getCustomerType();
         

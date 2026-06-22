@@ -6,7 +6,9 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use App\Models\Hospital;
 use App\Models\Area;
-use App\Models\BloodBankProduct; 
+use App\Models\BloodBankProduct;
+use App\Models\InsuranceCompany;
+use App\Models\Organisation;
 use Illuminate\Support\Facades\View;
 use App\Http\View\Composers\BloodGroupComposer;
 use App\Http\View\Composers\AreaComposer;
@@ -27,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
 {
+    $this->registerOrganisationInsuranceRelations();
+
     URL::forceRootUrl(config('app.url'));
 
     if ($this->app->environment('production')) {
@@ -84,4 +88,24 @@ class AppServiceProvider extends ServiceProvider
         $view->with('hospitalData', $hospital);
     });
 }
+
+    /**
+     * Ensure insurance relations exist on Organisation even if an older model
+     * file was deployed on Linux (case-sensitive) without these methods.
+     */
+    protected function registerOrganisationInsuranceRelations(): void
+    {
+        Organisation::resolveRelationUsing('insuranceCompany', function (Organisation $organisation) {
+            return $organisation->belongsTo(InsuranceCompany::class, 'insurance_company_id');
+        });
+
+        Organisation::resolveRelationUsing('insuranceCompanies', function (Organisation $organisation) {
+            return $organisation->belongsToMany(
+                InsuranceCompany::class,
+                'insurance_company_organisation',
+                'organisation_id',
+                'insurance_company_id'
+            )->withTimestamps();
+        });
+    }
 }
