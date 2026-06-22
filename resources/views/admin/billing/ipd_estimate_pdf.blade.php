@@ -426,6 +426,11 @@
                                 <td class="patient_value">{{ strtoupper($ipd->doctor->name ?? 'N/A') }} {{ strtoupper($ipd->doctor->surname ?? '') }}@if($ipd->doctor->registration_no) (REG-{{ $ipd->doctor->registration_no }})@endif</td>
                             </tr>
                             @endif
+                            <tr>
+                                <td class="patient_label">Guardian Name</td>
+                                <td class="patient_colon">:</td>
+                                <td class="patient_value">{{ strtoupper($ipd->patient->guardian_name ?? 'N/A') }}</td>
+                            </tr>
                         </table>
                     </td>
                     <!-- Right Column -->
@@ -459,9 +464,9 @@
                             </tr>
                             @endif
                             <tr>
-                                <td class="patient_label">URN</td>
+                                <td class="patient_label">Relation</td>
                                 <td class="patient_colon">:</td>
-                                <td class="patient_value">{{ $ipd->urn ?? '' }}</td>
+                                <td class="patient_value">{{ strtoupper($ipd->patient->guardian_relation ?? 'N/A') }}</td>
                             </tr>
                         </table>
                     </td>
