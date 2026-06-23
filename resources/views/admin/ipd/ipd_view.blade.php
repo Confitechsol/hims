@@ -5957,18 +5957,28 @@
             }
 
             /*--------------------------------------------------
+             | FUNCTION TO POPULATE CHARGE TYPES
+             --------------------------------------------------*/
+            function populateChargeTypes() {
+                if (window.chargeTypeData) {
+                    chargeTypeSelect.innerHTML = `<option value="">Select</option>`;
+                    window.chargeTypeData.forEach(type => {
+                        chargeTypeSelect.innerHTML += `
+                    <option value="${type.id}">${type.charge_type}</option>
+                `;
+                    });
+                    refreshSelect2(chargeTypeSelect);
+                }
+            }
+
+            /*--------------------------------------------------
              | FETCH CHARGE TYPES
              --------------------------------------------------*/
             fetch("{{ route('getChargeTypes') }}")
                 .then(res => res.json())
                 .then(data => {
                     window.chargeTypeData = data;
-                    chargeTypeSelect.innerHTML = `<option value="">Select</option>`;
-                    data.forEach(type => {
-                        chargeTypeSelect.innerHTML += `
-                    <option value="${type.id}">${type.charge_type}</option>
-                `;
-                    });
+                    populateChargeTypes();
                 });
 
             /*--------------------------------------------------
@@ -6216,9 +6226,9 @@
 
                 document.getElementById("addChargeForm").reset();
                 
-                // Restore date and clear fields after reset
+                // Restore date and repopulate dropdowns after reset
                 document.getElementById("charge_date").value = admissionDate;
-                chargeTypeSelect.innerHTML = `<option value="">Select</option>`;
+                populateChargeTypes();
                 chargeCategorySelect.innerHTML = `<option value="">Select</option>`;
                 chargeSelect.innerHTML = `<option value="">Select</option>`;
                 totalInp.value = '0.00';
@@ -6226,7 +6236,7 @@
                 taxAmtInp.value = '0.00';
                 netAmountInp.value = '0.00';
                 
-                console.log('✅ Charge added. Date captured:', chargeDate);
+                console.log('✅ Charge added. Date captured:', chargeDate, 'Dropdowns repopulated');
             });
 
             /*--------------------------------------------------
@@ -6262,6 +6272,11 @@
                 if (chargeDate && admissionDate) {
                     chargeDate.value = admissionDate;
                 }
+
+                // Repopulate charge types and clear other dropdowns
+                populateChargeTypes();
+                chargeCategorySelect.innerHTML = `<option value="">Select</option>`;
+                chargeSelect.innerHTML = `<option value="">Select</option>`;
 
                 // Clear dynamic preview rows
                 if (previewBody) previewBody.innerHTML = '';
