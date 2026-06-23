@@ -945,18 +945,34 @@
                 }
             });
 
-            // Load available packages for edit (same as Add Admission)
-            if (packageSelectEdit) {
-                fetch("{{ route('packages.api.active') }}")
+            function buildPackageApiUrl() {
+                const params = new URLSearchParams();
+                const bgEl = document.getElementById('bed_group_select');
+                if (bgEl && bgEl.value) {
+                    params.set('bed_group_id', bgEl.value);
+                }
+                const base = "{{ route('packages.api.active') }}";
+                const qs = params.toString();
+                return qs ? `${base}?${qs}` : base;
+            }
+
+            function loadPackagesForEdit() {
+                if (!packageSelectEdit) return;
+                fetch(buildPackageApiUrl())
                     .then(response => response.json())
                     .then(data => {
-                        packageSelectEdit.innerHTML = '<option value=\"\">-- Select Package --</option>';
+                        const current = packageSelectEdit.value;
+                        packageSelectEdit.innerHTML = '<option value="">-- Select Package --</option>';
 
                         if (data.success && data.packages) {
                             data.packages.forEach(pkg => {
                                 const opt = document.createElement('option');
                                 opt.value = pkg.id;
-                                opt.textContent = `${pkg.name} - ₹${pkg.package_rate}`;
+                                let label = `${pkg.name} - ₹${parseFloat(pkg.package_rate).toFixed(2)}`;
+                                if (pkg.package_type === 'insurance' && pkg.insurer_procedure_code) {
+                                    label += ` (${pkg.insurer_procedure_code})`;
+                                }
+                                opt.textContent = label;
                                 opt.dataset.rate = pkg.package_rate;
                                 packageSelectEdit.appendChild(opt);
                             });
@@ -965,12 +981,21 @@
                         if (appliedPackageId) {
                             packageSelectEdit.value = appliedPackageId;
                             if (packageAmountWrapperEdit) packageAmountWrapperEdit.style.display = '';
+                        } else if (current) {
+                            packageSelectEdit.value = current;
                         }
                     })
                     .catch(error => {
                         console.error('Error loading packages:', error);
-                        packageSelectEdit.innerHTML = '<option value=\"\">Error loading packages</option>';
+                        packageSelectEdit.innerHTML = '<option value="">Error loading packages</option>';
                     });
+            }
+
+            // Load available packages for edit (same as Add Admission)
+            if (packageSelectEdit) {
+                loadPackagesForEdit();
+
+                bedGroupSelect?.addEventListener('change', loadPackagesForEdit);
 
                 packageSelectEdit.addEventListener('change', function () {
                     const opt = this.options[this.selectedIndex];
@@ -1497,28 +1522,44 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const appliedPackageId = "{{ $appliedPackage->package_id ?? '' }}";
 
-    fetch("{{ route('packages.api.active') }}")
+    function buildPackageApiUrlPush() {
+        const params = new URLSearchParams();
+        const bg = document.getElementById('bed_group_select')?.value;
+        if (bg) params.set('bed_group_id', bg);
+        const base = "{{ route('packages.api.active') }}";
+        const qs = params.toString();
+        return qs ? `${base}?${qs}` : base;
+    }
+
+    function loadPackagesPush() {
+        fetch(buildPackageApiUrlPush())
         .then(r => r.json())
         .then(data => {
+            const cur = select.value;
             select.innerHTML = '<option value="">-- Select Package --</option>';
             if (data.success && data.packages) {
                 data.packages.forEach(pkg => {
                     const opt = document.createElement('option');
                     opt.value = pkg.id;
-                    opt.textContent = `${pkg.name} - ₹${pkg.package_rate}`;
+                    opt.textContent = `${pkg.name} - ₹${parseFloat(pkg.package_rate).toFixed(2)}`;
                     opt.dataset.rate = pkg.package_rate;
                     select.appendChild(opt);
                 });
             }
-
             if (appliedPackageId) {
                 select.value = appliedPackageId;
                 if (amountWrapper) amountWrapper.style.display = '';
+            } else if (cur) {
+                select.value = cur;
             }
         })
         .catch(() => {
             select.innerHTML = '<option value="">Error loading packages</option>';
         });
+    }
+
+    loadPackagesPush();
+    document.getElementById('bed_group_select')?.addEventListener('change', loadPackagesPush);
 
     select.addEventListener('change', function () {
         const opt = this.options[this.selectedIndex];

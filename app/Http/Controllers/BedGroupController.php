@@ -46,7 +46,7 @@ class BedGroupController extends Controller
             'description' => $request->description ?? "",
             'sac_hsn_code' => $request->sac_hsn_code ?? null,
             'gst_rate'    => $request->gst_rate ?? null,
-            'is_active'   => 0,
+            'is_active'   => 1,
         ]);
 
         return redirect()->back()->with('success', 'Bed group created successfully.');

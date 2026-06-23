@@ -28,6 +28,20 @@
                             <td>{{ $package->name }}</td>
                         </tr>
                         <tr>
+                            <th>Type:</th>
+                            <td>{{ ($package->package_type ?? 'hospital') === 'insurance' ? 'Insurance' : 'Hospital' }}</td>
+                        </tr>
+                        @if($package->isInsurance())
+                        <tr><th>Procedure Code:</th><td><code>{{ $package->insurer_procedure_code ?? '—' }}</code></td></tr>
+                        <tr><th>Speciality:</th><td>{{ $package->speciality ?? '—' }}</td></tr>
+                        <tr><th>Panel:</th><td>{{ $package->insuranceRatePanel->name ?? '—' }}</td></tr>
+                        <tr><th>Insurance Co.:</th><td>{{ $package->insuranceCompany->name ?? '—' }}</td></tr>
+                        <tr><th>Room eligibility:</th><td>{{ $package->room_eligibility ?? '—' }}</td></tr>
+                        @if($package->inclusion_notes)
+                        <tr><th>Inclusions:</th><td>{{ $package->inclusion_notes }}</td></tr>
+                        @endif
+                        @endif
+                        <tr>
                             <th>Account Head:</th>
                             <td>{{ $package->account_head ?? 'N/A' }}</td>
                         </tr>
@@ -81,6 +95,28 @@
                     </table>
                 </div>
             </div>
+            @if($package->roomRates->isNotEmpty())
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h6>Room-tier Rates</h6>
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-light">
+                            <tr><th>Bed Group</th><th>Room Code</th><th>Label</th><th>Rate</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach($package->roomRates as $rr)
+                            <tr>
+                                <td>{{ $rr->bedGroup->name ?? $rr->bed_group_id }}</td>
+                                <td>{{ $rr->insurer_room_code ?? '—' }}</td>
+                                <td>{{ $rr->label ?? '—' }}</td>
+                                <td>₹{{ number_format($rr->rate, 2) }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 </div>

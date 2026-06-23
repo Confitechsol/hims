@@ -14,6 +14,7 @@ class IpdPackage extends Model
     protected $fillable = [
         'ipd_id',
         'package_id',
+        'bed_group_id',
         'applied_date',
         'applied_by',
         'package_rate',

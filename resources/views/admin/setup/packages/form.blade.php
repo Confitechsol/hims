@@ -44,6 +44,8 @@
                 @endif
 
                 <div class="row">
+                    @include('admin.setup.packages.partials.insurance_fields')
+
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="name" class="form-label">Package Name <span class="text-danger">*</span></label>

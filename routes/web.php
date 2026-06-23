@@ -77,6 +77,7 @@ use App\Http\Controllers\Setup\MedicineSupplierController;
 use App\Http\Controllers\Setup\MedicineSupplierController as SetupMedicineSupplierController;
 use App\Http\Controllers\Setup\MedicineUnitController as SetupMedicineUnitController;
 use App\Http\Controllers\Setup\PackageController;
+use App\Http\Controllers\Setup\PackageRoomMappingController;
 use App\Http\Controllers\Setup\PrefixesController;
 use App\Http\Controllers\Setup\ProfileController;
 use App\Http\Controllers\Setup\RadiologyController;
@@ -1079,6 +1080,9 @@ Route::prefix('setup')->group(function () {
     Route::delete('/medicine-group/destroy/{id}', [SetupMedicineGroupController::class, 'destroy'])->name('setup.medicine-group.destroy');
 
     // Package Management Routes
+    Route::get('/packages/room-mappings', [PackageRoomMappingController::class, 'index'])->name('packages.room-mappings');
+    Route::post('/packages/room-mappings', [PackageRoomMappingController::class, 'store'])->name('packages.room-mappings.store');
+    Route::delete('/packages/room-mappings/{id}', [PackageRoomMappingController::class, 'destroy'])->name('packages.room-mappings.destroy');
     Route::get('/packages', [PackageController::class, 'index'])->name('packages.index');
     Route::get('/packages/create', [PackageController::class, 'create'])->name('packages.create');
     Route::post('/packages', [PackageController::class, 'store'])->name('packages.store');

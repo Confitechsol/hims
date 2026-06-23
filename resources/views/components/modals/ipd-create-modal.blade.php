@@ -1575,7 +1575,15 @@
             const packageAmountInput = $modal.find('#package_amount_admission');
             const packageAmountWrapper = $modal.find('#package_amount_wrapper_admission');
             if (packageSelect.length) {
-                fetch("{{ route('packages.api.active') }}")
+                function loadAdmissionPackages() {
+                    const params = new URLSearchParams();
+                    const bg = $modal.find('#bed_group_select').val();
+                    if (bg) params.set('bed_group_id', bg);
+                    let url = "{{ route('packages.api.active') }}";
+                    const qs = params.toString();
+                    if (qs) url += '?' + qs;
+
+                    fetch(url)
                     .then(response => response.json())
                     .then(data => {
                         packageSelect.empty().append('<option value="">-- Select Package --</option>');
@@ -1583,7 +1591,7 @@
                         if (data.success && data.packages) {
                             data.packages.forEach(pkg => {
                                 const option = new Option(
-                                    `${pkg.name} - ₹${pkg.package_rate}`,
+                                    `${pkg.name} - ₹${parseFloat(pkg.package_rate).toFixed(2)}`,
                                     pkg.id,
                                     false,
                                     false
@@ -1598,6 +1606,10 @@
                         console.error('Error loading packages:', error);
                         packageSelect.empty().append('<option value="">Error loading packages</option>');
                     });
+                }
+
+                loadAdmissionPackages();
+                $modal.find('#bed_group_select').on('change', loadAdmissionPackages);
 
                 packageSelect.on('change', function() {
                     const opt = this.options[this.selectedIndex];

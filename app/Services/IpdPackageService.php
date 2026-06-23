@@ -6,6 +6,7 @@ use App\Models\IpdDetail;
 use App\Models\IpdPackage;
 use App\Models\Package;
 use App\Models\Transaction;
+use App\Services\PackageInsuranceRateService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,6 +14,13 @@ use Carbon\Carbon;
 
 class IpdPackageService
 {
+    protected PackageInsuranceRateService $packageRateService;
+
+    public function __construct(?PackageInsuranceRateService $packageRateService = null)
+    {
+        $this->packageRateService = $packageRateService ?? new PackageInsuranceRateService();
+    }
+
     /**
      * Apply a package to an IPD patient
      *
@@ -79,6 +87,7 @@ class IpdPackageService
             $ipdPackage = IpdPackage::create([
                 'ipd_id' => $ipdId,
                 'package_id' => $packageId,
+                'bed_group_id' => $ipd->bed_group_id,
                 'applied_date' => $appliedDate,
                 'applied_by' => Auth::id() ?? null,
                 'package_rate' => $calculatedCharge['package_rate'],
@@ -271,7 +280,14 @@ class IpdPackageService
      */
     private function calculatePackageCharge($ipd, $package, $rateOverride = null)
     {
-        $packageRate = $rateOverride !== null && $rateOverride !== '' ? (float) $rateOverride : (float) ($package->package_rate ?? 0.00);
+        if ($rateOverride !== null && $rateOverride !== '') {
+            $packageRate = (float) $rateOverride;
+        } else {
+            $packageRate = $this->packageRateService->resolveRate(
+                $package,
+                $ipd->bed_group_id ? (int) $ipd->bed_group_id : null
+            );
+        }
         
         // Calculate discount percentage
         // Priority: MOU Discount > Special Discount
