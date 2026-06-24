@@ -14,7 +14,8 @@ return new class extends Migration
             $table->unsignedBigInteger('insurance_rate_panel_id')->nullable()->after('insurance_company_id')->index();
             $table->string('insurer_procedure_code', 50)->nullable()->after('name')->index();
             $table->string('speciality', 100)->nullable()->after('insurer_procedure_code');
-            $table->string('room_eligibility', 20)->nullable()->after('speciality');
+            $table->string('package_inclusions', 50)->nullable()->after('speciality');
+            $table->string('package_exclusions', 50)->nullable()->after('package_inclusions');
             $table->text('inclusion_notes')->nullable()->after('description');
             $table->date('effective_from')->nullable()->after('inclusion_notes');
             $table->date('effective_to')->nullable()->after('effective_from');
@@ -38,7 +39,8 @@ return new class extends Migration
                 'insurance_rate_panel_id',
                 'insurer_procedure_code',
                 'speciality',
-                'room_eligibility',
+                'package_inclusions',
+                'package_exclusions',
                 'inclusion_notes',
                 'effective_from',
                 'effective_to',

@@ -322,27 +322,24 @@ class IpdBillingController extends Controller
                 $gstRate = 0;
                 $sacHsnCode = null;
 
-                // First, try exact date match for daywise charge
-                if ($daywiseCharges->has($chargeDate)) {
-                    $daywise = $daywiseCharges->get($chargeDate);
-                    if ($daywise && isset($daywise->bed_charge) && (float)$daywise->bed_charge > 0) {
+                $customChargeKey = $activeBed->bed_group_id . '|' . $activeBedHistoryIndex;
+
+                // Prefer custom rate set at admit/transfer for the whole bed segment.
+                if (isset($bedGroupCustomCharges[$customChargeKey])) {
+                    $daywise = $bedGroupCustomCharges[$customChargeKey];
+                    if ($daywise && isset($daywise->bed_charge) && (float) $daywise->bed_charge > 0) {
                         $bedCost = (float) $daywise->bed_charge;
                         $bedChargeRate = (float) ($daywise->bed_charge_rate ?? $activeBed->bedGroup->bed_cost ?? 0);
                         $gstRate = $daywise->bedGroup->gst_rate ?? $activeBed->bedGroup->gst_rate ?? 0;
                         $sacHsnCode = $daywise->bedGroup->sac_hsn_code ?? $activeBed->bedGroup->sac_hsn_code ?? null;
                     }
-                } else {
-                    // If no exact date match, use the pre-computed most recent custom bed charge
-                    // This ensures a custom charge set during admission/transfer applies to all subsequent days
-                    $customChargeKey = $activeBed->bed_group_id . '|' . $activeBedHistoryIndex;
-                    if (isset($bedGroupCustomCharges[$customChargeKey])) {
-                        $daywise = $bedGroupCustomCharges[$customChargeKey];
-                        if ($daywise && isset($daywise->bed_charge) && (float)$daywise->bed_charge > 0) {
-                            $bedCost = (float) $daywise->bed_charge;
-                            $bedChargeRate = (float) ($daywise->bed_charge_rate ?? $activeBed->bedGroup->bed_cost ?? 0);
-                            $gstRate = $daywise->bedGroup->gst_rate ?? $activeBed->bedGroup->gst_rate ?? 0;
-                            $sacHsnCode = $daywise->bedGroup->sac_hsn_code ?? $activeBed->bedGroup->sac_hsn_code ?? null;
-                        }
+                } elseif ($daywiseCharges->has($chargeDate)) {
+                    $daywise = $daywiseCharges->get($chargeDate);
+                    if ($daywise && isset($daywise->bed_charge) && (float) $daywise->bed_charge > 0) {
+                        $bedCost = (float) $daywise->bed_charge;
+                        $bedChargeRate = (float) ($daywise->bed_charge_rate ?? $activeBed->bedGroup->bed_cost ?? 0);
+                        $gstRate = $daywise->bedGroup->gst_rate ?? $activeBed->bedGroup->gst_rate ?? 0;
+                        $sacHsnCode = $daywise->bedGroup->sac_hsn_code ?? $activeBed->bedGroup->sac_hsn_code ?? null;
                     }
                 }
 
@@ -601,13 +598,7 @@ class IpdBillingController extends Controller
      */
     private function resolveChargeLabelDayForMoment(Carbon $moment): Carbon
     {
-        $labelDay = $moment->copy()->startOfDay();
-        [, $boundaryEnd] = BedBillingPeriod::windowForChargeCalendarDay($labelDay);
-        if ($moment->gt($boundaryEnd)) {
-            $labelDay->addDay();
-        }
-
-        return $labelDay;
+        return BedBillingPeriod::chargeLabelDayForMoment($moment);
     }
 
     /**

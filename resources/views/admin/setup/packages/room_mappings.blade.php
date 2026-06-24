@@ -5,22 +5,29 @@
     <div class="card shadow-sm">
         <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0" style="color: #750096"><i class="ti ti-bed me-2"></i>Insurer Room → Bed Group Mappings</h5>
+                <h5 class="mb-0" style="color: #750096"><i class="ti ti-bed me-2"></i>Room Tier → Bed Group Mappings</h5>
                 <a href="{{ route('packages.index') }}" class="btn btn-secondary btn-sm">Back to Packages</a>
             </div>
         </div>
         <div class="card-body">
             @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 
+            <div class="alert alert-info small mb-3">
+                <strong>Room tier codes</strong> (GEN / SEMI / PVT, Galaxy GW/SHR/DLX, or ICICI A–D) map insurer package columns to your hospital bed groups.
+                <strong>L1–L4</strong> in GIPSA/Star/HDFC PDFs are <em>inclusion buckets</em>, not room tiers — configure those on each insurance package.
+            </div>
+
             <form method="GET" class="mb-3">
                 <label class="form-label">Filter by rate panel</label>
-                <select name="insurance_rate_panel_id" class="form-select w-auto" onchange="this.form.submit()">
+                <select name="insurance_rate_panel_id" id="filter_panel_id" class="form-select w-auto" onchange="this.form.submit()">
                     <option value="">All panels</option>
                     @foreach($ratePanels as $panel)
-                        <option value="{{ $panel->id }}" {{ (string) $selectedPanelId === (string) $panel->id ? 'selected' : '' }}>{{ $panel->name }}</option>
+                        <option value="{{ $panel->id }}" {{ (string) $selectedPanelId === (string) $panel->id ? 'selected' : '' }}>{{ $panel->name }} ({{ $panel->code }})</option>
                     @endforeach
                 </select>
             </form>
+
+            <div id="mapping-tier-hint" class="small text-secondary mb-3"></div>
 
             <div class="row">
                 <div class="col-lg-5">
@@ -29,16 +36,17 @@
                         @csrf
                         <div class="mb-2">
                             <label class="form-label">Rate Panel</label>
-                            <select name="insurance_rate_panel_id" class="form-select" required>
+                            <select name="insurance_rate_panel_id" id="mapping_panel_id" class="form-select" required>
                                 <option value="">Select</option>
                                 @foreach($ratePanels as $panel)
-                                    <option value="{{ $panel->id }}" {{ (string) $selectedPanelId === (string) $panel->id ? 'selected' : '' }}>{{ $panel->name }}</option>
+                                    <option value="{{ $panel->id }}" {{ (string) $selectedPanelId === (string) $panel->id ? 'selected' : '' }}>{{ $panel->name }} ({{ $panel->code }})</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="mb-2">
-                            <label class="form-label">Insurer room code</label>
-                            <input type="text" name="insurer_room_code" class="form-control" placeholder="A, B, C, D" required>
+                            <label class="form-label">Room tier code</label>
+                            <input type="text" name="insurer_room_code" id="insurer_room_code_input" class="form-control" placeholder="GEN, SEMI, PVT" required>
+                            <small class="text-muted" id="room-code-examples">e.g. GEN = General, SEMI = Semi-Private, PVT = Private</small>
                         </div>
                         <div class="mb-2">
                             <label class="form-label">Bed group</label>
@@ -53,7 +61,7 @@
                         </div>
                         <div class="mb-2">
                             <label class="form-label">Label (optional)</label>
-                            <input type="text" name="label" class="form-control" placeholder="General Ward, Twin Sharing…">
+                            <input type="text" name="label" id="mapping_label_input" class="form-control" placeholder="General Ward, Twin Sharing…">
                         </div>
                         <button type="submit" class="btn btn-primary btn-sm">Save mapping</button>
                     </form>
@@ -65,7 +73,7 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>Panel</th>
-                                    <th>Code</th>
+                                    <th>Tier code</th>
                                     <th>Bed Group</th>
                                     <th>Label</th>
                                     <th></th>
@@ -96,4 +104,35 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const panelSchemes = @json($panelSchemesJson ?? []);
+    const panelSelect = document.getElementById('mapping_panel_id');
+    const hint = document.getElementById('mapping-tier-hint');
+    const codeExamples = document.getElementById('room-code-examples');
+    const codeInput = document.getElementById('insurer_room_code_input');
+
+    function updateHints() {
+        const panelId = panelSelect?.value;
+        const preset = panelId && panelSchemes[panelId] ? panelSchemes[panelId] : null;
+        if (!preset || !preset.tiers) {
+            if (hint) hint.textContent = '';
+            if (codeExamples) codeExamples.textContent = 'e.g. GEN = General, SEMI = Semi-Private, PVT = Private';
+            if (codeInput) codeInput.placeholder = 'GEN, SEMI, PVT';
+            return;
+        }
+        if (hint) hint.textContent = 'Panel scheme: ' + (preset.scheme_label || '');
+        if (codeExamples) {
+            codeExamples.textContent = preset.tiers.map(t => t.code + ' = ' + t.label).join(' · ');
+        }
+        if (codeInput && preset.tiers[0]) {
+            codeInput.placeholder = preset.tiers.map(t => t.code).join(', ');
+        }
+    }
+
+    panelSelect?.addEventListener('change', updateHints);
+    updateHints();
+});
+</script>
 @endsection

@@ -36,7 +36,9 @@
                         <tr><th>Speciality:</th><td>{{ $package->speciality ?? '—' }}</td></tr>
                         <tr><th>Panel:</th><td>{{ $package->insuranceRatePanel->name ?? '—' }}</td></tr>
                         <tr><th>Insurance Co.:</th><td>{{ $package->insuranceCompany->name ?? '—' }}</td></tr>
-                        <tr><th>Room eligibility:</th><td>{{ $package->room_eligibility ?? '—' }}</td></tr>
+                        <tr><th>Package inclusions:</th><td><code>{{ $package->package_inclusions ?? '—' }}</code></td></tr>
+                        <tr><th>Package exclusions:</th><td><code>{{ $package->package_exclusions ?? '—' }}</code></td></tr>
+                        <tr><th>Linked hospital package:</th><td>{{ $package->linkedHospitalPackage->name ?? '—' }}</td></tr>
                         @if($package->inclusion_notes)
                         <tr><th>Inclusions:</th><td>{{ $package->inclusion_notes }}</td></tr>
                         @endif
@@ -101,7 +103,7 @@
                     <h6>Room-tier Rates</h6>
                     <table class="table table-bordered table-sm">
                         <thead class="table-light">
-                            <tr><th>Bed Group</th><th>Room Code</th><th>Label</th><th>Rate</th></tr>
+                            <tr><th>Bed Group</th><th>Room tier code</th><th>Tier label</th><th>Rate</th></tr>
                         </thead>
                         <tbody>
                             @foreach($package->roomRates as $rr)

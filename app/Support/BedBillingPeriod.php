@@ -97,4 +97,19 @@ class BedBillingPeriod
             'period_end_date' => $pe->format('Y-m-d'),
         ];
     }
+
+    /**
+     * Charge label calendar day for a moment (admission, discharge, or now).
+     * If the moment is after the boundary on its calendar day, it belongs to the next label day.
+     */
+    public static function chargeLabelDayForMoment(Carbon $moment): Carbon
+    {
+        $labelDay = $moment->copy()->startOfDay();
+        [, $boundaryEnd] = self::windowForChargeCalendarDay($labelDay);
+        if ($moment->gt($boundaryEnd)) {
+            $labelDay->addDay();
+        }
+
+        return $labelDay;
+    }
 }

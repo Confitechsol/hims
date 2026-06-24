@@ -12,7 +12,9 @@ use App\Models\Package;
 use App\Models\PackageCharge;
 use App\Models\PackageExclude;
 use App\Models\PackageRoomRate;
+use App\Services\InsurancePackageImportService;
 use App\Services\PackageInsuranceRateService;
+use App\Support\InsurerRoomTierPresets;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +30,7 @@ class PackageController extends Controller
 
     public function index(Request $request)
     {
-        $query = Package::with(['insuranceCompany', 'insuranceRatePanel', 'roomRates'])
+        $query = Package::with(['insuranceCompany', 'insuranceRatePanel', 'roomRates', 'linkedHospitalPackage'])
             ->withCount('roomRates')
             ->orderByDesc('created_at');
 
@@ -89,6 +91,7 @@ class PackageController extends Controller
             'roomRates.bedGroup',
             'insuranceCompany',
             'insuranceRatePanel',
+            'linkedHospitalPackage',
             'ipdPackages.ipd.patient',
         ])->findOrFail($id);
 
@@ -205,6 +208,50 @@ class PackageController extends Controller
         ]);
     }
 
+    public function importInsurancePackages(Request $request, InsurancePackageImportService $importService)
+    {
+        $request->validate([
+            'import_file' => 'required|file|mimes:csv,txt,xlsx,xls|max:20480',
+        ]);
+
+        $path = $request->file('import_file')->getRealPath();
+        $replace = $request->boolean('replace_panel_packages');
+
+        try {
+            $stats = $importService->importFromFile($path, $replace, true);
+        } catch (\Throwable $e) {
+            Log::error('Insurance package import failed', ['error' => $e->getMessage()]);
+
+            return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
+        }
+
+        $msg = sprintf(
+            'Imported %d package(s) across %d panel(s). Room rates: %d. Linked to hospital packages: %d.',
+            $stats['packages'],
+            $stats['panels'],
+            $stats['room_rates'],
+            $stats['linked']
+        );
+        if ($stats['skipped'] > 0) {
+            $msg .= ' Skipped: ' . $stats['skipped'] . '.';
+        }
+
+        return redirect()->route('packages.index', ['package_type' => 'insurance'])->with('success', $msg);
+    }
+
+    public function roomTierPresets(Request $request)
+    {
+        $panel = null;
+        if ($request->filled('insurance_rate_panel_id')) {
+            $panel = InsuranceRatePanel::find($request->integer('insurance_rate_panel_id'));
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => InsurerRoomTierPresets::forPanel($panel),
+        ]);
+    }
+
     protected function formData(Package $package): array
     {
         return [
@@ -214,6 +261,17 @@ class PackageController extends Controller
             'bedGroups' => BedGroup::orderBy('name')->get(['id', 'name', 'floor', 'bed_cost']),
             'insuranceCompanies' => InsuranceCompany::orderBy('name')->get(['id', 'name', 'code']),
             'ratePanels' => InsuranceRatePanel::where('is_active', true)->orderBy('name')->get(['id', 'name', 'code']),
+            'hospitalPackages' => Package::query()
+                ->where(function ($q) {
+                    $q->where('package_type', Package::TYPE_HOSPITAL)->orWhereNull('package_type');
+                })
+                ->orderBy('name')
+                ->get(['id', 'name']),
+            'inclusionLegend' => InsurerRoomTierPresets::inclusionLegend(),
+            'panelSchemesJson' => json_encode(
+                InsuranceRatePanel::where('is_active', true)->get(['id', 'name', 'code'])
+                    ->mapWithKeys(fn ($p) => [(string) $p->id => InsurerRoomTierPresets::forPanel($p)])
+            ),
         ];
     }
 
@@ -229,9 +287,11 @@ class PackageController extends Controller
             'status' => 'nullable|string|in:active,inactive',
             'insurance_company_id' => 'nullable|exists:insurance_companies,id',
             'insurance_rate_panel_id' => 'nullable|exists:insurance_rate_panels,id',
+            'linked_hospital_package_id' => 'nullable|exists:packages,id',
             'insurer_procedure_code' => 'nullable|string|max:50',
             'speciality' => 'nullable|string|max:100',
-            'room_eligibility' => 'nullable|string|max:20',
+            'package_inclusions' => 'nullable|string|max:50',
+            'package_exclusions' => 'nullable|string|max:50',
             'inclusion_notes' => 'nullable|string',
             'effective_from' => 'nullable|date',
             'effective_to' => 'nullable|date|after_or_equal:effective_from',
@@ -258,7 +318,8 @@ class PackageController extends Controller
             'is_active' => ($request->status ?? 'active') === 'active',
             'insurer_procedure_code' => $request->insurer_procedure_code ?? null,
             'speciality' => $request->speciality ?? null,
-            'room_eligibility' => $request->room_eligibility ?? null,
+            'package_inclusions' => $request->package_inclusions ?? null,
+            'package_exclusions' => $request->package_exclusions ?? null,
             'inclusion_notes' => $request->inclusion_notes ?? null,
             'effective_from' => $request->effective_from ?: null,
             'effective_to' => $request->effective_to ?: null,
@@ -270,6 +331,7 @@ class PackageController extends Controller
         if ($type === Package::TYPE_INSURANCE) {
             $attrs['insurance_company_id'] = $request->insurance_company_id ?: null;
             $attrs['insurance_rate_panel_id'] = $request->insurance_rate_panel_id ?: null;
+            $attrs['linked_hospital_package_id'] = $request->linked_hospital_package_id ?: null;
         }
 
         if (!$existing) {

@@ -1094,7 +1094,9 @@ Route::prefix('setup')->group(function () {
 });
 
 // Package API Routes (for admission form population)
-Route::get('/packages/api/active', [PackageController::class, 'getActivePackagesApi'])->name('packages.api.active');
+    Route::post('/packages/import-insurance', [PackageController::class, 'importInsurancePackages'])->name('packages.import.insurance');
+    Route::get('/packages/api/room-tier-presets', [PackageController::class, 'roomTierPresets'])->name('packages.api.room-tier-presets');
+    Route::get('/packages/api/active', [PackageController::class, 'getActivePackagesApi'])->name('packages.api.active');
 
 Route::get('/test-medicine-controller', [MedicineController::class, 'test'])->name('testMedicineController');
 Route::get('/getMedicineCategories', [MedicineController::class, 'getCategories'])->name('getMedicineCategories');

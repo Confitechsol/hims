@@ -1,0 +1,13 @@
+panel_code,panel_name,procedure_code,procedure_name,speciality,max_stay,package_inclusions,package_exclusions,tier1_code,tier1_rate,tier2_code,tier2_rate,tier3_code,tier3_rate,tier4_code,tier4_rate
+GIPSA_PPN,GIPSA PPN Samaritan 2022,PPN C 01,Angiography,CARDIOLOGY,1,"L1,L2,L3,L4",,GEN,11500,SEMI,12650,PVT,14000,,
+GIPSA_PPN,GIPSA PPN Samaritan 2022,PPN C 02,Angioplasty,CARDIOLOGY,4,"L1,L3,L4",L2,GEN,47150,SEMI,55200,PVT,62100,,
+GIPSA_PPN,GIPSA PPN Samaritan 2022,PPN E 01,Tonsillectomy/Adenoidectomy,ENT,2,"L1,L2,L3,L4",,GEN,21850,SEMI,23900,PVT,25300,,
+GIPSA_PPN,GIPSA PPN Samaritan 2022,PPN G 06 A,Appendectomy LAP,GENERAL SURGERY,3,"L1,L2,L3,L4",,GEN,33040,SEMI,38940,PVT,42480,,
+GIPSA_PPN,GIPSA PPN Samaritan 2022,PPN G 06 B,Appendectomy Open,GENERAL SURGERY,4,"L1,L2,L3,L4",,GEN,33040,SEMI,38940,PVT,44840,,
+GIPSA_PPN,GIPSA PPN Samaritan 2022,PPN G 07 A,Cholecystectomy LAP,GENERAL SURGERY,4,"L1,L2,L3,L4",,GEN,37760,SEMI,41300,PVT,44840,,
+STAR_HEALTH,Star Health Package 2022,,Angiography,CARDIOLOGY,1,"L1,L2,L3,L4",,GEN,11200,SEMI,12600,PVT,14000,,
+STAR_HEALTH,Star Health Package 2022,,Angioplasty,CARDIOLOGY,4,"L1,L3,L4",L2,GEN,51200,SEMI,57600,PVT,64000,,
+STAR_HEALTH,Star Health Package 2022,,Tonsillectomy,ENT,2,"L1,L2,L3,L4",,GEN,20240,SEMI,22770,PVT,25300,,
+HDFC_ERGO,HDFC Ergo Package 2023,,Angiography,CARDIOLOGY,1,"L1,L3,L4",L2,GEN,12600,SEMI,14000,PVT,16800,,
+HDFC_ERGO,HDFC Ergo Package 2023,,Tonsillectomy,ENT,2,"L1,L2,L3,L4",,GEN,26600,SEMI,28000,PVT,30800,,
+GALAXY,Galaxy Health Insurance,GAL-7,Tonsillectomy,ENT,2,,,DLX,30600,SHR,27600,GW,24500,,

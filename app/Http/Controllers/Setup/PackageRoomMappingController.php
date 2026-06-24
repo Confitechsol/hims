@@ -7,6 +7,7 @@ use App\Models\BedGroup;
 use App\Models\InsurerRoomMapping;
 use App\Models\InsuranceCompany;
 use App\Models\InsuranceRatePanel;
+use App\Support\InsurerRoomTierPresets;
 use Illuminate\Http\Request;
 
 class PackageRoomMappingController extends Controller
@@ -25,6 +26,8 @@ class PackageRoomMappingController extends Controller
             'ratePanels' => InsuranceRatePanel::where('is_active', true)->orderBy('name')->get(['id', 'name', 'code']),
             'insuranceCompanies' => InsuranceCompany::orderBy('name')->get(['id', 'name']),
             'selectedPanelId' => $panelId,
+            'panelSchemesJson' => InsuranceRatePanel::where('is_active', true)->get(['id', 'name', 'code'])
+                ->mapWithKeys(fn ($p) => [(string) $p->id => InsurerRoomTierPresets::forPanel($p)]),
         ]);
     }
 

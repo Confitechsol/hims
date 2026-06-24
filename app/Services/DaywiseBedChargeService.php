@@ -89,7 +89,6 @@ class DaywiseBedChargeService
                 ];
             }
 
-            // Get bed group to retrieve bed_cost (bed_charge_rate)
             $bedGroup = BedGroup::find($lastBed->bed_group_id);
             if (!$bedGroup) {
                 Log::warning("Bed group not found for bed group ID: {$lastBed->bed_group_id}", [
@@ -103,8 +102,14 @@ class DaywiseBedChargeService
                 ];
             }
 
-            // Get bed charge rate from bed_group.bed_cost
-            $bedChargeRate = $bedGroup->bed_cost ?? 0.00;
+            $segmentFrom = Carbon::parse($lastBed->from_date);
+            $segmentTo = $lastBed->to_date ? Carbon::parse($lastBed->to_date) : null;
+            $bedChargeRate = $this->resolveBedChargeRate(
+                $ipdId,
+                (int) $lastBed->bed_group_id,
+                $segmentFrom,
+                $segmentTo
+            );
             
             if ($bedChargeRate <= 0) {
                 Log::warning("Invalid bed charge rate for bed group ID: {$lastBed->bed_group_id}", [
@@ -143,7 +148,7 @@ class DaywiseBedChargeService
                 'bed_group_id' => $lastBed->bed_group_id,
                 'bed_id' => $lastBed->bed_id,
                 'bed_charge' => $bedCharge, // Total charge for the period
-                'bed_charge_rate' => $bedChargeRate, // Per-day rate from bed_group.bed_cost
+                'bed_charge_rate' => $bedChargeRate,
                 'no_of_days' => 1, // Always 1 for each day period (boundary → next day boundary)
                 'is_active' => 'yes',
             ]);
@@ -228,6 +233,120 @@ class DaywiseBedChargeService
             })
             ->orderBy('from_date', 'desc')
             ->first();
+    }
+
+    /**
+     * Resolve per-day bed rate: custom admit/transfer rate for the bed segment, else bed group master.
+     */
+    public function resolveBedChargeRate(
+        int $ipdId,
+        int $bedGroupId,
+        Carbon $segmentFrom,
+        ?Carbon $segmentTo = null
+    ): float {
+        $firstChargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($segmentFrom);
+        $query = IpdDaywiseBedCharge::where('ipd_id', $ipdId)
+            ->where('bed_group_id', $bedGroupId)
+            ->where('is_active', 'yes')
+            ->whereDate('charge_date', '>=', $firstChargeDay->format('Y-m-d'));
+
+        if ($segmentTo !== null) {
+            $query->whereDate(
+                'charge_date',
+                '<=',
+                BedBillingPeriod::chargeLabelDayForMoment($segmentTo)->format('Y-m-d')
+            );
+        }
+
+        $custom = $query->orderByDesc('charge_date')->get()->first(function ($row) {
+            return (float) ($row->bed_charge_rate ?? $row->bed_charge ?? 0) > 0;
+        });
+
+        if ($custom) {
+            $rate = (float) ($custom->bed_charge_rate ?? $custom->bed_charge ?? 0);
+            if ($rate > 0) {
+                return $rate;
+            }
+        }
+
+        $bedGroup = BedGroup::find($bedGroupId);
+
+        return (float) ($bedGroup->bed_cost ?? 0);
+    }
+
+    /**
+     * Write/update ipd_daywise_bed_charges for every billable day in a bed segment at the given rate.
+     */
+    public function syncStoredChargesForBedSegment(
+        IpdDetail $ipd,
+        float $bedChargeRate,
+        int $bedGroupId,
+        int $bedId,
+        Carbon $segmentFrom,
+        ?Carbon $segmentTo = null
+    ): int {
+        if ($bedChargeRate <= 0) {
+            return 0;
+        }
+
+        if ($segmentTo === null && $ipd->discharged === 'yes' && ! empty($ipd->discharged_date)) {
+            $endAt = Carbon::parse($ipd->discharged_date);
+        } elseif ($segmentTo !== null) {
+            $endAt = $segmentTo->copy();
+        } else {
+            $endAt = Carbon::now();
+        }
+
+        $firstChargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($segmentFrom);
+        $lastChargeDay = BedBillingPeriod::chargeLabelDayForMoment($endAt);
+        $segmentCalendarDay = $segmentFrom->copy()->startOfDay();
+        $updated = 0;
+        $current = $firstChargeDay->copy();
+
+        while ($current->lte($lastChargeDay)) {
+            $chargeDate = $current->format('Y-m-d');
+            [$periodStart, $periodEnd] = BedBillingPeriod::windowForChargeCalendarDay($current->copy()->startOfDay());
+
+            if ($periodStart->copy()->startOfDay()->lt($segmentCalendarDay)) {
+                $current->addDay();
+                continue;
+            }
+
+            if ($periodEnd->lte($segmentFrom) || $periodStart->gte($endAt)) {
+                $current->addDay();
+                continue;
+            }
+
+            $periodDates = BedBillingPeriod::periodStorageDatesForChargeDay(
+                $current->copy()->startOfDay(),
+                $segmentFrom
+            );
+            if ($periodDates === null) {
+                $current->addDay();
+                continue;
+            }
+
+            $this->storeDaywiseCharge([
+                'hospital_id' => $ipd->hospital_id,
+                'branch_id' => $ipd->branch_id,
+                'ipd_id' => $ipd->id,
+                'case_reference_id' => $ipd->case_reference_id,
+                'patient_id' => $ipd->patient_id,
+                'charge_date' => $chargeDate,
+                'period_start_date' => $periodDates['period_start_date'],
+                'period_end_date' => $periodDates['period_end_date'],
+                'bed_group_id' => $bedGroupId,
+                'bed_id' => $bedId,
+                'bed_charge' => $bedChargeRate,
+                'bed_charge_rate' => $bedChargeRate,
+                'no_of_days' => 1,
+                'is_active' => 'yes',
+            ]);
+            $updated++;
+            $current->addDay();
+        }
+
+        return $updated;
     }
 
     /**

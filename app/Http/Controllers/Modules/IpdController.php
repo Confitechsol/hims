@@ -33,6 +33,7 @@ use App\Models\Staff;
 use App\Models\Symptom;
 use App\Models\SymptomsClassification;
 use App\Services\BedOccupancyService;
+use App\Services\DaywiseBedChargeService;
 use App\Services\IpdPackageService;
 use App\Services\PmsBridgeService;
 use Carbon\Carbon;
@@ -275,42 +276,17 @@ class IpdController extends Controller
             // Bed charges are always created when a bed is selected, regardless of package selection.
             if ($hasBed && $request->admission_date) {
                 $bedGroup = BedGroup::find($request->bed_group);
-                // Use on-the-fly bed charge if provided, otherwise fall back to bed group master
                 $bedChargeRate = $request->bed_charge !== null && $request->bed_charge !== ''
                     ? (float) $request->bed_charge
                     : (float) ($bedGroup->bed_cost ?? 0.00);
 
-                // For a single-day entry, the daily rate and charge are the same
-                $bedCharge = $bedChargeRate;
-
-                // Always create daywise bed charge when a bed is selected (so estimate/final bill include bed charges)
                 $admissionDate = Carbon::parse($request->admission_date);
-                $chargeDay     = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($admissionDate);
-                // $chargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($admissionDate);
-                $chargeDate    = $chargeDay->format('Y-m-d');
-                $periodDates   = BedBillingPeriod::periodStorageDatesForChargeDay($chargeDay, $admissionDate);
-                $periodStartDate = $periodDates['period_start_date'];
-                $periodEndDate   = $periodDates['period_end_date'];
-
-                IpdDaywiseBedCharge::updateOrCreate(
-                    [
-                        'ipd_id'      => $ipd->id,
-                        'charge_date' => $chargeDate,
-                    ],
-                    [
-                        'hospital_id'       => $ipd->hospital_id,
-                        'branch_id'         => $ipd->branch_id ?? null,
-                        'case_reference_id' => $ipd->case_reference_id ?? null,
-                        'patient_id'        => $ipd->patient_id,
-                        'period_start_date' => $periodStartDate,
-                        'period_end_date'   => $periodEndDate,
-                        'bed_group_id'      => $request->bed_group,
-                        'bed_id'            => $request->bed_number,
-                        'bed_charge'        => $bedCharge,
-                        'bed_charge_rate'   => $bedChargeRate,
-                        'no_of_days'        => 1,
-                        'is_active'         => 'yes',
-                    ]
+                app(DaywiseBedChargeService::class)->syncStoredChargesForBedSegment(
+                    $ipd,
+                    $bedChargeRate,
+                    (int) $request->bed_group,
+                    (int) $request->bed_number,
+                    $admissionDate
                 );
             }
 
@@ -510,33 +486,25 @@ class IpdController extends Controller
             $ipdPatient->doctor4_id = $request->consultant_doctor4 ?? null;
             $ipdPatient->save();
 
-            // Persist edited bed charge for admission period so estimate/final bill uses the updated value.
+            // Persist edited bed charge for the admission bed segment only (not later transfers).
             $bedChargeRate = $request->bed_charge !== null && $request->bed_charge !== ''
                 ? (float) $request->bed_charge
                 : (float) (optional($ipd->bedGroup)->bed_cost ?? 0);
-            $chargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($newAdmissionDate);
-            $chargeDate = $chargeDay->format('Y-m-d');
-            $periodDates = BedBillingPeriod::periodStorageDatesForChargeDay($chargeDay, $newAdmissionDate);
 
-            IpdDaywiseBedCharge::updateOrCreate(
-                [
-                    'ipd_id'      => $ipd->id,
-                    'charge_date' => $chargeDate,
-                ],
-                [
-                    'hospital_id'       => $ipd->hospital_id,
-                    'branch_id'         => $ipd->branch_id ?? null,
-                    'case_reference_id' => $ipd->case_reference_id ?? null,
-                    'patient_id'        => $ipd->patient_id,
-                    'period_start_date' => $periodDates['period_start_date'],
-                    'period_end_date'   => $periodDates['period_end_date'],
-                    'bed_group_id'      => $request->bed_group,
-                    'bed_id'            => $request->bed_number,
-                    'bed_charge'        => $bedChargeRate,
-                    'bed_charge_rate'   => $bedChargeRate,
-                    'no_of_days'        => 1,
-                    'is_active'         => 'yes',
-                ]
+            $admissionBedHistory = PatientBedHistory::where('ipd_id', $ipd->id)
+                ->orderBy('from_date')
+                ->first();
+            $admissionSegmentTo = $admissionBedHistory && $admissionBedHistory->to_date
+                ? Carbon::parse($admissionBedHistory->to_date)
+                : null;
+
+            app(DaywiseBedChargeService::class)->syncStoredChargesForBedSegment(
+                $ipd,
+                $bedChargeRate,
+                (int) $request->bed_group,
+                (int) $request->bed_number,
+                $newAdmissionDate,
+                $admissionSegmentTo
             );
 
             // Package update during admission edit:
@@ -1885,33 +1853,12 @@ class IpdController extends Controller
             ? (float) $request->bed_charge
             : (float) ($bedGroup->bed_cost ?? 0);
 
-        $chargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($transferDate);
-        $chargeDate = $chargeDay->format('Y-m-d');
-        $periodDates = BedBillingPeriod::periodStorageDatesForChargeDay($chargeDay, $transferDate);
-        $periodStartDate = $periodDates['period_start_date'];
-        $periodEndDate   = $periodDates['period_end_date'];
-
-        // Create or update bed charge entry for transfer date
-        IpdDaywiseBedCharge::updateOrCreate(
-            [
-                'ipd_id'      => $ipd->id,
-                'charge_date' => $chargeDate,
-            ],
-            [
-                'hospital_id'       => $ipd->hospital_id,
-                'branch_id'         => $ipd->branch_id ?? null,
-                'case_reference_id' => $ipd->case_reference_id ?? null,
-                'patient_id'        => $ipd->patient_id,
-                'period_start_date' => $periodStartDate,
-                'period_end_date'   => $periodEndDate,
-                'bed_group_id'      => $request->bed_group,
-                'bed_id'            => $request->new_bed,
-                // Store the effective daily bed charge (custom or master) in both fields
-                'bed_charge'        => $bedChargeRate,
-                'bed_charge_rate'   => $bedChargeRate,
-                'no_of_days'        => 1,
-                'is_active'         => 'yes',
-            ]
+        app(DaywiseBedChargeService::class)->syncStoredChargesForBedSegment(
+            $ipd,
+            $bedChargeRate,
+            (int) $request->bed_group,
+            (int) $request->new_bed,
+            $transferDate
         );
 
         return redirect()->back()->with('success', 'Bed assigned successfully.');
@@ -1988,34 +1935,18 @@ class IpdController extends Controller
                 $ipd->save();
             }
 
-            // 4. Update ipd_daywise_bed_charges for from_date (billing uses this)
+            // 4. Sync daywise bed charges for this bed segment through discharge (or segment end).
             $bedChargeRate = $request->bed_charge !== null && $request->bed_charge !== ''
                 ? (float) $request->bed_charge
                 : (float) ($history->bedGroup->bed_cost ?? 0);
 
-            $chargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($fromDate);
-            $chargeDate = $chargeDay->format('Y-m-d');
-            $periodDates = BedBillingPeriod::periodStorageDatesForChargeDay($chargeDay, $fromDate);
-
-            IpdDaywiseBedCharge::updateOrCreate(
-                [
-                    'ipd_id'      => $ipd->id,
-                    'charge_date' => $chargeDate,
-                ],
-                [
-                    'hospital_id'       => $ipd->hospital_id,
-                    'branch_id'         => $ipd->branch_id ?? null,
-                    'case_reference_id' => $ipd->case_reference_id ?? null,
-                    'patient_id'        => $ipd->patient_id,
-                    'period_start_date' => $periodDates['period_start_date'],
-                    'period_end_date'   => $periodDates['period_end_date'],
-                    'bed_group_id'      => $request->bed_group,
-                    'bed_id'            => $newBedId,
-                    'bed_charge'        => $bedChargeRate,
-                    'bed_charge_rate'   => $bedChargeRate,
-                    'no_of_days'        => 1,
-                    'is_active'         => 'yes',
-                ]
+            app(DaywiseBedChargeService::class)->syncStoredChargesForBedSegment(
+                $ipd,
+                $bedChargeRate,
+                (int) $request->bed_group,
+                $newBedId,
+                $fromDate,
+                $request->to_date ? $toDate : null
             );
 
             DB::commit();
@@ -2081,34 +2012,18 @@ class IpdController extends Controller
             $history->created_at        = now();
             $history->save();
 
-            // Create / update daywise bed charge for the from_date so estimate/final bill consider it
+            // Sync daywise bed charges for this history segment.
             $bedChargeRate = $request->bed_charge !== null && $request->bed_charge !== ''
                 ? (float) $request->bed_charge
                 : (float) ($bed->bedGroup->bed_cost ?? 0);
 
-            $chargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($fromDate);
-            $chargeDate = $chargeDay->format('Y-m-d');
-            $periodDates = BedBillingPeriod::periodStorageDatesForChargeDay($chargeDay, $fromDate);
-
-            IpdDaywiseBedCharge::updateOrCreate(
-                [
-                    'ipd_id'      => $ipd->id,
-                    'charge_date' => $chargeDate,
-                ],
-                [
-                    'hospital_id'       => $ipd->hospital_id,
-                    'branch_id'         => $ipd->branch_id ?? null,
-                    'case_reference_id' => $ipd->case_reference_id ?? null,
-                    'patient_id'        => $ipd->patient_id,
-                    'period_start_date'  => $periodDates['period_start_date'],
-                    'period_end_date'    => $periodDates['period_end_date'],
-                    'bed_group_id'      => $request->bed_group,
-                    'bed_id'            => $newBedId,
-                    'bed_charge'        => $bedChargeRate,
-                    'bed_charge_rate'   => $bedChargeRate,
-                    'no_of_days'        => 1,
-                    'is_active'         => 'yes',
-                ]
+            app(DaywiseBedChargeService::class)->syncStoredChargesForBedSegment(
+                $ipd,
+                $bedChargeRate,
+                (int) $request->bed_group,
+                $newBedId,
+                $fromDate,
+                $request->to_date ? $toDate : null
             );
 
             DB::commit();

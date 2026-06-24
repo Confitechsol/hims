@@ -20,9 +20,11 @@ class Package extends Model
         'package_type',
         'insurance_company_id',
         'insurance_rate_panel_id',
+        'linked_hospital_package_id',
         'insurer_procedure_code',
         'speciality',
-        'room_eligibility',
+        'package_inclusions',
+        'package_exclusions',
         'name',
         'account_head',
         'gst_amount',
@@ -78,6 +80,16 @@ class Package extends Model
     public function insuranceRatePanel()
     {
         return $this->belongsTo(InsuranceRatePanel::class, 'insurance_rate_panel_id');
+    }
+
+    public function linkedHospitalPackage()
+    {
+        return $this->belongsTo(Package::class, 'linked_hospital_package_id');
+    }
+
+    public function insurancePackagesLinkedHere()
+    {
+        return $this->hasMany(Package::class, 'linked_hospital_package_id');
     }
 
     public function createdBy()
