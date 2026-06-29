@@ -462,7 +462,7 @@
                         <div class="col-md-3">
                             <label for="discharge_department" class="form-label">
                                 <i class="bi bi-credit-card"></i>
-                                Department
+                                Department <span class="required">*</span>
                             </label>
                             <select multiple name="discharge_department[]" id="discharge_department_text"
                                 class="form-select p-0">
@@ -645,7 +645,7 @@
                         <div class="col-md-4">
                             <label for="reason_discharge" class="form-label">
                                 <i class="bi bi-clipboard-check"></i>
-                                Discharge Type
+                                Discharge Type <span class="required">*</span>
                             </label>
                             <select class="form-select" id="reason_discharge_text" name="reason_discharge" required>
                                 <option value="">Select</option>
