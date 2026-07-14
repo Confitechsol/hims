@@ -27,39 +27,39 @@
 
                 <div class="card-body">
                     <div class="row align-items-center gy-4">
-                        <div class="col-md-3">
+                        {{-- <div class="col-md-3">
                             <a href="{{ route('reports.daily.transaction') }}">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
                                     <p>Daily Transaction Report</p>
                                 </div>
                             </a>
-                        </div>
-                        <div class="col-md-3">
+                        </div> --}}
+                        {{-- <div class="col-md-3">
                             <a href="allTransactionReport">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
                                     <p>All Transaction Report</p>
                                 </div>
                             </a>
-                        </div>
-                        <div class="col-md-3">
+                        </div> --}}
+                        {{-- <div class="col-md-3">
                             <a href="incomeReport">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
                                     <p>Income Report</p>
                                 </div>
                             </a>
-                        </div>
-                        <div class="col-md-3">
+                        </div> --}}
+                        {{-- <div class="col-md-3">
                             <a href="incomeGroupReport">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
                                     <p>Income Group Report</p>
                                 </div>
                             </a>
-                        </div>
-                        <div class="col-md-3">
+                        </div> --}}
+                        {{-- <div class="col-md-3">
                             <a href="expenseReport">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
@@ -74,8 +74,8 @@
                                     <p>Expense Group Report</p>
                                 </div>
                             </a>
-                        </div>
-                        <div class="col-md-3">
+                        </div> --}}
+                        {{-- <div class="col-md-3">
                             <a href="patientBillReport">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-check"></i>
@@ -90,7 +90,7 @@
                                     <p>Processing Transaction Report</p>
                                 </div>
                             </a>
-                        </div>
+                        </div> --}}
                         <div class="col-md-3">
                             <a href="{{ route('reports.money-receipt-register') }}">
                                 <div class="module_billing">

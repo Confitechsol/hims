@@ -147,10 +147,6 @@
                                             <button class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
                                         @endif
                                     </div>
-
-                    <div class="mt-3">
-                        {{ $bills->links() }}
-                    </div>
                 </div>
             </div>
         </div>
