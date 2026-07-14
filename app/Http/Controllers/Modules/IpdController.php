@@ -271,7 +271,13 @@ class IpdController extends Controller
             // Save IPD Record
             $ipd->save();
 
-            // dd($opd->id);
+            // Keep patient master TPA aligned with latest IPD admission
+            if ($request->patient_id) {
+                Patient::where('id', $request->patient_id)->update([
+                    'organisation_id' => $request->organisation_id ?: null,
+                ]);
+            }
+
             $ipdPatient->patient_id = $request->patient_id ?? null;
             $ipdPatient->ipd_id     = $ipd->id ?? null;
             $ipdPatient->doctor_id  = $request->doctor_id ?? null;
@@ -542,6 +548,13 @@ class IpdController extends Controller
 
             // Save IPD Record
             $ipd->save();
+
+            // Keep patient master TPA aligned with latest IPD admission
+            if ($request->patient_id) {
+                Patient::where('id', $request->patient_id)->update([
+                    'organisation_id' => $request->organisation_id ?: null,
+                ]);
+            }
 
             $ipdPatient->patient_id = $request->patient_id ?? null;
             $ipdPatient->doctor_id  = $request->consultant_doctor ?? null;

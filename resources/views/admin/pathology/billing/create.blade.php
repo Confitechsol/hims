@@ -680,10 +680,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         // If it's an IPD prescription, load the tests and also reload TPAs
                         if (prescription.type === 'ipd' && prescription.prescription_id) {
                             loadPrescriptionTests(prescription.prescription_id);
-                            // Reload TPAs in case this prescription's IPD has a TPA
                             const patientId = document.getElementById('patient_id').value;
                             if (patientId) {
-                                loadPatientTpas(patientId);
+                                loadPatientTpas(patientId, {
+                                    ipdId: prescription.ipd_id,
+                                    forceSelect: true,
+                                });
                             }
                         }
                         
@@ -745,16 +747,20 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    function loadPatientTpas(patientId) {
+    function loadPatientTpas(patientId, options) {
+        options = options || {};
         console.log('Loading TPAs for patient ID:', patientId);
         const helpText = document.getElementById('tpa_help_text');
         helpText.textContent = 'Loading TPAs...';
         helpText.className = 'text-muted';
-        
-        const url = `{{ url('/pathology/billing/api/patient-tpas') }}/${patientId}`;
+
+        let url = `{{ url('/pathology/billing/api/patient-tpas') }}/${patientId}`;
+        if (options.ipdId) {
+            url += `?ipd_id=${encodeURIComponent(options.ipdId)}`;
+        }
         console.log('Fetching TPAs from URL:', url);
-        
-        fetch(url)
+
+        return fetch(url)
             .then(response => {
                 console.log('TPA Response status:', response.status);
                 if (!response.ok) {
@@ -766,7 +772,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('TPAs loaded:', data);
                 const tpaDropdown = document.getElementById('tpa_dropdown');
                 tpaDropdown.innerHTML = '<option value="">Select TPA</option>';
-                
+
                 if (data && Array.isArray(data) && data.length > 0) {
                     data.forEach(tpa => {
                         if (tpa && tpa.id) {
@@ -777,7 +783,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     helpText.textContent = `${data.length} TPA(s) found for this patient`;
                     helpText.className = 'text-success';
-                    console.log('TPAs loaded successfully:', data.length);
+
+                    const activateCheckbox = document.getElementById('activate_tpa');
+                    const shouldAutoSelect = options.autoSelect !== false
+                        && (activateCheckbox?.checked || options.forceSelect || data.some(t => t && t.preferred));
+                    if (shouldAutoSelect) {
+                        BillingTpaInsurance.selectPreferredTpa(data, function (organisationId) {
+                            applyTpaCharges(organisationId);
+                        });
+                    }
                 } else {
                     const option = document.createElement('option');
                     option.value = '';
@@ -788,6 +802,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     helpText.className = 'text-warning';
                     console.warn('No TPAs found for this patient');
                 }
+                return data;
             })
             .catch(error => {
                 console.error('Error loading TPAs:', error);
@@ -958,40 +973,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                     
-                    // If TPA is available from the prescription, add it to the dropdown
+                    // Always refresh TPA + insurance from this IPD admission (latest values)
                     if (data.tpa && data.tpa.id) {
-                        const tpaDropdown = document.getElementById('tpa_dropdown');
-                        const helpText = document.getElementById('tpa_help_text');
-                        
-                        // Check if TPA already exists in dropdown
-                        let tpaExists = false;
-                        for (let option of tpaDropdown.options) {
-                            if (option.value == data.tpa.id) {
-                                tpaExists = true;
-                                break;
-                            }
-                        }
-                        
-                        if (!tpaExists) {
-                            // Clear the "No TPA found" option if it exists
-                            if (tpaDropdown.options.length > 0 && tpaDropdown.options[0].disabled) {
-                                tpaDropdown.remove(0);
-                            }
-                            
-                            const option = document.createElement('option');
-                            BillingTpaInsurance.setTpaOption(option, data.tpa);
-                            // Insert after the "Select TPA" option
-                            if (tpaDropdown.options.length > 0) {
-                                tpaDropdown.insertBefore(option, tpaDropdown.options[1] || null);
-                            } else {
-                                tpaDropdown.appendChild(option);
-                            }
-                            helpText.textContent = 'TPA found from prescription';
-                            helpText.className = 'text-success';
-                            console.log('TPA added from prescription:', data.tpa);
-                        }
+                        BillingTpaInsurance.upsertAndSelectTpa(data.tpa, {
+                            helpText: 'Using latest IPD admission TPA / insurance',
+                            onSelected: function (organisationId) {
+                                applyTpaCharges(organisationId);
+                            },
+                        });
+                        console.log('TPA synced from IPD prescription:', data.tpa);
                     }
-                    
+
                     calculateTotals();
                 } else {
                     alert('No pathology tests found in this prescription.');
@@ -1034,13 +1026,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Show TPA dropdown if checkbox is already checked when TPAs are loaded
     const originalLoadPatientTpas = loadPatientTpas;
-    loadPatientTpas = function(patientId) {
-        originalLoadPatientTpas(patientId);
-        // If TPA checkbox is already checked, show the dropdown
-        const tpaCheckbox = document.getElementById('activate_tpa');
-        if (tpaCheckbox && tpaCheckbox.checked) {
-            document.getElementById('tpa_dropdown_container').style.display = 'block';
-        }
+    loadPatientTpas = function(patientId, options) {
+        return originalLoadPatientTpas(patientId, options).then(function (data) {
+            const tpaCheckbox = document.getElementById('activate_tpa');
+            if (tpaCheckbox && tpaCheckbox.checked) {
+                document.getElementById('tpa_dropdown_container').style.display = 'block';
+            }
+            return data;
+        });
     };
 
     // TPA dropdown change handler

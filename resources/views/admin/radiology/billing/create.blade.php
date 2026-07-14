@@ -620,19 +620,23 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    function loadPatientTpas(patientId) {
+    function loadPatientTpas(patientId, options) {
+        options = options || {};
         const helpText = document.getElementById('tpa_help_text');
         helpText.textContent = 'Loading TPAs...';
         helpText.className = 'text-muted';
-        
-        const url = `{{ url('/radiology/billing/api/patient-tpas') }}/${patientId}`;
+
+        let url = `{{ url('/radiology/billing/api/patient-tpas') }}/${patientId}`;
+        if (options.ipdId) {
+            url += `?ipd_id=${encodeURIComponent(options.ipdId)}`;
+        }
         console.log('Fetching TPAs from URL:', url);
-        fetch(url)
+        return fetch(url)
             .then(response => response.json())
             .then(data => {
                 const tpaDropdown = document.getElementById('tpa_dropdown');
                 tpaDropdown.innerHTML = '<option value="">Select TPA</option>';
-                
+
                 if (data && data.length > 0) {
                     data.forEach(tpa => {
                         const option = document.createElement('option');
@@ -641,6 +645,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     helpText.textContent = `${data.length} TPA(s) found for this patient`;
                     helpText.className = 'text-success';
+
+                    const activateCheckbox = document.getElementById('activate_tpa');
+                    const shouldAutoSelect = options.autoSelect !== false
+                        && (activateCheckbox?.checked || options.forceSelect || data.some(t => t && t.preferred));
+                    if (shouldAutoSelect) {
+                        BillingTpaInsurance.selectPreferredTpa(data, function (organisationId) {
+                            applyTpaCharges(organisationId);
+                        });
+                    }
                 } else {
                     const option = document.createElement('option');
                     option.value = '';
@@ -650,6 +663,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     helpText.textContent = 'No TPA found for this patient. TPA charges will not be available.';
                     helpText.className = 'text-warning';
                 }
+                return data;
             })
             .catch(error => {
                 console.error('Error loading TPAs:', error);
@@ -1011,46 +1025,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                     
-                    // If TPA is available from the prescription, add it to the dropdown
+                    // Always refresh TPA + insurance from this IPD admission (latest values)
                     if (data.tpa && data.tpa.id) {
-                        const tpaDropdown = document.getElementById('tpa_dropdown');
-                        const helpText = document.getElementById('tpa_help_text');
-                        
-                        // Check if TPA already exists in dropdown
-                        let tpaExists = false;
-                        for (let option of tpaDropdown.options) {
-                            if (option.value == data.tpa.id) {
-                                tpaExists = true;
-                                break;
-                            }
-                        }
-                        
-                        if (!tpaExists) {
-                            // Clear the "No TPA found" option if it exists
-                            if (tpaDropdown.options.length > 0 && tpaDropdown.options[0].disabled) {
-                                tpaDropdown.remove(0);
-                            }
-                            
-                            const option = document.createElement('option');
-                            option.value = data.tpa.id;
-                            option.textContent = data.tpa.name + (data.tpa.code ? ' (' + data.tpa.code + ')' : '');
-                            tpaDropdown.appendChild(option);
-                        }
-                        
-                        // Activate TPA checkbox and select the TPA
-                        const activateTpaCheckbox = document.getElementById('activate_tpa');
-                        if (!activateTpaCheckbox.checked) {
-                            activateTpaCheckbox.checked = true;
-                            activateTpaCheckbox.dispatchEvent(new Event('change'));
-                        }
-                        
-                        // Wait a bit for TPA dropdown to populate, then select
-                        setTimeout(() => {
-                            tpaDropdown.value = data.tpa.id;
-                            tpaDropdown.dispatchEvent(new Event('change'));
-                        }, 500);
+                        BillingTpaInsurance.upsertAndSelectTpa(data.tpa, {
+                            helpText: 'Using latest IPD admission TPA / insurance',
+                            onSelected: function (organisationId) {
+                                applyTpaCharges(organisationId);
+                            },
+                        });
                     }
-                    
+
                     calculateTotals();
                 } else {
                     console.log('No tests found in prescription');

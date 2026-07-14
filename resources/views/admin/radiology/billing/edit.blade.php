@@ -609,20 +609,24 @@ function loadPatientPrescriptions(patientId) {
         });
 }
 
-function loadPatientTpas(patientId) {
+function loadPatientTpas(patientId, options) {
+    options = options || {};
     const helpText = document.getElementById('tpa_help_text');
     helpText.textContent = 'Loading TPAs...';
     helpText.className = 'text-muted';
-    
-    const url = `{{ url('/radiology/billing/api/patient-tpas') }}/${patientId}`;
+
+    let url = `{{ url('/radiology/billing/api/patient-tpas') }}/${patientId}`;
+    if (options.ipdId) {
+        url += `?ipd_id=${encodeURIComponent(options.ipdId)}`;
+    }
     const tpaDropdown = document.getElementById('tpa_dropdown');
     const currentValue = tpaDropdown.value;
-    
-    fetch(url)
+
+    return fetch(url)
         .then(response => response.json())
         .then(data => {
             tpaDropdown.innerHTML = '<option value="">Select TPA</option>';
-            
+
             if (data && Array.isArray(data) && data.length > 0) {
                 data.forEach(tpa => {
                     if (tpa && tpa.id) {
@@ -631,15 +635,28 @@ function loadPatientTpas(patientId) {
                         tpaDropdown.appendChild(option);
                     }
                 });
+
+                const preferred = data.find(t => t && t.preferred);
                 if (currentValue) {
                     tpaDropdown.value = currentValue;
+                    if (preferred && String(preferred.id) === String(currentValue)) {
+                        BillingTpaInsurance.upsertAndSelectTpa(preferred, {
+                            select: false,
+                            helpText: 'Using latest IPD admission TPA / insurance',
+                        });
+                        tpaDropdown.value = currentValue;
+                    }
+                } else if (preferred) {
+                    BillingTpaInsurance.selectPreferredTpa(data);
                 }
+
                 helpText.textContent = `${data.length} TPA(s) found for this patient`;
                 helpText.className = 'text-success';
             } else {
                 helpText.textContent = 'No TPA found for this patient. TPA charges will not be available.';
                 helpText.className = 'text-warning';
             }
+            return data;
         })
         .catch(error => {
             console.error('Error loading TPAs:', error);

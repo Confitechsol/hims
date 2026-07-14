@@ -440,6 +440,7 @@ class PathologyBillingController extends Controller
                         'doctor' => $prescription->prescribedBy ? $prescription->prescribedBy->name : null,
                         'type' => 'ipd',
                         'prescription_id' => $prescription->id,
+                        'ipd_id' => $prescription->ipd_id,
                     ];
                 });
             
@@ -482,71 +483,14 @@ class PathologyBillingController extends Controller
     }
 
     /**
-     * API: Get TPA names for a patient from previous pathology bills, IPD records, and Patient record
+     * API: Get TPA names for a patient — prefers latest IPD admission TPA + insurance.
      */
-    public function getPatientTpas($patientId)
+    public function getPatientTpas($patientId, Request $request)
     {
         try {
-            \Log::info('Getting TPAs for patient ID: ' . $patientId);
-            
-            $tpas = collect();
-            
-            // FIRST: Get TPA directly from Patient record (this is the primary source)
-            $patient = Patient::with('organisation.insuranceCompany')->find($patientId);
-            if ($patient && $patient->organisation_id && $patient->organisation) {
-                $tpas->push(BillingTpaHelper::formatTpa($patient->organisation));
-                \Log::info('TPA from Patient record: ' . ($patient->organisation->organisation_name ?? 'N/A'));
-            }
-            
-            // Get TPAs from previous pathology bills
-            $pathologyTpas = PathologyBilling::where('patient_id', $patientId)
-                ->whereNotNull('organisation_id')
-                ->with('organisation.insuranceCompany')
-                ->select('organisation_id')
-                ->distinct()
-                ->get()
-                ->map(fn ($billing) => BillingTpaHelper::formatTpa($billing->organisation))
-                ->filter();
-            
-            $tpas = $tpas->merge($pathologyTpas);
-            \Log::info('TPAs from pathology bills: ' . $pathologyTpas->count());
-            
-            // Get TPAs from IPD records
-            $ipdTpas = IpdDetail::where('patient_id', $patientId)
-                ->whereNotNull('organisation_id')
-                ->with('organisation.insuranceCompany')
-                ->select('organisation_id')
-                ->distinct()
-                ->get()
-                ->map(fn ($ipd) => BillingTpaHelper::formatTpa($ipd->organisation))
-                ->filter();
-            
-            $tpas = $tpas->merge($ipdTpas);
-            \Log::info('TPAs from IPD records: ' . $ipdTpas->count());
-            
-            // Also get TPAs from IPD Prescriptions (if the prescription has an IPD with TPA)
-            $ipdPrescriptionTpas = IpdPrescription::whereHas('ipd', function($query) use ($patientId) {
-                    $query->where('patient_id', $patientId)
-                          ->whereNotNull('organisation_id');
-                })
-                ->with('ipd.organisation.insuranceCompany')
-                ->get()
-                ->map(function ($prescription) {
-                    if ($prescription->ipd && $prescription->ipd->organisation) {
-                        return BillingTpaHelper::formatTpa($prescription->ipd->organisation);
-                    }
+            $ipdId = $request->query('ipd_id') ? (int) $request->query('ipd_id') : null;
+            $uniqueTpas = BillingTpaHelper::collectPatientTpas((int) $patientId, 'pathology', $ipdId);
 
-                    return null;
-                })
-                ->filter();
-            
-            $tpas = $tpas->merge($ipdPrescriptionTpas);
-            \Log::info('TPAs from IPD Prescriptions: ' . $ipdPrescriptionTpas->count());
-            
-            // Remove duplicates based on ID
-            $uniqueTpas = $tpas->filter()->unique('id')->values();
-            \Log::info('Total unique TPAs: ' . $uniqueTpas->count());
-            
             return response()->json($uniqueTpas);
         } catch (\Exception $e) {
             \Log::error('Error getting patient TPAs: ' . $e->getMessage());
@@ -603,16 +547,8 @@ class PathologyBillingController extends Controller
                 ];
             });
         
-        // Get TPA - Priority: Patient's TPA > IPD's TPA
-        $tpa = null;
-        if ($prescription->ipd && $prescription->ipd->patient) {
-            // First check patient's TPA (primary source)
-            if ($prescription->ipd->patient->organisation_id && $prescription->ipd->patient->organisation) {
-                $tpa = BillingTpaHelper::formatTpa($prescription->ipd->patient->organisation);
-            } elseif ($prescription->ipd->organisation_id && $prescription->ipd->organisation) {
-                $tpa = BillingTpaHelper::formatTpa($prescription->ipd->organisation);
-            }
-        }
+        // Prefer this IPD admission's TPA + insurance (not stale patient master / TPA default)
+        $tpa = BillingTpaHelper::tpaFromPrescriptionIpd($prescription->ipd);
         
         // Get full doctor name with surname
         $doctorName = null;
@@ -647,6 +583,21 @@ class PathologyBillingController extends Controller
             $organisationId ? (int) $organisationId : null,
             $request->input('insurance_company_id') ? (int) $request->input('insurance_company_id') : null
         );
+
+        // If UI did not send insurance, use latest IPD admission insurance for this TPA
+        if (!$request->filled('insurance_company_id') && $request->filled('patient_id') && $organisationId) {
+            $latestIpd = BillingTpaHelper::latestIpdForPatient(
+                (int) $request->input('patient_id'),
+                $request->input('ipd_id') ? (int) $request->input('ipd_id') : null
+            );
+            if ($latestIpd
+                && (int) $latestIpd->organisation_id === (int) $organisationId
+                && $latestIpd->insurance_company_id
+            ) {
+                $insuranceCompanyId = (int) $latestIpd->insurance_company_id;
+            }
+        }
+
         $customerType = $request->input('customer_type', 'OPD');
 
         if (!$testId) {
