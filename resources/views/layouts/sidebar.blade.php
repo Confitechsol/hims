@@ -668,7 +668,7 @@
                         </li>
                         <li>
                             <a href="{{ route('packages.index') }}"
-                                class="{{ request()->routeIs('packages.index') ? 'active' : '' }}">
+                                class="{{ request()->routeIs('packages.*') ? 'active' : '' }}">
                                 <i class="ti ti-package"></i><span>Package Master</span>
                             </a>
                         </li>

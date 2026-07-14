@@ -18,6 +18,7 @@ class IpdPackage extends Model
         'applied_date',
         'applied_by',
         'package_rate',
+        'approval_percentage',
         'discount_percentage',
         'discount_amount',
         'gst_amount',
@@ -29,6 +30,7 @@ class IpdPackage extends Model
     protected $casts = [
         'applied_date' => 'date',
         'package_rate' => 'decimal:2',
+        'approval_percentage' => 'decimal:2',
         'discount_percentage' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'gst_amount' => 'decimal:2',

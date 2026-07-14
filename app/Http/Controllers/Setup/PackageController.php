@@ -13,6 +13,7 @@ use App\Models\PackageCharge;
 use App\Models\PackageExclude;
 use App\Models\PackageRoomRate;
 use App\Services\InsurancePackageImportService;
+use App\Services\PackageDropdownService;
 use App\Services\PackageInsuranceRateService;
 use App\Support\InsurerRoomTierPresets;
 use Illuminate\Http\Request;
@@ -24,7 +25,8 @@ use Illuminate\Validation\Rule;
 class PackageController extends Controller
 {
     public function __construct(
-        protected PackageInsuranceRateService $rateService
+        protected PackageInsuranceRateService $rateService,
+        protected PackageDropdownService $dropdownService
     ) {
     }
 
@@ -36,6 +38,9 @@ class PackageController extends Controller
 
         if ($request->filled('package_type')) {
             $query->where('package_type', $request->package_type);
+        }
+        if (!$request->boolean('show_inactive')) {
+            $query->active();
         }
         if ($request->filled('insurance_rate_panel_id')) {
             $query->where('insurance_rate_panel_id', $request->insurance_rate_panel_id);
@@ -175,36 +180,20 @@ class PackageController extends Controller
     {
         $bedGroupId = $request->integer('bed_group_id') ?: null;
         $insuranceCompanyId = $request->integer('insurance_company_id') ?: null;
-        $panelId = $request->integer('insurance_rate_panel_id') ?: null;
+        $panelId = $insuranceCompanyId ? ($request->integer('insurance_rate_panel_id') ?: null) : null;
 
         $packages = Package::query()
             ->active()
             ->forInsuranceContext($insuranceCompanyId, $panelId)
-            ->with(['roomRates', 'insuranceRatePanel'])
+            ->with(['roomRates', 'insuranceRatePanel', 'insuranceCompany.tpas'])
             ->orderBy('name')
-            ->get()
-            ->map(function (Package $package) use ($bedGroupId) {
-                $resolvedRate = $this->rateService->resolveRate($package, $bedGroupId);
+            ->get();
 
-                return [
-                    'id' => $package->id,
-                    'name' => $package->name,
-                    'package_type' => $package->package_type ?? Package::TYPE_HOSPITAL,
-                    'package_rate' => $resolvedRate,
-                    'base_package_rate' => (float) $package->package_rate,
-                    'gst_amount' => (float) $package->gst_amount,
-                    'description' => $package->description,
-                    'insurer_procedure_code' => $package->insurer_procedure_code,
-                    'speciality' => $package->speciality,
-                    'insurance_rate_panel_id' => $package->insurance_rate_panel_id,
-                    'panel_name' => $package->insuranceRatePanel?->name,
-                    'has_room_rates' => $package->roomRates->isNotEmpty(),
-                ];
-            });
+        $mapped = $this->dropdownService->mapPackagesForDropdown($packages, $bedGroupId);
 
         return response()->json([
             'success' => true,
-            'packages' => $packages,
+            'packages' => $mapped,
         ]);
     }
 
@@ -218,7 +207,13 @@ class PackageController extends Controller
         $replace = $request->boolean('replace_panel_packages');
 
         try {
-            $stats = $importService->importFromFile($path, $replace, true);
+            $stats = $importService->importFromFile(
+                $path,
+                $replace,
+                false,
+                false,
+                $request->boolean('deactivate_missing')
+            );
         } catch (\Throwable $e) {
             Log::error('Insurance package import failed', ['error' => $e->getMessage()]);
 
@@ -265,6 +260,7 @@ class PackageController extends Controller
                 ->where(function ($q) {
                     $q->where('package_type', Package::TYPE_HOSPITAL)->orWhereNull('package_type');
                 })
+                ->when($package->id, fn ($q) => $q->where('id', '!=', $package->id))
                 ->orderBy('name')
                 ->get(['id', 'name']),
             'inclusionLegend' => InsurerRoomTierPresets::inclusionLegend(),

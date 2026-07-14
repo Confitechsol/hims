@@ -53,6 +53,13 @@ class IpdDetail extends Model
         'cons_doctor3',
         'cons_doctor4',
         'organisation_id',
+        'insurance_company_id',
+        'is_cashless',
+        'insurance_policy_no',
+        'insurance_card_no',
+        'ccn_no',
+        'initial_approval_amount',
+        'final_approval_amount',
         'credit_limit',
         'payment_mode',
         'date',
@@ -75,7 +82,10 @@ class IpdDetail extends Model
     protected $casts = [
         'mou_discount' => 'decimal:2',
         'special_discount' => 'decimal:2',
+        'initial_approval_amount' => 'decimal:2',
+        'final_approval_amount' => 'decimal:2',
         'due_patient_party_amount' => 'decimal:2',
+        'is_cashless' => 'boolean',
     ];
 
     /**
@@ -116,6 +126,16 @@ class IpdDetail extends Model
     public function organisation()
     {
         return $this->belongsTo(Organisation::class, 'organisation_id');
+    }
+
+    public function insuranceCompany()
+    {
+        return $this->belongsTo(InsuranceCompany::class, 'insurance_company_id');
+    }
+
+    public function isInsuranceBilling(): bool
+    {
+        return (bool) ($this->insurance_company_id || $this->is_cashless || $this->organisation_id);
     }
 
     public function generatedBy()

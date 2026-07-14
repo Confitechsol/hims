@@ -323,7 +323,7 @@
         <div class="header-content">
         <!-- Title -->
         <div class="heading">
-            <h4 class="red">ESTIMATE COPY</h4>
+            <h4 class="red">{{ $billHeading ?? 'ESTIMATE COPY' }}</h4>
         </div>
 
         <!-- Thick Horizontal Line -->
@@ -474,38 +474,16 @@
             </table>
         </div>
 
+        @if(!empty($showInsuranceSection))
+            @include('admin.billing.partials.ipd_insurance_info_block')
+        @endif
+
         <div class="header-body-spacer" aria-hidden="true"></div>
         <!-- Charges Breakdown -->
         <div class="section-title">Charges Breakdown</div>
 
         <!-- Package Charges (first when present) -->
-        @if(isset($packageDetails) && $packageDetails->count() > 0)
-        <table class="charges-table">
-            <thead>
-                <tr>
-                    <th colspan="3">Package Charges</th>
-                </tr>
-                <tr>
-                    <th>Applied Date</th>
-                    <th>Package Name</th>
-                    <th class="text-right">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($packageDetails as $pkg)
-                <tr>
-                    <td>{{ \Carbon\Carbon::parse($pkg['date'])->format('d/m/Y') }}</td>
-                    <td>{{ $pkg['package_name'] ?? 'N/A' }}</td>
-                    <td class="text-right">Rs. {{ number_format($pkg['amount'] ?? 0, 2) }}</td>
-                </tr>
-                @endforeach
-                <tr style="font-weight: bold;">
-                    <td colspan="2" class="text-right">Subtotal:</td>
-                    <td class="text-right">Rs. {{ number_format($breakup['package_charges'] ?? 0, 2) }}</td>
-                </tr>
-            </tbody>
-        </table>
-        @endif
+        @include('admin.billing.partials.ipd_package_charges_table')
 
         <!-- Bed Charges (grouped by bed and date range) -->
         @if(isset($bedChargesGroupedForDisplay) && $bedChargesGroupedForDisplay->count() > 0)
@@ -818,6 +796,9 @@
         </table>
         @endif
 
+        @if(!empty($isApprovalBill))
+            @include('admin.billing.partials.ipd_approval_summary')
+        @else
         <!-- Summary Section -->
         <div class="summary-section">
             <div class="section-title" style="margin-top: 0; margin-bottom: 8px;">Payment Summary</div>
@@ -888,6 +869,7 @@
                 <span class="words-value"><strong>{{ $netBalanceInWords }}</strong></span>
             </div>
         </div>
+        @endif
         @endif
     </main>
 

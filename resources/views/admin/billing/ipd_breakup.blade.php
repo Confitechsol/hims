@@ -208,33 +208,122 @@
             </div>
         </div>
 
-        <!-- Discount (Final Bill Only) - before Payment Summary -->
+        <!-- Discount (Final Bill & Insurance Approval Bill) -->
         <div class="card mb-3">
             <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="fas fa-percent me-2"></i> Discount (Final Bill Only)</h6>
+                <h6 class="mb-0"><i class="fas fa-percent me-2"></i> Discount &amp; Final Approval (Final Bill)</h6>
             </div>
             <div class="card-body">
-                <p class="text-muted small mb-3">Discounts apply only to the final bill. Save before exporting the final bill PDF.</p>
+                <p class="text-muted small mb-3">MOU discount applies on Approval Bill and Final Bill. Final Approval Amount is entered manually after insurer response (Insurance Final Bill only).</p>
                 <form id="discountForm" class="row g-3">
                     @csrf
                     <input type="hidden" name="ipd_id" value="{{ $ipd->id }}">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label for="mou_discount" class="form-label">MOU Discount (₹) <small class="text-muted">TPA/Insurance</small></label>
                         <input type="number" step="0.01" min="0" class="form-control" id="mou_discount" name="mou_discount" placeholder="0.00" value="{{ number_format((float)($ipd->mou_discount ?? 0), 2, '.', '') }}">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label for="special_discount" class="form-label">Special / Hospital Discount (₹)</label>
                         <input type="number" step="0.01" min="0" class="form-control" id="special_discount" name="special_discount" placeholder="0.00" value="{{ number_format((float)($ipd->special_discount ?? 0), 2, '.', '') }}">
                     </div>
-                    <div class="col-md-4 d-flex align-items-end">
+                    @if(!empty($isInsuranceIpd))
+                    <div class="col-md-3">
+                        <label for="final_approval_amount" class="form-label">Final Approval Amount (₹)</label>
+                        <input type="number" step="0.01" min="0" class="form-control" id="final_approval_amount" name="final_approval_amount" placeholder="0.00" value="{{ number_format((float)($ipd->final_approval_amount ?? 0), 2, '.', '') }}">
+                        <small class="text-muted">After insurer response</small>
+                    </div>
+                    @endif
+                    <div class="col-md-3 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary" id="discountSaveBtn">
-                            <i class="fas fa-save me-1"></i> Save Discount
+                            <i class="fas fa-save me-1"></i> Save
                         </button>
                     </div>
                 </form>
                 <div id="discountMessage" class="mt-2 small" style="display: none;"></div>
             </div>
         </div>
+
+        @if(!empty($isInsuranceIpd))
+        <div class="card mb-3 border-primary">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h6 class="mb-0"><i class="fas fa-file-medical me-2"></i> Insurance Approval Bill</h6>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="exportApprovalBillBtn" data-ipd-id="{{ $ipd->id }}">
+                    <i class="fas fa-file-pdf me-1"></i> Export Approval Bill
+                </button>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">
+                    Set <strong>Initial Approval Amount</strong> on IPD admission (Edit IPD → TPA &amp; Insurance).
+                    Enter <strong>MOU Discount</strong> above before exporting.
+                </p>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="border rounded p-3 h-100">
+                            <small class="text-muted d-block">Grand Total</small>
+                            <strong>₹ {{ number_format($grandTotal ?? 0, 2) }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3 h-100">
+                            <small class="text-muted d-block">MOU Discount</small>
+                            <strong>₹ {{ number_format($mouDiscountAmount ?? 0, 2) }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3 h-100">
+                            <small class="text-muted d-block">Initial Approval Amount</small>
+                            <strong class="text-primary">₹ {{ number_format($initialApprovalAmount ?? 0, 2) }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3 h-100 bg-light">
+                            <small class="text-muted d-block">Request for Further Approval</small>
+                            <strong class="text-danger">₹ {{ number_format($requestFurtherApproval ?? 0, 2) }}</strong>
+                        </div>
+                    </div>
+                </div>
+                <p class="small text-muted mt-2 mb-0">Formula: Grand Total − MOU Discount − Initial Approval Amount</p>
+            </div>
+        </div>
+
+        <div class="card mb-3 border-success">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-file-invoice-dollar me-2"></i> Insurance Final Bill Preview</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">
+                    Enter <strong>Final Approval Amount</strong> above after insurer response, then export Final Bill.
+                    Balance Amount = Total Bill − Approval Amount (display). Due on A/C = Approval Amount.
+                </p>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="border rounded p-3 h-100">
+                            <small class="text-muted d-block">Total Bill Amount</small>
+                            <strong>₹ {{ number_format($grandTotal ?? 0, 2) }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3 h-100">
+                            <small class="text-muted d-block">Final Approval Amount</small>
+                            <strong class="text-primary" id="previewFinalApproval">₹ {{ number_format($finalApprovalAmount ?? 0, 2) }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3 h-100">
+                            <small class="text-muted d-block">MOU Discount</small>
+                            <strong>₹ {{ number_format($mouDiscountAmount ?? 0, 2) }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3 h-100 bg-light">
+                            <small class="text-muted d-block">Balance Amount</small>
+                            <strong class="text-danger" id="previewInsuranceBalance">₹ {{ number_format($insuranceBalanceAmount ?? 0, 2) }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
 
         <!-- DUE ON ACCOUNT OF PATIENT PARTY (Under Doctor - Final Bill) -->
         <div class="card mb-3">

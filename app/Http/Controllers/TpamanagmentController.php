@@ -96,41 +96,44 @@ class TpamanagmentController extends Controller
         return redirect()->route('tpamanagement')->with('success', 'TPA added successfully.');
     }
 
-    function update(Request $request)
+    function update(Request $request, $id)
     {
+        $request->merge(['id' => $id]);
+
         $request->validate([
             'id' => 'required|exists:organisation,id',
             'insurance_company_id' => 'required|exists:insurance_companies,id',
             'organisation_name' => 'required|string|max:255',
-            'code' => 'required|string|max:100|unique:organisation,code,' . $request->id,
-            'contact_no' => 'required|string|max:15|different:contact_person_phone',
-            'address' => 'required|string|max:500',
-            'contact_person_name' => 'required|string|max:255',
-            'contact_person_phone' => 'required|string|max:15|different:contact_no',
-            'poilicy_no' => 'required|string|max:255',
-            'e_card_no' => 'required|string|max:255',
+            'code' => 'required|string|max:100|unique:organisation,code,' . $id,
+            'contact_no' => 'required|string|max:15',
+            'address' => 'nullable|string|max:500',
+            'contact_person_name' => 'nullable|string|max:255',
+            'contact_person_phone' => 'nullable|string|max:15',
+            'poilicy_no' => 'nullable|string|max:255',
+            'e_card_no' => 'nullable|string|max:255',
             'e_card_upload' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
-        $organisation = Organisation::findOrFail($request->id);
+        $organisation = Organisation::findOrFail($id);
 
-        $organisation->update([
-            'insurance_company_id' => $request->insurance_company_id,
-            'organisation_name' => $request->organisation_name,
-            'code' => $request->code,
-            'contact_no' => $request->contact_no,
-            'address' => $request->address,
-            'contact_person_name' => $request->contact_person_name,
-            'contact_person_phone' => $request->contact_person_phone,
-            'poilicy_no' => $request->poilicy_no,
-            'e_card_no' => $request->e_card_no,
-            'e_card_upload' => $request->hasFile('e_card_upload') ? function() use ($request) {
-                $file = $request->file('e_card_upload');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('uploads/e_cards'), $filename);
-                return 'uploads/e_cards/' . $filename;
-            } : $organisation->e_card_upload,
-        ]);
+        $organisation->insurance_company_id = $request->insurance_company_id;
+        $organisation->organisation_name = $request->organisation_name;
+        $organisation->code = $request->code;
+        $organisation->contact_no = $request->contact_no;
+        $organisation->address = $request->address;
+        $organisation->contact_person_name = $request->contact_person_name;
+        $organisation->contact_person_phone = $request->contact_person_phone;
+        $organisation->poilicy_no = $request->poilicy_no;
+        $organisation->e_card_no = $request->e_card_no;
+
+        if ($request->hasFile('e_card_upload')) {
+            $file = $request->file('e_card_upload');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/e_cards'), $filename);
+            $organisation->e_card_upload = 'uploads/e_cards/' . $filename;
+        }
+
+        $organisation->save();
 
         return redirect()->route('tpamanagement')->with('success', 'TPA updated successfully.');
     }

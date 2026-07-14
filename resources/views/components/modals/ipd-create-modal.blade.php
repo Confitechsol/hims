@@ -123,6 +123,30 @@
         margin: 0;
     }
 
+    .form-row {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .form-row.cols-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .form-row.cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .form-row.cols-1 {
+        grid-template-columns: 1fr;
+    }
+
+    @media (max-width: 768px) {
+        .form-row.cols-2,
+        .form-row.cols-3 {
+            grid-template-columns: 1fr;
+        }
+    }
+
     .patient-info-grid {
         display: grid;
         grid-template-columns: 140px 1fr;
@@ -814,13 +838,6 @@
                                     <option value="New Patient">New Patient</option>
                                 </select>
                             </div>
-                            <div class="col-md-2 align-items-center d-flex">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="applyTPA" name="apply_tpa"
-                                        value="1">
-                                    <label class="form-check-label" for="applyTPA">Apply TPA</label>
-                                </div>
-                            </div>
                             <div class="col-md-4">
                                 <label class="form-label">Emergency</label>
                                 <select class="form-select" name="casualty">
@@ -867,6 +884,14 @@
                         </div>
                     </div>
 
+                    @include('admin.ipd.partials.tpa_insurance_fields', [
+                        'ipd' => new \App\Models\IpdDetail(),
+                        'tpas' => $tpas ?? collect(),
+                        'insuranceCompanies' => $insuranceCompanies ?? collect(),
+                        'select2DropdownParent' => '#createIpdModal .modal-content',
+                        'sectionClass' => 'section-card',
+                    ])
+
                     <!-- Billing Information Section -->
                     <div class="section-card">
                         <div class="section-header">
@@ -889,30 +914,35 @@
                                     <option value="Yes">Yes</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Bed Group <span class="required">*</span></label>
+                            <div class="col-md-6" id="admission_bed_group_field">
+                                <label class="form-label">Bed Group <span class="required bed-field-required">*</span></label>
                                 <select class="form-select" name="bed_group" id="bed_group_select">
                                     <option value="">Loading...</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Bed Number <span class="required">*</span></label>
+                            <div class="col-md-6" id="admission_bed_number_field">
+                                <label class="form-label">Bed Number <span class="required bed-field-required">*</span></label>
                                 <select class="form-select" name="bed_number" id="bed_number_select">
                                     <option value="">Loading...</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Bed Charge (INR) <span class="required">*</span></label>
+                            <div class="col-md-6" id="admission_bed_charge_field">
+                                <label class="form-label">Bed Charge (INR) <span class="required bed-field-required">*</span></label>
                                 <input type="number" class="form-control" name="bed_charge" id="bed_charge_input" 
                                     step="0.01" min="0" placeholder="0.00">
                                 <small class="text-muted">Auto-filled from bed group (editable)</small>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Package (Optional)</label>
-                                <select class="form-select" name="package_id" id="package_select_admission">
+                                <select class="form-select select2-input" name="package_id" id="package_select_admission">
                                     <option value="">-- Select Package --</option>
                                 </select>
                                 <small class="text-muted">Select a package to include it from day 1</small>
+                                <small class="text-muted d-block mt-1" id="package_bed_hint" style="display:none;">
+                                    Select <strong>bed group</strong> first — package amount may change by room category (insurance packages).
+                                    Choose <strong>Insurance</strong> to see insurer package rates; TPA is recorded separately.
+                                    Bed group, bed number, and bed charge remain required with package admission.
+                                </small>
                             </div>
                             <div class="col-md-6" id="package_amount_wrapper_admission">
                                 <label class="form-label">Package Amount (INR)</label>
@@ -1242,6 +1272,17 @@
                 document.getElementById('patient_tpa_validity_value').textContent =
                     selected.tpa_validity ?? 'N/A';
 
+                const tpaOrgSelect = document.getElementById('organisation_id');
+                if (tpaOrgSelect && selected.organisation?.id) {
+                    const orgId = String(selected.organisation.id);
+                    if (window.jQuery && window.jQuery.fn.select2 && window.jQuery(tpaOrgSelect).hasClass('select2-hidden-accessible')) {
+                        window.jQuery(tpaOrgSelect).val(orgId).trigger('change');
+                    } else {
+                        tpaOrgSelect.value = orgId;
+                        tpaOrgSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                }
+
                 document.getElementById('patient_identification_value').textContent =
                     selected.identification_number ?? 'N/A';
 
@@ -1445,6 +1486,7 @@
             const $modal = $(this);
             const bedGroupSelect = $modal.find('#bed_group_select');
             const bedNumberSelect = $modal.find('#bed_number_select');
+            const bedChargeInput = document.getElementById('bed_charge_input');
             if (!bedGroupSelect.length) return;
             // Init Select2 safely inside modal
             function initSelect2($el) {
@@ -1460,6 +1502,11 @@
 
             initSelect2(bedGroupSelect);
             initSelect2(bedNumberSelect);
+            bedGroupSelect.prop('required', true);
+            bedNumberSelect.prop('required', true);
+            if (bedChargeInput) {
+                bedChargeInput.setAttribute('required', 'required');
+            }
 
             // Fetch Bed Groups
             fetch("{{ route('getBedGroups') }}")
@@ -1574,33 +1621,65 @@
             const packageSelect = $modal.find('#package_select_admission');
             const packageAmountInput = $modal.find('#package_amount_admission');
             const packageAmountWrapper = $modal.find('#package_amount_wrapper_admission');
+            const packageBedHint = $modal.find('#package_bed_hint');
+
+            function updatePackageBedHint() {
+                packageBedHint.toggle(!!packageSelect.val());
+            }
+
             if (packageSelect.length) {
                 function loadAdmissionPackages() {
                     const params = new URLSearchParams();
                     const bg = $modal.find('#bed_group_select').val();
-                    if (bg) params.set('bed_group_id', bg);
+                    if (bg) {
+                        params.set('bed_group_id', bg);
+                    }
+                    const insEl = document.getElementById('insurance_company_id');
+                    if (insEl && insEl.value) {
+                        params.set('insurance_company_id', insEl.value);
+                    }
                     let url = "{{ route('packages.api.active') }}";
                     const qs = params.toString();
-                    if (qs) url += '?' + qs;
+                    if (qs) {
+                        url += '?' + qs;
+                    }
+
+                    const selectedPackageId = packageSelect.val();
 
                     fetch(url)
                     .then(response => response.json())
                     .then(data => {
-                        packageSelect.empty().append('<option value="">-- Select Package --</option>');
-                        
-                        if (data.success && data.packages) {
-                            data.packages.forEach(pkg => {
-                                const option = new Option(
-                                    `${pkg.name} - ₹${parseFloat(pkg.package_rate).toFixed(2)}`,
-                                    pkg.id,
-                                    false,
-                                    false
-                                );
-                                option.dataset.rate = pkg.package_rate;
-                                packageSelect.append(option);
-                            });
+                        if (window.IpdPackageSelect) {
+                            window.IpdPackageSelect.appendOptions(packageSelect[0], data.success ? data.packages : []);
+                            window.IpdPackageSelect.initSelect2(packageSelect, $modal.find('.modal-content'));
+                        } else {
+                            packageSelect.empty().append('<option value="">-- Select Package --</option>');
+                            if (data.success && data.packages) {
+                                data.packages.forEach(pkg => {
+                                    const option = new Option(pkg.display_title || pkg.name, pkg.id, false, false);
+                                    option.dataset.rate = pkg.package_rate;
+                                    option.dataset.packageType = pkg.package_type || 'hospital';
+                                    option.dataset.subtitle = pkg.display_subtitle || '';
+                                    packageSelect.append(option);
+                                });
+                            }
                         }
-                        packageAmountWrapper.hide();
+
+                        if (selectedPackageId) {
+                            packageSelect.val(selectedPackageId).trigger('change');
+                        }
+
+                        if (packageSelect.val()) {
+                            const opt = packageSelect[0].options[packageSelect[0].selectedIndex];
+                            if (opt && opt.dataset.rate !== undefined) {
+                                packageAmountInput.val(parseFloat(opt.dataset.rate).toFixed(2));
+                                packageAmountWrapper.show();
+                            }
+                        } else {
+                            packageAmountWrapper.hide();
+                        }
+
+                        updatePackageBedHint();
                     })
                     .catch(error => {
                         console.error('Error loading packages:', error);
@@ -1608,10 +1687,23 @@
                     });
                 }
 
-                loadAdmissionPackages();
-                $modal.find('#bed_group_select').on('change', loadAdmissionPackages);
+                if (!$modal.data('admission-packages-bound')) {
+                    $modal.data('admission-packages-bound', true);
+                    bedGroupSelect.off('change.admissionPackages').on('change.admissionPackages', loadAdmissionPackages);
 
-                packageSelect.on('change', function() {
+                    const insuranceSelectAdmission = document.getElementById('insurance_company_id');
+                    if (insuranceSelectAdmission) {
+                        if (window.jQuery) {
+                            window.jQuery(insuranceSelectAdmission).on('change select2:select select2:clear', loadAdmissionPackages);
+                        } else {
+                            insuranceSelectAdmission.addEventListener('change', loadAdmissionPackages);
+                        }
+                    }
+                }
+
+                loadAdmissionPackages();
+
+                packageSelect.off('change.admissionPackage').on('change.admissionPackage', function() {
                     const opt = this.options[this.selectedIndex];
                     if (this.value && opt && opt.dataset.rate !== undefined) {
                         packageAmountInput.val(parseFloat(opt.dataset.rate).toFixed(2));
@@ -1620,7 +1712,10 @@
                         packageAmountInput.val('');
                         packageAmountWrapper.hide();
                     }
+                    updatePackageBedHint();
                 });
+
+                updatePackageBedHint();
             }
         });
     </script>

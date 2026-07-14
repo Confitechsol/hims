@@ -223,18 +223,18 @@
         ['name' => 'e_card_upload', 'label' => 'E Card Upload', 'type' => 'file', 'required' => true,'size'=>'12'],
         ]" :columns="3" />
  <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit TPA"
-    action="{{route('tpamanagement.update')}}" :fields="[
+    action="{{ url('tpamanagement/update') }}" :fields="[
         ['name' => 'id', 'type' => 'hidden', 'required' => true],
         ['name' => 'insurance_company_id', 'label' => 'Insurance Company', 'type' => 'select', 'required' => true, 'options' => $insuranceCompanies->toArray(), 'size' => '12'],
         ['name' => 'organisation_name', 'label' => 'organisation Name', 'type' => 'text', 'required' => true,'size'=>'5'],
         ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true,'size'=>'3'],
         ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true,'size'=>'4'],
-        ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true,'size'=>'12'],
-        ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text', 'required' => true,'size'=>'6'],
-        ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => true,'size'=>'6'],
-        ['name' => 'poilicy_no', 'label' => 'Poilicy No', 'type' => 'text', 'required' => true,'size'=>'6'],
-        ['name' => 'e_card_no', 'label' => 'E Card No', 'type' => 'text', 'required' => true,'size'=>'6'],
-        ['name' => 'e_card_image', 'label' => 'E Card Current Image', 'type' => 'img', 'required' => true,'size'=>'12'],
+        ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => false,'size'=>'12'],
+        ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text', 'required' => false,'size'=>'6'],
+        ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => false,'size'=>'6'],
+        ['name' => 'poilicy_no', 'label' => 'Poilicy No', 'type' => 'text', 'required' => false,'size'=>'6'],
+        ['name' => 'e_card_no', 'label' => 'E Card No', 'type' => 'text', 'required' => false,'size'=>'6'],
+        ['name' => 'e_card_image', 'label' => 'E Card Current Image', 'type' => 'img', 'required' => false,'size'=>'12'],
         ['name' => 'e_card_upload', 'label' => 'E Card Image Update', 'type' => 'file', 'required' => false ,'size'=>'12'],
     ]" :columns="3" />
     

@@ -513,8 +513,12 @@
                                 <td class="patient_label">Patient Name</td>
                                 <td class="patient_colon">:</td>
                                 <td class="patient_value">
-                                    {{ strtoupper($ipd->patient->patient_name ?? 'N/A') }}@if($ipd->patient && $ipd->patient->organisation)
-                                    ({{ strtoupper($ipd->patient->organisation->organisation_name ?? '') }})@endif</td>
+                                    {{ strtoupper($ipd->patient->patient_name ?? 'N/A') }}@php
+                                        $tpaTag = $ipd->organisation->organisation_name
+                                            ?? ($ipd->patient->organisation->organisation_name ?? null);
+                                    @endphp
+                                    @if($tpaTag)
+                                    ({{ strtoupper($tpaTag) }})@endif</td>
                             </tr>
                             <tr>
                                 <td class="patient_label">Address</td>
@@ -627,34 +631,15 @@
             </table>
         </div>
 
-        <!-- Package Charges (first when present) -->
-        @if(isset($packageDetails) && $packageDetails->count() > 0)
-            <table class="charges-table">
-                <thead>
-                    <tr>
-                        <th colspan="3">Package Charges</th>
-                    </tr>
-                    <tr>
-                        <th>Applied Date</th>
-                        <th>Package Name</th>
-                        <th class="text-right">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($packageDetails as $pkg)
-                        <tr>
-                            <td>{{ \Carbon\Carbon::parse($pkg['date'])->format('d/m/Y') }}</td>
-                            <td>{{ $pkg['package_name'] ?? 'N/A' }}</td>
-                            <td class="text-right">Rs. {{ number_format($pkg['amount'] ?? 0, 2) }}</td>
-                        </tr>
-                    @endforeach
-                    <tr style="font-weight: bold;">
-                        <td colspan="2" class="text-right">Subtotal:</td>
-                        <td class="text-right">Rs. {{ number_format($breakup['package_charges'] ?? 0, 2) }}</td>
-                    </tr>
-                </tbody>
-            </table>
+        @if(!empty($isInsuranceFinalBill))
+            @include('admin.billing.partials.ipd_insurance_info_block')
         @endif
+
+        <!-- Package Charges (first when present) -->
+        @if(!empty($useInsurancePackageLayout))
+            @include('admin.billing.partials.ipd_insurance_package_section')
+        @else
+            @include('admin.billing.partials.ipd_package_charges_table')
 
         <!-- Bed Charges (grouped by bed and date range) -->
         @if(isset($bedChargesGroupedForDisplay) && $bedChargesGroupedForDisplay->count() > 0)
@@ -906,6 +891,8 @@
             </table>
         @endif
 
+        @endif {{-- end non-package layout --}}
+
         <!-- Payment Details -->
         @if(isset($payments) && $payments->count() > 0)
             <div class="section-title">Payment Details</div>
@@ -965,6 +952,9 @@
         @endif
 
         <!-- Summary Section -->
+        @if(!empty($isInsuranceFinalBill) && !empty($insuranceFinalSummary))
+            @include('admin.billing.partials.ipd_insurance_final_summary')
+        @else
         <div class="summary-section">
             <div class="section-title" style="margin-top: 0; margin-bottom: 8px;">Payment Summary</div>
             @if(($breakup['package_charges'] ?? 0) > 0)
@@ -1072,6 +1062,7 @@
                     <span class="words-value"><strong>{{ $balanceInWords ?? 'Zero Rupees Only' }}</strong></span>
                 </div>
             </div>
+        @endif
         @endif
     </main>
 

@@ -89,7 +89,7 @@
                             <th>Base Rate</th>
                             <th>Linked Hospital</th>
                             <th>Status</th>
-                            <th width="150">Action</th>
+                            <th class="package-actions-col text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -102,7 +102,11 @@
                                     <span class="badge bg-secondary">Hospital</span>
                                 @endif
                             </td>
-                            <td class="package-name-col text-break">{{ $package->name }}</td>
+                            <td class="package-name-col text-break">
+                                <a href="{{ route('packages.edit', $package->id) }}" class="text-decoration-none fw-semibold" title="Edit package">
+                                    {{ $package->name }}
+                                </a>
+                            </td>
                             <td>
                                 @if($package->insurer_procedure_code)
                                     <code>{{ $package->insurer_procedure_code }}</code><br>
@@ -131,13 +135,21 @@
                                     <span class="badge bg-secondary">Inactive</span>
                                 @endif
                             </td>
-                            <td>
-                                <a href="{{ route('packages.show', $package->id) }}" class="btn btn-sm btn-info"><i class="ti ti-eye"></i></a>
-                                <a href="{{ route('packages.edit', $package->id) }}" class="btn btn-sm btn-warning"><i class="ti ti-pencil"></i></a>
-                                <form action="{{ route('packages.destroy', $package->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this package?')">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger"><i class="ti ti-trash"></i></button>
-                                </form>
+                            <td class="package-actions-col text-center">
+                                <div class="btn-group btn-group-sm package-action-btns" role="group" aria-label="Package actions">
+                                    <a href="{{ route('packages.show', $package->id) }}" class="btn btn-outline-info" title="View details">
+                                        <i class="ti ti-eye"></i>
+                                    </a>
+                                    <a href="{{ route('packages.edit', $package->id) }}" class="btn btn-outline-warning" title="Edit package">
+                                        <i class="ti ti-pencil"></i>
+                                    </a>
+                                    <form action="{{ route('packages.destroy', $package->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this package?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger" title="Delete package">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         @empty
@@ -157,6 +169,21 @@
         white-space: normal;
         word-break: break-word;
         line-height: 1.35;
+    }
+    .package-master-table .package-actions-col {
+        width: 130px;
+        min-width: 130px;
+        position: sticky;
+        right: 0;
+        background: #fff;
+        z-index: 2;
+        box-shadow: -4px 0 6px -4px rgba(0, 0, 0, 0.12);
+    }
+    .package-master-table thead .package-actions-col {
+        background: #f8f9fa;
+    }
+    .package-master-table .package-action-btns .btn {
+        padding: 0.25rem 0.45rem;
     }
 </style>
 @endsection

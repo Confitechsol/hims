@@ -3649,7 +3649,7 @@
                                 <div class="mb-3">
                                     <label for="package_select" class="form-label">Select Package <span
                                             class="text-danger">*</span></label>
-                                    <select class="form-select" id="package_select" name="package_id" required>
+                                    <select class="form-select select2-input" id="package_select" name="package_id" required>
                                         <option value="">-- Select Package --</option>
                                     </select>
                                     <div id="package_details" class="mt-3 p-3 bg-light rounded"
@@ -3665,8 +3665,14 @@
                                             class="text-danger">*</span></label>
                                     <input type="number" class="form-control" id="package_amount_input"
                                         step="0.01" min="0" placeholder="0.00" value="">
-                                    <small class="text-muted">Auto-filled from package (editable). Reflects on estimate
+                                    <small class="text-muted">Contract rate — auto-filled from package (editable). Reflects on estimate
                                         &amp; final bill.</small>
+                                </div>
+                                <div class="mb-3" id="approval_percentage_wrap" style="display: none;">
+                                    <label for="approval_percentage_input" class="form-label">Approval %</label>
+                                    <input type="number" class="form-control" id="approval_percentage_input"
+                                        step="0.01" min="0" max="100" placeholder="e.g. 50">
+                                    <small class="text-muted">Optional. Used for insurance/TPA/cashless admissions or insurance packages. Leave blank if not yet approved.</small>
                                 </div>
                                 <div class="mb-3">
                                     <label for="applied_date" class="form-label">Applied Date</label>
@@ -3684,6 +3690,55 @@
                                     data-bs-dismiss="modal">Cancel</button>
                                 <button type="submit" class="btn btn-primary" id="apply_package_btn">
                                     <i class="ti ti-check me-1"></i>Apply Package
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Applied Package Modal -->
+            <div class="modal fade" id="edit_applied_package_modal" tabindex="-1" aria-labelledby="edit_applied_package_label"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="edit_applied_package_label">Edit Applied Package</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="edit_applied_package_form">
+                            <div class="modal-body">
+                                <input type="hidden" id="edit_ipd_package_id" value="">
+                                <div class="mb-3">
+                                    <label class="form-label">Package</label>
+                                    <input type="text" class="form-control" id="edit_package_name" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_package_rate" class="form-label">Contract Rate (INR) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="edit_package_rate" step="0.01" min="0" required>
+                                    <small class="text-muted">Contract rate for this admission. Final bill uses calculated final amount.</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_approval_percentage" class="form-label">Approval %</label>
+                                    <input type="number" class="form-control" id="edit_approval_percentage" step="0.01" min="0" max="100" placeholder="e.g. 50">
+                                    <small class="text-muted">Optional. Insurer approval on contract rate. Leave blank if not applicable.</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_applied_date" class="form-label">Applied Date</label>
+                                    <input type="date" class="form-control" id="edit_applied_date" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_package_note" class="form-label">Notes</label>
+                                    <textarea class="form-control" id="edit_package_note" rows="2" placeholder="Optional notes..."></textarea>
+                                </div>
+                                <div class="alert alert-light border mb-0 py-2">
+                                    <small class="text-muted">Current final amount: <strong id="edit_final_amount_preview">₹0.00</strong></small>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="edit_applied_package_btn">
+                                    <i class="ti ti-check me-1"></i>Save Changes
                                 </button>
                             </div>
                         </form>
@@ -6797,15 +6852,37 @@
     </script>
 
     <!-- Package Management Script -->
+    @include('admin.ipd.partials.package_select2_scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const ipdId = "{{ $ipd->id }}";
             const packagesUrl = "{{ route('ipd.packages', $ipd->id) }}";
+            const isInsuranceIpd = @json((bool) ($ipd->insurance_company_id || $ipd->is_cashless || $ipd->organisation_id));
+            const canEditPackages = @json($ipd->discharged != 'yes');
             const packageSelectEl = document.getElementById('package_select');
             const applyPackageForm = document.getElementById('apply_package_form');
             const appliedPackagesList = document.getElementById('applied-packages-list');
             const applyPackageModal = document.getElementById('apply_package_modal');
+            const editAppliedPackageForm = document.getElementById('edit_applied_package_form');
+            const editAppliedPackageModal = document.getElementById('edit_applied_package_modal');
             const packagesTabLink = document.querySelector('a[href="#packages"]');
+            let appliedPackagesCache = [];
+
+            function formatInr(amount) {
+                const n = parseFloat(amount);
+                if (isNaN(n)) return '₹0.00';
+                return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            function toDateInputValue(dateStr) {
+                if (!dateStr) return '';
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return '';
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${day}`;
+            }
 
             if (applyPackageModal) {
                 applyPackageModal.addEventListener('shown.bs.modal', function() {
@@ -6827,6 +6904,15 @@
                 loadAppliedPackages();
             }
 
+            function packageIsInsurance(pkg) {
+                if (!pkg) return false;
+                const p = pkg.package || pkg;
+                return p.package_type === 'insurance'
+                    || (p.insurance_company_id != null && p.insurance_company_id !== '')
+                    || (p.insurance_rate_panel_id != null && p.insurance_rate_panel_id !== '')
+                    || (p.insurer_procedure_code != null && p.insurer_procedure_code !== '');
+            }
+
             function loadAvailablePackages() {
                 if (!packageSelectEl) return;
 
@@ -6844,21 +6930,35 @@
                     .then(data => {
                         if (data.success && data.available_packages) {
                             const currentOptions = packageSelectEl.value;
-                            packageSelectEl.innerHTML = '<option value="">-- Select Package --</option>';
 
-                            data.available_packages.forEach(pkg => {
-                                const option = document.createElement('option');
-                                option.value = pkg.id;
-                                option.textContent = `${pkg.name} - ₹${pkg.package_rate}`;
-                                option.dataset.rate = pkg.package_rate;
-                                option.dataset.gst = pkg.gst_amount;
-                                option.dataset.desc = pkg.description;
-                                packageSelectEl.appendChild(option);
-                            });
+                            if (window.IpdPackageSelect) {
+                                window.IpdPackageSelect.appendOptions(packageSelectEl, data.available_packages);
+                                window.IpdPackageSelect.initSelect2(
+                                    packageSelectEl,
+                                    document.getElementById('apply_package_modal')
+                                );
+                            } else {
+                                packageSelectEl.innerHTML = '<option value="">-- Select Package --</option>';
+                                data.available_packages.forEach(pkg => {
+                                    const option = document.createElement('option');
+                                    option.value = pkg.id;
+                                    option.textContent = pkg.display_title || pkg.name;
+                                    option.dataset.rate = pkg.package_rate;
+                                    option.dataset.gst = pkg.gst_amount ?? '';
+                                    option.dataset.desc = pkg.description ?? '';
+                                    option.dataset.insuranceCompanyId = pkg.insurance_company_id ?? '';
+                                    option.dataset.packageType = packageIsInsurance(pkg) ? 'insurance' : 'hospital';
+                                    packageSelectEl.appendChild(option);
+                                });
+                            }
 
                             if (currentOptions) {
                                 packageSelectEl.value = currentOptions;
+                                if (window.jQuery) {
+                                    window.jQuery(packageSelectEl).trigger('change');
+                                }
                             }
+                            toggleApplyApprovalField();
                         }
                     })
                     .catch(error => {
@@ -6882,30 +6982,58 @@
                     .then(data => {
                         if (!data) return;
                         if (data.success && data.applied_packages) {
+                            appliedPackagesCache = data.applied_packages;
                             if (data.applied_packages.length === 0) {
                                 appliedPackagesList.innerHTML =
                                     '<div class="alert alert-info"><i class="ti ti-info-circle me-2"></i>No packages applied yet.</div>';
                             } else {
+                                const showApprovalColumn = true;
+                                let headerCols =
+                                    '<th>Package</th><th>Applied Date</th><th>Contract Rate (INR)</th>';
+                                if (showApprovalColumn) {
+                                    headerCols += '<th>Approval %</th>';
+                                }
+                                headerCols += '<th>Final Amount</th><th class="text-center">Action</th>';
                                 let html =
-                                    '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Package</th><th>Applied Date</th><th>Package Amount (INR)</th><th>Final Amount</th><th>Action</th></tr></thead><tbody>';
+                                    `<div class="table-responsive"><table class="table table-hover"><thead><tr>${headerCols}</tr></thead><tbody>`;
 
                                 data.applied_packages.forEach(pkg => {
                                     const rate = parseFloat(pkg.package_rate);
                                     const finalAmt = parseFloat(pkg.final_amount);
+                                    const approvalDisplay = pkg.approval_percentage != null && pkg.approval_percentage !== '' ?
+                                        parseFloat(pkg.approval_percentage).toFixed(2) + '%' : '—';
+                                    let approvalCell = '';
+                                    if (showApprovalColumn) {
+                                        approvalCell = `<td>${approvalDisplay}</td>`;
+                                    }
+                                    const actionBtns = pkg.status === 'applied' && canEditPackages
+                                        ? `<div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-outline-warning edit-pkg-btn" data-ipd-pkg-id="${pkg.id}" title="Edit package">
+                                                <i class="ti ti-pencil"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger remove-pkg-btn" data-ipd-pkg-id="${pkg.id}" title="Remove package">
+                                                <i class="ti ti-trash"></i>
+                                            </button>
+                                           </div>`
+                                        : `<span class="badge bg-secondary">${pkg.status}</span>`;
                                     html += `<tr>
                                     <td><strong>${pkg.package.name}</strong></td>
                                     <td>${new Date(pkg.applied_date).toLocaleDateString()}</td>
-                                    <td><input type="number" class="form-control form-control-sm package-amount-input" data-ipd-pkg-id="${pkg.id}" value="${rate.toFixed(2)}" step="0.01" min="0" style="width:110px;"></td>
-                                    <td>₹${finalAmt.toFixed(2)}</td>
-                                    <td>
-                                        ${pkg.status === 'applied' ? `<button class="btn btn-sm btn-danger remove-pkg-btn" data-ipd-pkg-id="${pkg.id}"><i class="ti ti-trash me-1"></i>Remove</button>` : `<span class="badge bg-secondary">${pkg.status}</span>`}
-                                    </td>
+                                    <td>${formatInr(rate)}</td>
+                                    ${approvalCell}
+                                    <td class="package-final-amount" data-ipd-pkg-id="${pkg.id}">${formatInr(finalAmt)}</td>
+                                    <td class="text-center">${actionBtns}</td>
                                 </tr>`;
                                 });
 
                                 html += '</tbody></table></div>';
                                 appliedPackagesList.innerHTML = html;
 
+                                document.querySelectorAll('.edit-pkg-btn').forEach(btn => {
+                                    btn.addEventListener('click', function() {
+                                        openEditAppliedPackageModal(this.dataset.ipdPkgId);
+                                    });
+                                });
                                 document.querySelectorAll('.remove-pkg-btn').forEach(btn => {
                                     btn.addEventListener('click', function() {
                                         if (confirm(
@@ -6913,12 +7041,6 @@
                                                 )) {
                                             removePackage(this.dataset.ipdPkgId);
                                         }
-                                    });
-                                });
-                                document.querySelectorAll('.package-amount-input').forEach(input => {
-                                    input.addEventListener('blur', function() {
-                                        updatePackageAmount(this.dataset.ipdPkgId, parseFloat(
-                                            this.value));
                                     });
                                 });
                             }
@@ -6931,6 +7053,16 @@
 
             // Handle package selection change - show details and set package amount
             const packageAmountInputEl = document.getElementById('package_amount_input');
+            const approvalWrapEl = document.getElementById('approval_percentage_wrap');
+            const approvalInputEl = document.getElementById('approval_percentage_input');
+
+            function toggleApplyApprovalField() {
+                if (!approvalWrapEl || !packageSelectEl) return;
+                const show = !!packageSelectEl.value;
+                approvalWrapEl.style.display = show ? 'block' : 'none';
+                if (!show && approvalInputEl) approvalInputEl.value = '';
+            }
+
             if (packageSelectEl) {
                 packageSelectEl.addEventListener('change', function() {
                     const detailsDiv = document.getElementById('package_details');
@@ -6946,6 +7078,7 @@
                         detailsDiv.style.display = 'none';
                         if (packageAmountInputEl) packageAmountInputEl.value = '';
                     }
+                    toggleApplyApprovalField();
                 });
             }
 
@@ -6960,6 +7093,16 @@
                     const packageAmountEl = document.getElementById('package_amount_input');
                     const packageRate = packageAmountEl && packageAmountEl.value ? parseFloat(
                         packageAmountEl.value) : null;
+                    const approvalEl = document.getElementById('approval_percentage_input');
+                    const payload = {
+                        package_id: packageId,
+                        applied_date: appliedDate,
+                        notes: notes,
+                        package_rate: packageRate
+                    };
+                    if (approvalEl && approvalWrapEl && approvalWrapEl.style.display !== 'none' && approvalEl.value.trim() !== '') {
+                        payload.approval_percentage = parseFloat(approvalEl.value);
+                    }
 
                     if (!packageId) {
                         alert('Please select a package');
@@ -6973,12 +7116,7 @@
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
                                     .content
                             },
-                            body: JSON.stringify({
-                                package_id: packageId,
-                                applied_date: appliedDate,
-                                notes: notes,
-                                package_rate: packageRate
-                            })
+                            body: JSON.stringify(payload)
                         })
                         .then(response => response.json())
                         .then(data => {
@@ -6998,6 +7136,41 @@
                             console.error('Error:', error);
                             alert('Error applying package: ' + error.message);
                         });
+                });
+            }
+
+            function openEditAppliedPackageModal(ipdPackageId) {
+                const pkg = appliedPackagesCache.find(p => String(p.id) === String(ipdPackageId));
+                if (!pkg) return;
+
+                document.getElementById('edit_ipd_package_id').value = pkg.id;
+                document.getElementById('edit_package_name').value = pkg.package?.name || '';
+                document.getElementById('edit_package_rate').value = parseFloat(pkg.package_rate).toFixed(2);
+                document.getElementById('edit_approval_percentage').value =
+                    pkg.approval_percentage != null && pkg.approval_percentage !== '' ?
+                    parseFloat(pkg.approval_percentage) : '';
+                document.getElementById('edit_applied_date').value = toDateInputValue(pkg.applied_date);
+                document.getElementById('edit_package_note').value = pkg.note || '';
+                document.getElementById('edit_final_amount_preview').textContent = formatInr(pkg.final_amount);
+
+                if (editAppliedPackageModal) {
+                    bootstrap.Modal.getOrCreateInstance(editAppliedPackageModal).show();
+                }
+            }
+
+            if (editAppliedPackageForm) {
+                editAppliedPackageForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const ipdPackageId = document.getElementById('edit_ipd_package_id').value;
+                    const approvalRaw = document.getElementById('edit_approval_percentage').value.trim();
+                    const payload = {
+                        package_rate: parseFloat(document.getElementById('edit_package_rate').value),
+                        approval_percentage: approvalRaw === '' ? null : parseFloat(approvalRaw),
+                        applied_date: document.getElementById('edit_applied_date').value,
+                        note: document.getElementById('edit_package_note').value
+                    };
+
+                    updatePackageBilling(ipdPackageId, payload, true);
                 });
             }
 
@@ -7028,8 +7201,7 @@
                     });
             }
 
-            function updatePackageAmount(ipdPackageId, packageRate) {
-                if (packageRate == null || isNaN(packageRate) || packageRate < 0) return;
+            function updatePackageBilling(ipdPackageId, fields, closeEditModal = false) {
                 const url = "{{ url('ipd/' . $ipd->id . '/packages') }}/" + ipdPackageId;
                 fetch(url, {
                         method: 'PATCH',
@@ -7037,21 +7209,24 @@
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         },
-                        body: JSON.stringify({
-                            package_rate: packageRate
-                        })
+                        body: JSON.stringify(fields)
                     })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
+                            if (closeEditModal && editAppliedPackageModal) {
+                                const modal = bootstrap.Modal.getInstance(editAppliedPackageModal);
+                                if (modal) modal.hide();
+                            }
                             loadAppliedPackages();
                         } else {
-                            alert('Error: ' + (data.message || 'Failed to update amount'));
+                            alert('Error: ' + (data.message || 'Failed to update package'));
+                            loadAppliedPackages();
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Error updating package amount: ' + error.message);
+                        alert('Error updating package: ' + error.message);
                     });
             }
         });

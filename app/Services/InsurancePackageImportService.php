@@ -6,6 +6,8 @@ use App\Models\BedGroup;
 use App\Models\InsurerRoomMapping;
 use App\Models\InsuranceRatePanel;
 use App\Models\Package;
+use App\Models\PackageCharge;
+use App\Models\PackageExclude;
 use App\Models\PackageRoomRate;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -20,26 +22,56 @@ class InsurancePackageImportService
     }
 
     /**
-     * @return array{panels: int, packages: int, room_rates: int, linked: int, skipped: int, errors: array<int, string>}
+     * @return array{
+     *     panels: int,
+     *     packages: int,
+     *     inserted: int,
+     *     updated: int,
+     *     unchanged: int,
+     *     deactivated: int,
+     *     purged: int,
+     *     room_rates: int,
+     *     linked: int,
+     *     skipped: int,
+     *     errors: array<int, string>,
+     *     dry_run: bool
+     * }
      */
-    public function importFromFile(string $filePath, bool $replacePanelPackages = false, bool $autoLinkHospital = true): array
-    {
+    public function importFromFile(
+        string $filePath,
+        bool $replacePanelPackages = false,
+        bool $autoLinkHospital = false,
+        bool $dryRun = false,
+        bool $deactivateMissing = false
+    ): array {
         $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
-        $rows = in_array($ext, ['xlsx', 'xls'], true)
-            ? $this->rowsFromSpreadsheet($filePath)
-            : $this->rowsFromCsv($filePath);
+        if (in_array($ext, ['xlsx', 'xls'], true) && $this->isGipsaPpnExcel($filePath)) {
+            $rows = $this->rowsFromGipsaPpnExcel($filePath);
+        } elseif (in_array($ext, ['xlsx', 'xls'], true)) {
+            $rows = $this->rowsFromSpreadsheet($filePath);
+        } else {
+            $rows = $this->rowsFromCsv($filePath);
+        }
 
         $stats = [
             'panels' => 0,
             'packages' => 0,
+            'inserted' => 0,
+            'updated' => 0,
+            'unchanged' => 0,
+            'deactivated' => 0,
+            'purged' => 0,
             'room_rates' => 0,
             'linked' => 0,
             'skipped' => 0,
             'errors' => [],
+            'dry_run' => $dryRun,
         ];
 
         $panelCache = [];
         $replacedPanels = [];
+        /** @var array<int, array<int, string>> $importedCodesByPanel */
+        $importedCodesByPanel = [];
 
         DB::beginTransaction();
         try {
@@ -52,36 +84,42 @@ class InsurancePackageImportService
                 try {
                     $panelKey = strtoupper($parsed['panel_code']);
                     if (!isset($panelCache[$panelKey])) {
-                        $panel = $this->upsertPanel($parsed['panel_code'], $parsed['panel_name']);
+                        $panel = $dryRun
+                            ? (InsuranceRatePanel::where('code', strtoupper(Str::slug($parsed['panel_code'], '_')))->first()
+                                ?? new InsuranceRatePanel(['code' => strtoupper(Str::slug($parsed['panel_code'], '_')), 'name' => $parsed['panel_name']]))
+                            : $this->upsertPanel($parsed['panel_code'], $parsed['panel_name']);
                         $panelCache[$panelKey] = $panel;
                         $stats['panels']++;
 
-                        if ($replacePanelPackages && !in_array($panel->id, $replacedPanels, true)) {
-                            Package::where('package_type', Package::TYPE_INSURANCE)
-                                ->where('insurance_rate_panel_id', $panel->id)
-                                ->each(function (Package $p) {
-                                    PackageRoomRate::where('package_id', $p->id)->delete();
-                                    $p->delete();
-                                });
+                        if ($replacePanelPackages && !$dryRun && !in_array($panel->id, $replacedPanels, true)) {
+                            $stats['purged'] += $this->purgePanelPackages($panel->id);
                             $replacedPanels[] = $panel->id;
                         }
                     }
                     $panel = $panelCache[$panelKey];
+                    $panelTrackId = $panel->id ?: $panelKey;
 
-                    $package = $this->upsertInsurancePackage($panel, $parsed);
+                    if ($parsed['procedure_code'] !== '') {
+                        $importedCodesByPanel[$panelTrackId][] = $parsed['procedure_code'];
+                    }
+
+                    $result = $this->upsertInsurancePackage($panel, $parsed, $dryRun);
                     $stats['packages']++;
-                    $stats['room_rates'] += $this->syncRoomRates($panel, $package, $parsed);
+                    $stats[$result['action']]++;
+                    if ($result['action'] !== 'unchanged') {
+                        $stats['room_rates'] += $this->syncRoomRates($panel, $result['package'], $parsed, $dryRun);
+                    }
 
-                    if ($autoLinkHospital && !$package->linked_hospital_package_id) {
+                    if (!$dryRun && $autoLinkHospital && !$result['package']->linked_hospital_package_id) {
                         $linked = $this->hospitalMapping->autoLinkHospitalPackage(
-                            $package,
+                            $result['package'],
                             $parsed['procedure_name'],
                             $parsed['procedure_code']
                         );
                         if ($linked) {
                             $stats['linked']++;
                         }
-                    } elseif ($package->linked_hospital_package_id) {
+                    } elseif ($result['package']->linked_hospital_package_id) {
                         $stats['linked']++;
                     }
                 } catch (\Throwable $e) {
@@ -90,7 +128,22 @@ class InsurancePackageImportService
                 }
             }
 
-            DB::commit();
+            if ($deactivateMissing) {
+                foreach ($panelCache as $panelKey => $panel) {
+                    $trackId = $panel->id ?: $panelKey;
+                    if (!$panel->id) {
+                        continue;
+                    }
+                    $codes = array_values(array_unique($importedCodesByPanel[$trackId] ?? []));
+                    $stats['deactivated'] += $this->deactivatePackagesNotInImport($panel->id, $codes, $dryRun);
+                }
+            }
+
+            if ($dryRun) {
+                DB::rollBack();
+            } else {
+                DB::commit();
+            }
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
@@ -125,6 +178,117 @@ class InsurancePackageImportService
         fclose($handle);
 
         return $rows;
+    }
+
+    protected function isGipsaPpnExcel(string $filePath): bool
+    {
+        $sheet = IOFactory::load($filePath)->getActiveSheet();
+        foreach ($sheet->toArray(null, true, true, false) as $row) {
+            $colB = trim((string) ($row[1] ?? ''));
+            if (stripos($colB, 'NEW PPN CODE') !== false || stripos($colB, 'PPN CODE') !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Parse Samaritan GIPSA PPN Excel (header row with NEW PPN CODE + category sections).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function rowsFromGipsaPpnExcel(string $filePath): array
+    {
+        $sheet = IOFactory::load($filePath)->getActiveSheet();
+        $raw = $sheet->toArray(null, true, true, false);
+        if (empty($raw)) {
+            return [];
+        }
+
+        $headerIndex = null;
+        foreach ($raw as $i => $row) {
+            $colB = trim((string) ($row[1] ?? ''));
+            if (stripos($colB, 'NEW PPN CODE') !== false || stripos($colB, 'PPN CODE') !== false) {
+                $headerIndex = $i;
+                break;
+            }
+        }
+        if ($headerIndex === null) {
+            return [];
+        }
+
+        $contractReference = '';
+        foreach (array_slice($raw, 0, $headerIndex) as $row) {
+            $line = trim(implode(' ', array_map(fn ($v) => trim((string) $v), $row)));
+            if (stripos($line, 'ROHINI') !== false) {
+                $contractReference = $line;
+                break;
+            }
+        }
+
+        $panelCode = 'GIPSA_PPN';
+        $panelName = 'GIPSA PPN Samaritan 2022';
+        $currentSpeciality = 'CARDIOLOGY';
+        $byCode = [];
+
+        for ($i = $headerIndex + 1; $i < count($raw); $i++) {
+            $row = $raw[$i] ?? [];
+            $colA = trim((string) ($row[0] ?? ''));
+            $colB = trim((string) ($row[1] ?? ''));
+            $colC = trim((string) ($row[2] ?? ''));
+            $general = $this->floatOrNull($row[5] ?? null);
+            $semi = $this->floatOrNull($row[6] ?? null);
+            $private = $this->floatOrNull($row[7] ?? null);
+
+            if ($colB !== '' && stripos($colB, 'PPN') === 0) {
+                $parsed = [
+                    'panel_code' => $panelCode,
+                    'panel_name' => $panelName,
+                    'procedure_code' => $colB,
+                    'procedure_name' => $colC !== '' ? $colC : $colB,
+                    'speciality' => $currentSpeciality,
+                    'package_inclusions' => $this->normalizeLcodes($row[3] ?? ''),
+                    'package_exclusions' => $this->normalizeLcodes($row[4] ?? ''),
+                    'contract_reference' => $contractReference,
+                    'general' => $general,
+                    'semi_private' => $semi,
+                    'private' => $private,
+                ];
+
+                $existing = $byCode[$colB] ?? null;
+                if ($existing === null || $this->gipsaRowRateScore($parsed) > $this->gipsaRowRateScore($existing)) {
+                    $byCode[$colB] = $parsed;
+                }
+                continue;
+            }
+
+            if ($colC !== '' && $general === null && $semi === null && $private === null && stripos($colC, 'note') === false) {
+                $currentSpeciality = $colC;
+                continue;
+            }
+
+            if ($colA !== '' && !is_numeric($colA) && stripos($colA, 'PPN') !== 0 && stripos($colA, 'note') === false) {
+                $currentSpeciality = $colA;
+            }
+        }
+
+        return array_values($byCode);
+    }
+
+    /**
+     * @param  array<string, mixed>  $row
+     */
+    protected function gipsaRowRateScore(array $row): int
+    {
+        $score = 0;
+        foreach (['general', 'semi_private', 'private'] as $key) {
+            if (($row[$key] ?? null) !== null && (float) $row[$key] > 0) {
+                $score++;
+            }
+        }
+
+        return $score;
     }
 
     protected function rowsFromSpreadsheet(string $filePath): array
@@ -240,6 +404,32 @@ class InsurancePackageImportService
         return $unique;
     }
 
+    /**
+     * Remove all insurance packages (and child rows) for one rate panel only.
+     */
+    public function purgePanelPackages(int $panelId): int
+    {
+        $packageIds = Package::query()
+            ->where('package_type', Package::TYPE_INSURANCE)
+            ->where('insurance_rate_panel_id', $panelId)
+            ->pluck('id');
+
+        if ($packageIds->isEmpty()) {
+            return 0;
+        }
+
+        Package::query()
+            ->whereIn('linked_hospital_package_id', $packageIds)
+            ->update(['linked_hospital_package_id' => null]);
+
+        PackageRoomRate::whereIn('package_id', $packageIds)->delete();
+        PackageCharge::whereIn('package_id', $packageIds)->delete();
+        PackageExclude::whereIn('package_id', $packageIds)->delete();
+        Package::whereIn('id', $packageIds)->delete();
+
+        return $packageIds->count();
+    }
+
     protected function upsertPanel(string $code, string $name): InsuranceRatePanel
     {
         $code = strtoupper(Str::slug($code, '_'));
@@ -255,8 +445,9 @@ class InsurancePackageImportService
 
     /**
      * @param  array<string, mixed>  $parsed
+     * @return array{package: Package, action: 'inserted'|'updated'|'unchanged'}
      */
-    protected function upsertInsurancePackage(InsuranceRatePanel $panel, array $parsed): Package
+    protected function upsertInsurancePackage(InsuranceRatePanel $panel, array $parsed, bool $dryRun = false): array
     {
         $name = $parsed['procedure_name'] !== ''
             ? $parsed['procedure_name']
@@ -272,7 +463,7 @@ class InsurancePackageImportService
             $query->where('name', $name);
         }
 
-        $package = $query->first();
+        $package = $query->with('roomRates')->first();
         $minRate = collect($parsed['tiers'])->min('rate') ?? 0;
 
         $attrs = [
@@ -290,10 +481,23 @@ class InsurancePackageImportService
             'is_active' => true,
         ];
 
+        if ($package && $this->packageMatchesParsed($package, $parsed, $attrs)) {
+            return ['package' => $package, 'action' => 'unchanged'];
+        }
+
+        if ($dryRun) {
+            return [
+                'package' => $package ?? new Package($attrs),
+                'action' => $package ? 'updated' : 'inserted',
+            ];
+        }
+
         if ($package) {
             $package->update($attrs);
+            $action = 'updated';
         } else {
             $package = Package::create($attrs);
+            $action = 'inserted';
         }
 
         if ($parsed['hospital_package_name'] !== '') {
@@ -308,14 +512,103 @@ class InsurancePackageImportService
             }
         }
 
-        return $package->fresh();
+        return ['package' => $package->fresh(['roomRates']), 'action' => $action];
+    }
+
+    /**
+     * @param  array<string, mixed>  $attrs
+     * @param  array<string, mixed>  $parsed
+     */
+    protected function packageMatchesParsed(Package $package, array $parsed, array $attrs): bool
+    {
+        if (!$package->is_active || ($package->status ?? 'active') !== 'active') {
+            return false;
+        }
+
+        $fields = ['name', 'speciality', 'package_inclusions', 'package_exclusions', 'contract_reference'];
+        foreach ($fields as $field) {
+            $existing = trim((string) ($package->{$field} ?? ''));
+            $incoming = trim((string) ($attrs[$field] ?? ''));
+            if ($existing !== $incoming) {
+                return false;
+            }
+        }
+
+        if (abs((float) $package->package_rate - (float) $attrs['package_rate']) > 0.009) {
+            return false;
+        }
+
+        $existingTiers = $package->relationLoaded('roomRates')
+            ? $package->roomRates
+            : PackageRoomRate::where('package_id', $package->id)->get();
+
+        $existingByCode = [];
+        foreach ($existingTiers as $tier) {
+            $code = strtoupper(trim((string) ($tier->insurer_room_code ?? '')));
+            if ($code !== '') {
+                $existingByCode[$code] = (float) $tier->rate;
+            }
+        }
+
+        $incomingByCode = [];
+        foreach ($parsed['tiers'] as $tier) {
+            $incomingByCode[strtoupper($tier['code'])] = (float) $tier['rate'];
+        }
+
+        if (count($existingByCode) !== count($incomingByCode)) {
+            return false;
+        }
+
+        foreach ($incomingByCode as $code => $rate) {
+            if (!isset($existingByCode[$code]) || abs($existingByCode[$code] - $rate) > 0.009) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param  array<int, string>  $importedCodes
+     */
+    protected function deactivatePackagesNotInImport(int $panelId, array $importedCodes, bool $dryRun = false): int
+    {
+        $query = Package::query()
+            ->where('package_type', Package::TYPE_INSURANCE)
+            ->where('insurance_rate_panel_id', $panelId)
+            ->where(function ($q) {
+                $q->where('is_active', true)->orWhereNull('is_active');
+            })
+            ->where(function ($q) {
+                $q->where('status', 'active')->orWhereNull('status');
+            });
+
+        if (!empty($importedCodes)) {
+            $query->whereNotIn('insurer_procedure_code', $importedCodes);
+        }
+
+        $count = (clone $query)->count();
+        if ($count === 0 || $dryRun) {
+            return $count;
+        }
+
+        $query->update([
+            'is_active' => false,
+            'status' => 'inactive',
+        ]);
+
+        return $count;
     }
 
     /**
      * @param  array<string, mixed>  $parsed
      */
-    protected function syncRoomRates(InsuranceRatePanel $panel, Package $package, array $parsed): int
+    protected function syncRoomRates(InsuranceRatePanel $panel, Package $package, array $parsed, bool $dryRun = false): int
     {
+        if ($dryRun || !$package->id) {
+            return count($parsed['tiers']);
+        }
+
         PackageRoomRate::where('package_id', $package->id)->delete();
         $count = 0;
 

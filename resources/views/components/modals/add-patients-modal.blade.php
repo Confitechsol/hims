@@ -521,43 +521,6 @@
                             @enderror
                         </div>
 
-
-                        {{-- TPA --}}
-                        <div class="col-md-4">
-                            <label for="tpa" class="form-label">TPA</label>
-                            <select id="tpa" name="tpa"
-                                class="form-control @error('tpa') is-invalid @enderror">
-                                <option value="">Loading...</option>
-                            </select>
-                            @error('tpa')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        {{-- TPA ID --}}
-                        <div class="col-md-4">
-                            <label for="tpa_id" class="form-label">TPA
-                                Code</label>
-                            <input type="text" id="tpa_id" name="tpa_id"
-                                class="form-control @error('tpa_id') is-invalid @enderror"
-                                value="{{ old('tpa_id') }}" />
-                            @error('tpa_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        {{-- TPA Validity --}}
-                        <div class="col-md-4">
-                            <label for="tpa_validity" class="form-label">TPA
-                                Validity</label>
-                            <input type="date" id="tpa_validity" name="tpa_validity"
-                                class="form-control @error('tpa_validity') is-invalid @enderror"
-                                value="{{ old('tpa_validity') }}" />
-                            @error('tpa_validity')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
                         {{-- National ID --}}
                         <div class="col-md-6">
                             <label for="national_id_number" class="form-label">Adhaar Card or PAN Card</label>
@@ -667,36 +630,6 @@ document.getElementById('area').addEventListener('change', function () {
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const tpaSelect = document.getElementById('tpa');
-        const tpaIdInput = document.getElementById('tpa_id');
-        tpaSelect.innerHTML = '<option value="">Loading...</option>';
-
-        // fetch("{{ route('getOrganizations') }}")
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         window.organizationsData = data;
-        //         tpaSelect.innerHTML = '<option value="">Select</option>';
-        //         data.forEach(org => {
-        //             const option = document.createElement('option');
-        //             option.value = org.id;
-        //             option.textContent = org.organisation_name;
-        //             if ("{{ old('tpa') }}" == org.id) {
-        //                 option.selected = true;
-        //             }
-        //             tpaSelect.appendChild(option);
-        //         });
-        //     })
-        //     .catch(error => {
-        //         console.error('Error fetching organizations:', error);
-        //         tpaSelect.innerHTML = '<option value="">Error loading options</option>';
-        //     });
-
-        // Listen for dropdown change
-        tpaSelect.addEventListener('change', function() {
-            const selectedId = this.value;
-            const selectedOrg = window.organizationsData.find(org => org.id == selectedId);
-            tpaIdInput.value = selectedOrg ? selectedOrg.code : '';
-        });
         // Elements
         const birthDateInput = document.getElementById('birth_date');
         const ageYearInput = document.getElementById('age_year');

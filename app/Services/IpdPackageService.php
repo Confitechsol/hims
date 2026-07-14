@@ -29,9 +29,10 @@ class IpdPackageService
      * @param string|null $appliedDate Date when package is applied (Y-m-d format, default: today)
      * @param string|null $notes Notes for package application
      * @param float|null $packageRateOverride Optional custom package amount (overrides package master rate)
+     * @param float|null $approvalPercentage Manual insurer approval % on contract rate (insurance packages only)
      * @return array Result with status, message, and package data
      */
-    public function applyPackage($ipdId, $packageId, $appliedDate = null, $notes = null, $packageRateOverride = null)
+    public function applyPackage($ipdId, $packageId, $appliedDate = null, $notes = null, $packageRateOverride = null, $approvalPercentage = null)
     {
         try {
             DB::beginTransaction();
@@ -81,7 +82,7 @@ class IpdPackageService
             // Calculate package charges with discounts and GST (use override amount if provided).
             // Package Master (packages table) is never updated; custom rate is stored only in ipd_packages
             // so it affects only this patient's estimate and final bill.
-            $calculatedCharge = $this->calculatePackageCharge($ipd, $package, $packageRateOverride);
+            $calculatedCharge = $this->calculatePackageCharge($ipd, $package, $packageRateOverride, $approvalPercentage);
 
             // Create IpdPackage record (per-patient; does not modify Package Master)
             $ipdPackage = IpdPackage::create([
@@ -91,6 +92,7 @@ class IpdPackageService
                 'applied_date' => $appliedDate,
                 'applied_by' => Auth::id() ?? null,
                 'package_rate' => $calculatedCharge['package_rate'],
+                'approval_percentage' => $calculatedCharge['approval_percentage'],
                 'discount_percentage' => $calculatedCharge['discount_percentage'],
                 'discount_amount' => $calculatedCharge['discount_amount'],
                 'gst_amount' => $calculatedCharge['gst_amount'],
@@ -147,17 +149,24 @@ class IpdPackageService
     }
 
     /**
-     * Update package amount for an applied IPD package (on-the-fly change).
-     * Recalculates discount, GST and final amount from the new package rate.
-     * Only updates ipd_packages; Package Master (packages table) is never modified.
+     * Update an applied IPD package (amount, approval %, date, notes).
      *
      * @param int $ipdId IPD patient ID
      * @param int $ipdPackageId IpdPackage record ID
-     * @param float $newPackageRate New package amount (INR)
+     * @param float|null $newPackageRate New contract package amount (INR); null keeps existing
+     * @param mixed $approvalPercentage Approval % (0–100), null to clear, false to keep existing
+     * @param mixed $appliedDate Applied date (Y-m-d), false to keep existing
+     * @param mixed $note Note text, false to keep existing
      * @return array Result with success and message
      */
-    public function updatePackageAmount($ipdId, $ipdPackageId, $newPackageRate)
-    {
+    public function updatePackageAmount(
+        $ipdId,
+        $ipdPackageId,
+        ?float $newPackageRate = null,
+        $approvalPercentage = false,
+        $appliedDate = false,
+        $note = false
+    ) {
         try {
             $ipdPackage = IpdPackage::where('id', $ipdPackageId)
                 ->where('ipd_id', $ipdId)
@@ -170,28 +179,53 @@ class IpdPackageService
                 throw new \Exception("IPD record not found");
             }
             if ($ipd->discharged === 'yes') {
-                throw new \Exception("Cannot change package amount after discharge");
+                throw new \Exception("Cannot change package after discharge");
             }
 
-            $packageRate = (float) $newPackageRate;
-            $discountPercentage = (float) ($ipdPackage->discount_percentage ?? 0);
-            $discountAmount = $discountPercentage > 0 ? ($packageRate * $discountPercentage) / 100 : 0;
-            $amountAfterDiscount = $packageRate - $discountAmount;
-            $gstPct = (float) ($ipdPackage->package->gst_amount ?? 0);
-            $gstAmount = $gstPct > 0 ? ($amountAfterDiscount * $gstPct) / 100 : 0;
-            $finalAmount = $amountAfterDiscount + $gstAmount;
+            $packageRate = $newPackageRate !== null
+                ? (float) $newPackageRate
+                : (float) $ipdPackage->package_rate;
 
-            $ipdPackage->update([
-                'package_rate' => round($packageRate, 2),
-                'discount_amount' => round($discountAmount, 2),
-                'gst_amount' => round($gstAmount, 2),
-                'final_amount' => round($finalAmount, 2),
-            ]);
+            $approval = $approvalPercentage !== false
+                ? $approvalPercentage
+                : $ipdPackage->approval_percentage;
+
+            if ($appliedDate !== false) {
+                $admissionDate = Carbon::parse($ipd->date)->format('Y-m-d');
+                if (Carbon::parse($appliedDate)->isBefore(Carbon::parse($admissionDate))) {
+                    throw new \Exception("Package cannot be applied before admission date ({$admissionDate})");
+                }
+            }
+
+            $calculated = $this->calculatePackageCharge(
+                $ipd,
+                $ipdPackage->package,
+                $packageRate,
+                $approval
+            );
+
+            $updates = [
+                'package_rate' => $calculated['package_rate'],
+                'approval_percentage' => $calculated['approval_percentage'],
+                'discount_percentage' => $calculated['discount_percentage'],
+                'discount_amount' => $calculated['discount_amount'],
+                'gst_amount' => $calculated['gst_amount'],
+                'final_amount' => $calculated['final_amount'],
+            ];
+
+            if ($appliedDate !== false) {
+                $updates['applied_date'] = $appliedDate;
+            }
+            if ($note !== false) {
+                $updates['note'] = $note;
+            }
+
+            $ipdPackage->update($updates);
 
             return [
                 'success' => true,
-                'message' => 'Package amount updated',
-                'data' => $ipdPackage->fresh(),
+                'message' => 'Package updated',
+                'data' => $ipdPackage->fresh(['package', 'appliedBy']),
             ];
         } catch (\Exception $e) {
             Log::error('Error updating package amount: ' . $e->getMessage(), [
@@ -276,9 +310,10 @@ class IpdPackageService
      * @param IpdDetail $ipd IPD patient record
      * @param Package $package Package to apply
      * @param float|null $rateOverride Optional custom package rate (overrides package master)
+     * @param float|null $approvalPercentage Manual approval % on contract rate (insurance packages only)
      * @return array Calculated charges array
      */
-    private function calculatePackageCharge($ipd, $package, $rateOverride = null)
+    private function calculatePackageCharge($ipd, $package, $rateOverride = null, $approvalPercentage = null)
     {
         if ($rateOverride !== null && $rateOverride !== '') {
             $packageRate = (float) $rateOverride;
@@ -288,9 +323,22 @@ class IpdPackageService
                 $ipd->bed_group_id ? (int) $ipd->bed_group_id : null
             );
         }
+
+        $storedApproval = null;
+        $chargeBase = $packageRate;
+
+        if ($this->allowsApprovalPercentage($ipd, $package)
+            && $approvalPercentage !== null
+            && $approvalPercentage !== '') {
+            $pct = (float) $approvalPercentage;
+            if ($pct >= 0 && $pct <= 100) {
+                $storedApproval = round($pct, 2);
+                $chargeBase = $packageRate * ($pct / 100);
+            }
+        }
         
         // Calculate discount percentage
-        // Priority: MOU Discount > Special Discount
+        // Priority: MOU Discount > Special Discount (applied after approval % when set)
         $discountPercentage = 0;
         $discountAmount = 0;
 
@@ -307,15 +355,15 @@ class IpdPackageService
             $discountPercentage = $ipd->special_discount;
         }
 
-        // Calculate discount amount
+        // Calculate discount amount on post-approval base
         if ($discountPercentage > 0) {
-            $discountAmount = ($packageRate * $discountPercentage) / 100;
+            $discountAmount = ($chargeBase * $discountPercentage) / 100;
         }
 
         // Amount after discount
-        $amountAfterDiscount = $packageRate - $discountAmount;
+        $amountAfterDiscount = $chargeBase - $discountAmount;
 
-        // Calculate GST if applicable
+        // Calculate GST if applicable (GST treatment on approval payable — pending client confirmation)
         $gstAmount = 0;
         if ($package->gst_amount && $package->gst_amount > 0) {
             $gstAmount = ($amountAfterDiscount * $package->gst_amount) / 100;
@@ -326,11 +374,24 @@ class IpdPackageService
 
         return [
             'package_rate' => round($packageRate, 2),
+            'approval_percentage' => $storedApproval,
             'discount_percentage' => round($discountPercentage, 2),
             'discount_amount' => round($discountAmount, 2),
             'gst_amount' => round($gstAmount, 2),
             'final_amount' => round($finalAmount, 2),
         ];
+    }
+
+    /**
+     * Approval % applies to insurance packages, or any package on insurance/TPA/cashless IPD.
+     */
+    private function allowsApprovalPercentage(IpdDetail $ipd, Package $package): bool
+    {
+        if ($package->isInsurance()) {
+            return true;
+        }
+
+        return (bool) ($ipd->insurance_company_id || $ipd->is_cashless || $ipd->organisation_id);
     }
 
     /**
@@ -375,6 +436,7 @@ class IpdPackageService
                 'package_name' => $ipdPackage->package->name,
                 'applied_date' => $ipdPackage->applied_date,
                 'package_rate' => $ipdPackage->package_rate,
+                'approval_percentage' => $ipdPackage->approval_percentage,
                 'discount_percentage' => $ipdPackage->discount_percentage,
                 'discount_amount' => $ipdPackage->discount_amount,
                 'gst_amount' => $ipdPackage->gst_amount,

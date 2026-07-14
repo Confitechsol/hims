@@ -105,6 +105,9 @@
                             <button type="button" id="exportEstimateBtn" class="btn btn-sm btn-outline-primary me-2">
                                 <i class="fas fa-file-pdf me-1"></i> Export Estimate Bill
                             </button>
+                            <button type="button" id="exportApprovalBtn" class="btn btn-sm btn-outline-info me-2" style="display:none;">
+                                <i class="fas fa-file-pdf me-1"></i> Export Approval Bill
+                            </button>
                             <button type="button" id="exportFinalBtn" class="btn btn-sm btn-outline-success">
                                 <i class="fas fa-file-pdf me-1"></i> Export Final Bill
                             </button>
@@ -337,6 +340,62 @@
                 });
             });
 
+            document.getElementById('exportApprovalBtn').addEventListener('click', function() {
+                var ipdId = document.getElementById('ipd_id').value;
+                if (!ipdId) {
+                    alert('Please select an IPD patient first');
+                    return;
+                }
+
+                fetch('{{ url("ipd/billing") }}/' + ipdId + '/check-approval')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.allowed) {
+                            promptApprovalBillExport(ipdId);
+                        } else {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Insurance Details Required',
+                                html: '<div style="text-align:left;"><p style="margin-bottom:10px;">' +
+                                    (data.message || 'Save TPA & Insurance on this IPD before exporting the approval bill.') +
+                                    '</p></div>',
+                                confirmButtonColor: '#750096',
+                                confirmButtonText: 'OK',
+                                width: '520px'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking approval bill:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Could not verify approval bill eligibility. Please try again.',
+                            confirmButtonColor: '#750096'
+                        });
+                    });
+            });
+
+            function promptApprovalBillExport(ipdId) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Show Original Amount?',
+                    text: 'Do you want to include the original package amount column on the approval bill?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    confirmButtonColor: '#750096',
+                    cancelButtonColor: '#6c757d',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-approval?show_original_amount=1', '_blank');
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-approval', '_blank');
+                    }
+                });
+            }
+
             document.getElementById('exportFinalBtn').addEventListener('click', function() {
                 var ipdId = document.getElementById('ipd_id').value;
                 if (!ipdId) {
@@ -389,6 +448,36 @@
                     .then(html => {
                         document.getElementById('breakupBillContent').innerHTML = html;
                         document.getElementById('breakupBillSection').style.display = 'block';
+                        const approvalBtn = document.getElementById('exportApprovalBtn');
+                        const inlineApprovalBtn = document.getElementById('exportApprovalBillBtn');
+                        const showApproval = html.indexOf('Insurance Approval Bill') !== -1;
+                        if (approvalBtn) {
+                            approvalBtn.style.display = showApproval ? 'inline-block' : 'none';
+                        }
+                        if (inlineApprovalBtn) {
+                            inlineApprovalBtn.addEventListener('click', function() {
+                                const targetIpdId = this.dataset.ipdId;
+                                fetch('{{ url("ipd/billing") }}/' + targetIpdId + '/check-approval')
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.allowed) {
+                                            promptApprovalBillExport(targetIpdId);
+                                        } else if (typeof Swal !== 'undefined') {
+                                            Swal.fire({
+                                                icon: 'info',
+                                                title: 'Insurance Details Required',
+                                                text: data.message || 'Save TPA & Insurance on this IPD first.',
+                                                confirmButtonColor: '#750096'
+                                            });
+                                        } else {
+                                            alert(data.message || 'Save TPA & Insurance on this IPD first.');
+                                        }
+                                    })
+                                    .catch(() => {
+                                        promptApprovalBillExport(targetIpdId);
+                                    });
+                            });
+                        }
                         initDiscountForm();
                     })
                     .catch(error => {
@@ -450,6 +539,9 @@
                     const formData = new FormData(form);
                     formData.set('mou_discount', form.mou_discount.value ? parseFloat(form.mou_discount.value) : 0);
                     formData.set('special_discount', form.special_discount.value ? parseFloat(form.special_discount.value) : 0);
+                    if (form.final_approval_amount) {
+                        formData.set('final_approval_amount', form.final_approval_amount.value ? parseFloat(form.final_approval_amount.value) : 0);
+                    }
                     fetch('{{ url("ipd/billing") }}/' + ipdId + '/discount', {
                         method: 'POST',
                         headers: {
@@ -481,6 +573,14 @@
                                 duePartyInput.placeholder = '₹ ' + suggestedDue.toFixed(2);
                             }
                             if (netBalanceEl) netBalanceEl.textContent = '₹ ' + (data.net_balance != null ? data.net_balance.toFixed(2) : (data.outstanding - (data.total_discount || 0) - (data.due_patient_party_amount || 0)).toFixed(2));
+                            const previewFinal = document.getElementById('previewFinalApproval');
+                            const previewBal = document.getElementById('previewInsuranceBalance');
+                            if (previewFinal && data.final_approval_amount != null) {
+                                previewFinal.textContent = '₹ ' + parseFloat(data.final_approval_amount || 0).toFixed(2);
+                            }
+                            if (previewBal && data.balance_amount != null) {
+                                previewBal.textContent = '₹ ' + parseFloat(data.balance_amount || 0).toFixed(2);
+                            }
                         } else {
                             msgEl.className = 'mt-2 small text-danger';
                             msgEl.textContent = data.message || 'Failed to save discount.';

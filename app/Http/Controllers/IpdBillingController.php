@@ -15,7 +15,9 @@ use App\Models\DischargeCard;
 use App\Models\PatientBedHistory;
 use App\Models\BedGroup;
 use App\Models\Doctor;
+use App\Services\InsuranceDischargeBedChargeService;
 use App\Services\IpdPackageService;
+use App\Services\InsuranceFinalBillSummaryService;
 use App\Support\BedBillingPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -90,7 +92,7 @@ class IpdBillingController extends Controller
      */
     public function breakup($ipdId)
     {
-        $ipd = IpdDetail::with(['patient', 'doctor', 'bedGroup', 'bedDetail', 'duePatientPartyDoctor'])
+        $ipd = IpdDetail::with(['patient', 'doctor', 'bedGroup', 'bedDetail', 'duePatientPartyDoctor', 'organisation', 'insuranceCompany'])
             ->findOrFail($ipdId);
 
         $doctors = Doctor::orderBy('name')->get(['id', 'name', 'surname']);
@@ -108,10 +110,30 @@ class IpdBillingController extends Controller
         $breakup['due_patient_party_amount'] = $duePatientPartyAmount;
         $breakup['net_balance'] = $netBalance;
 
+        $isInsuranceIpd = $ipd->isInsuranceBilling();
+        $grandTotal = (float) ($breakup['total_charges'] ?? 0);
+        $mouDiscountAmount = (float) ($ipd->mou_discount ?? 0);
+        $initialApprovalAmount = (float) ($ipd->initial_approval_amount ?? 0);
+        $finalApprovalAmount = (float) ($ipd->final_approval_amount ?? 0);
+        $requestFurtherApproval = max(0, $grandTotal - $mouDiscountAmount - $initialApprovalAmount);
+        $insuranceBalanceAmount = max(0, $grandTotal - $finalApprovalAmount);
+
         // Get detailed date-wise breakdown with same boundary as summary.
         $detailedBreakup = $this->getDetailedBreakup($ipdId, $ipd, $endDate);
 
-        return view('admin.billing.ipd_breakup', compact('ipd', 'breakup', 'detailedBreakup', 'doctors'));
+        return view('admin.billing.ipd_breakup', compact(
+            'ipd',
+            'breakup',
+            'detailedBreakup',
+            'doctors',
+            'isInsuranceIpd',
+            'grandTotal',
+            'mouDiscountAmount',
+            'initialApprovalAmount',
+            'finalApprovalAmount',
+            'insuranceBalanceAmount',
+            'requestFurtherApproval'
+        ));
     }
 
     /**
@@ -123,11 +145,17 @@ class IpdBillingController extends Controller
         $request->validate([
             'mou_discount' => 'nullable|numeric|min:0',
             'special_discount' => 'nullable|numeric|min:0',
+            'final_approval_amount' => 'nullable|numeric|min:0',
         ]);
 
         $ipd = IpdDetail::findOrFail($ipdId);
         $ipd->mou_discount = (float) ($request->input('mou_discount') ?? 0);
         $ipd->special_discount = (float) ($request->input('special_discount') ?? 0);
+        if ($request->exists('final_approval_amount')) {
+            $ipd->final_approval_amount = $request->filled('final_approval_amount')
+                ? (float) $request->input('final_approval_amount')
+                : null;
+        }
         $ipd->save();
 
         $totalDiscount = $ipd->mou_discount + $ipd->special_discount;
@@ -137,17 +165,22 @@ class IpdBillingController extends Controller
         $outstanding = $breakup['outstanding'] ?? 0;
         $outstandingAfterDiscount = max(0, $outstanding - $totalDiscount);
         $netBalance = max(0, $outstanding - $totalDiscount - $duePatientPartyAmount);
+        $approvalAmount = (float) ($ipd->final_approval_amount ?? 0);
+        $balanceAmount = max(0, (float) ($breakup['total_charges'] ?? 0) - $approvalAmount);
 
         return response()->json([
             'success' => true,
             'message' => 'Discount saved. It will apply to the final bill only.',
             'mou_discount' => $ipd->mou_discount,
             'special_discount' => $ipd->special_discount,
+            'final_approval_amount' => $ipd->final_approval_amount,
             'total_discount' => $totalDiscount,
             'due_patient_party_amount' => $duePatientPartyAmount,
             'outstanding' => $outstanding,
             'outstanding_after_discount' => $outstandingAfterDiscount,
             'net_balance' => $netBalance,
+            'balance_amount' => $balanceAmount,
+            'due_on_account' => $approvalAmount,
         ]);
     }
 
@@ -201,15 +234,27 @@ class IpdBillingController extends Controller
 
         $admissionAt = Carbon::parse($ipd->date);
         // For non-discharged preview/breakup, calculate up to current moment.
-        // Date-only end values are treated as end-of-day; datetime values are respected.
+        // Date-only end values use discharge card time when available (insurance discharge-day rule).
         if ($endDate === null) {
-            $endAt = Carbon::now();
+            $endAt = ($ipd->discharged ?? 'no') === 'yes'
+                ? ($this->resolveDischargeDateTimeForIpd($ipd) ?? Carbon::now())
+                : Carbon::now();
         } else {
             $rawEnd = trim((string) $endDate);
-            $endAt = preg_match('/^\d{4}-\d{2}-\d{2}$/', $rawEnd)
-                ? Carbon::parse($rawEnd)->endOfDay()
-                : Carbon::parse($rawEnd);
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $rawEnd)) {
+                $dischargeAt = $this->resolveDischargeDateTimeForIpd($ipd);
+                if ($dischargeAt && $dischargeAt->format('Y-m-d') === $rawEnd) {
+                    $endAt = $dischargeAt;
+                } else {
+                    $endAt = Carbon::parse($rawEnd)->endOfDay();
+                }
+            } else {
+                $endAt = Carbon::parse($rawEnd);
+            }
         }
+
+        $insuranceDischargeBedService = app(InsuranceDischargeBedChargeService::class);
+        $skipInsuranceDischargeChargeDate = $insuranceDischargeBedService->dischargeChargeDateToExclude($ipd, $endAt);
 
         // Get all bed history records for this IPD (primary source)
         $bedHistories = PatientBedHistory::where('ipd_id', $ipdId)
@@ -269,6 +314,12 @@ class IpdBillingController extends Controller
         // We also clamp by actual discharge datetime so final bill does not over-count.
         while ($currentDate->lte($lastChargeDay)) {
             $chargeDate = $currentDate->format('Y-m-d');
+
+            // Insurance IPD: skip discharge-day bed charge unless discharge is at/after 3 PM.
+            if ($skipInsuranceDischargeChargeDate !== null && $chargeDate === $skipInsuranceDischargeChargeDate) {
+                $currentDate->addDay();
+                continue;
+            }
 
             [$periodStart, $periodEnd] = BedBillingPeriod::windowForChargeCalendarDay($currentDate->copy()->startOfDay());
 
@@ -593,6 +644,14 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * Discharge datetime for billing (prefers discharge card date + time).
+     */
+    private function resolveDischargeDateTimeForIpd(IpdDetail $ipd): ?Carbon
+    {
+        return app(InsuranceDischargeBedChargeService::class)->resolveDischargeAt($ipd);
+    }
+
+    /**
      * Determine charge-label day (Y-m-d @ 00:00) for a moment.
      * If the moment is after boundary time, it belongs to the next label day.
      */
@@ -783,21 +842,8 @@ class IpdBillingController extends Controller
                 });
         }
 
-        // Package Charges Details
-        $packageDetails = IpdPackage::where('ipd_id', $ipdId)
-            ->where('status', 'applied')
-            ->with('package')
-            ->orderBy('applied_date', 'asc')
-            ->get()
-            ->map(function($ipdPackage) {
-                return [
-                    'date' => $ipdPackage->applied_date,
-                    'package_name' => $ipdPackage->package->name ?? 'N/A',
-                    'amount' => $ipdPackage->final_amount ?? 0,
-                    'type' => 'package',
-                    'description' => 'Package - ' . ($ipdPackage->package->name ?? 'N/A'),
-                ];
-            });
+        // Package Charges Details (ordered by approval % descending for procedure sequence)
+        $packageDetails = $this->buildPackageDetailsForBillDisplay($ipdId);
 
         // Combine all charges and sort by date
         $allCharges = collect()
@@ -825,6 +871,62 @@ class IpdBillingController extends Controller
             'doctor_visit_charges' => $doctorVisitDetails,
             'package_charges' => $packageDetails,
         ];
+    }
+
+    /**
+     * Applied packages for bill PDFs: ordered 100% → lower %, with procedure labels.
+     */
+    private function buildPackageDetailsForBillDisplay(int $ipdId): \Illuminate\Support\Collection
+    {
+        $packages = IpdPackage::where('ipd_id', $ipdId)
+            ->where('status', 'applied')
+            ->with('package')
+            ->orderByRaw('COALESCE(approval_percentage, 0) DESC')
+            ->orderBy('applied_date', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        return $packages->values()->map(function ($ipdPackage, $index) {
+            $name = $ipdPackage->package->name ?? 'N/A';
+            $pctLabel = $this->formatApprovalPercentageLabel($ipdPackage->approval_percentage);
+            $packageNameDisplay = trim($name . ($pctLabel !== '' ? ' ' . $pctLabel : ''));
+
+            return [
+                'date' => $ipdPackage->applied_date,
+                'procedure_label' => $this->ordinalProcedureLabel($index + 1),
+                'package_name' => $name,
+                'package_name_display' => $packageNameDisplay,
+                'approval_percentage' => $ipdPackage->approval_percentage,
+                'amount' => $ipdPackage->final_amount ?? 0,
+                'original_amount' => $ipdPackage->package_rate ?? 0,
+                'type' => 'package',
+                'description' => 'Package - ' . $packageNameDisplay,
+            ];
+        });
+    }
+
+    private function ordinalProcedureLabel(int $position): string
+    {
+        $suffix = match (true) {
+            ($position % 100) >= 11 && ($position % 100) <= 13 => 'th',
+            $position % 10 === 1 => 'st',
+            $position % 10 === 2 => 'nd',
+            $position % 10 === 3 => 'rd',
+            default => 'th',
+        };
+
+        return $position . $suffix . ' Procedure';
+    }
+
+    private function formatApprovalPercentageLabel($percentage): string
+    {
+        if ($percentage === null || $percentage === '') {
+            return '';
+        }
+
+        $formatted = rtrim(rtrim(number_format((float) $percentage, 2, '.', ''), '0'), '.');
+
+        return '(' . $formatted . '%)';
     }
 
     /**
@@ -1444,16 +1546,24 @@ class IpdBillingController extends Controller
     public function exportEstimate($ipdId, Request $request)
     {
         try {
-             $logged_user = auth()->user()->username ?? '';  
+             $logged_user = auth()->user()->username ?? '';
+            $isApprovalBill = $request->query('bill_type') === 'approval';
             $viewMode = strtolower((string) $request->query('view_mode', 'detailed'));
+            if ($isApprovalBill) {
+                $viewMode = 'detailed';
+            }
             if (!in_array($viewMode, ['brief', 'detailed'], true)) {
                 $viewMode = 'detailed';
             }
 
-            \Log::info('exportEstimate started', ['ipd_id' => $ipdId]);
+            \Log::info('exportEstimate started', ['ipd_id' => $ipdId, 'bill_type' => $isApprovalBill ? 'approval' : 'estimate']);
             
-            $ipd = IpdDetail::with(['patient.organisation', 'doctor', 'bedGroup', 'bedDetail'])
+            $ipd = IpdDetail::with(['patient.organisation', 'doctor', 'bedGroup', 'bedDetail', 'organisation', 'insuranceCompany'])
                 ->findOrFail($ipdId);
+
+            if ($isApprovalBill && ! $ipd->isInsuranceBilling()) {
+                abort(400, 'Insurance approval bill is only available for insurance / TPA / cashless IPD admissions.');
+            }
             
             \Log::info('IPD found', ['ipd_no' => $ipd->ipd_no]);
 
@@ -1577,19 +1687,9 @@ class IpdBillingController extends Controller
             $doctorVisitGroupedForDisplay = $this->groupDoctorVisitsForDisplay($doctorVisitDetails);
             $doctorVisitGroupedByVisitType = $this->groupDoctorVisitsByVisitTypeForDisplay($doctorVisitGroupedForDisplay);
 
-            // Package details (applied packages) for estimate PDF
-            $packageDetails = IpdPackage::where('ipd_id', $ipdId)
-                ->where('status', 'applied')
-                ->with('package')
-                ->orderBy('applied_date', 'asc')
-                ->get()
-                ->map(function ($ipdPackage) {
-                    return [
-                        'date' => $ipdPackage->applied_date,
-                        'package_name' => $ipdPackage->package->name ?? 'N/A',
-                        'amount' => $ipdPackage->final_amount ?? 0,
-                    ];
-                });
+            // Package details (applied packages) for estimate / approval PDF
+            $packageDetails = $this->buildPackageDetailsForBillDisplay($ipdId);
+            $showOriginalAmount = $isApprovalBill && $request->boolean('show_original_amount');
             
             // Get payment details
             \Log::info('Getting payment details');
@@ -1692,6 +1792,22 @@ class IpdBillingController extends Controller
             
             // Get hospital information
             $hospital = Hospital::first();
+
+            $billHeading = $isApprovalBill ? 'FINAL BILL (FOR APPROVAL)' : 'ESTIMATE COPY';
+            $showInsuranceSection = $isApprovalBill;
+            $grandTotal = (float) ($breakup['total_charges'] ?? 0);
+            $totalAdvance = (float) ($breakup['total_payments'] ?? 0);
+            $mouDiscountAmount = (float) ($ipd->mou_discount ?? 0);
+            $initialApprovalAmount = (float) ($ipd->initial_approval_amount ?? 0);
+            $requestFurtherApproval = max(0, $grandTotal - $mouDiscountAmount - $initialApprovalAmount);
+            $requestFurtherApprovalInWords = 'Zero Rupees Only';
+            try {
+                if (class_exists(\App\Helpers\NumberToWords::class)) {
+                    $requestFurtherApprovalInWords = \App\Helpers\NumberToWords::convert($requestFurtherApproval);
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Could not convert request further approval to words: ' . $e->getMessage());
+            }
                     
             
             // First pass: Render to get accurate page count
@@ -1701,7 +1817,9 @@ class IpdBillingController extends Controller
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise', 'investigationBrief', 'viewMode',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
-                'hospital', 'logged_user'
+                'hospital', 'logged_user', 'billHeading', 'isApprovalBill', 'showInsuranceSection', 'showOriginalAmount',
+                'grandTotal', 'totalAdvance', 'mouDiscountAmount', 'initialApprovalAmount',
+                'requestFurtherApproval', 'requestFurtherApprovalInWords'
             ));
             
             $tempPdf->setOption('enable-php', false); // Disable PHP for first pass
@@ -1742,7 +1860,10 @@ class IpdBillingController extends Controller
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise', 'investigationBrief', 'viewMode',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
-                'hospital', 'totalPages', 'gstChargesGrouped', 'logged_user'
+                'hospital', 'totalPages', 'gstChargesGrouped', 'logged_user',
+                'billHeading', 'isApprovalBill', 'showInsuranceSection', 'showOriginalAmount',
+                'grandTotal', 'totalAdvance', 'mouDiscountAmount', 'initialApprovalAmount',
+                'requestFurtherApproval', 'requestFurtherApprovalInWords'
             ));
             
             // Enable PHP scripts for page numbering
@@ -1753,8 +1874,13 @@ class IpdBillingController extends Controller
             
             \Log::info('PDF generated, returning inline stream');
 
-            // Open in browser tab (inline) instead of forcing download
-            return $pdf->stream('IPD_Estimate_Bill_' . $ipd->ipd_no . '.pdf');
+            $filename = $isApprovalBill
+                ? 'IPD_Approval_Bill_' . $ipd->ipd_no . '.pdf'
+                : 'IPD_Estimate_Bill_' . $ipd->ipd_no . '.pdf';
+
+            return $pdf->stream($filename);
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e) {
+            throw $e;
         } catch (\Exception $e) {
             \Log::error('Error in exportEstimate: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -1765,6 +1891,53 @@ class IpdBillingController extends Controller
             
             // Return error response
             abort(500, 'Error generating PDF: ' . $e->getMessage() . ' (Check logs for details)');
+        }
+    }
+
+    /**
+     * Export Insurance Approval Bill PDF (same layout as estimate + insurance section + approval summary).
+     */
+    public function exportApprovalBill($ipdId, Request $request)
+    {
+        $ipd = IpdDetail::findOrFail($ipdId);
+
+        if (! $ipd->isInsuranceBilling()) {
+            abort(400, 'This IPD has no TPA / insurance details saved. Open Edit IPD, complete the TPA & Insurance section, save, then export the approval bill again.');
+        }
+
+        $request->query->set('bill_type', 'approval');
+        $request->query->set('view_mode', 'detailed');
+
+        return $this->exportEstimate($ipdId, $request);
+    }
+
+    /**
+     * Check if approval bill can be exported (insurance / TPA / cashless admission).
+     */
+    public function checkApprovalBill($ipdId)
+    {
+        try {
+            $ipd = IpdDetail::with('patient.organisation')->findOrFail($ipdId);
+            $allowed = $ipd->isInsuranceBilling();
+
+            $message = 'Approval bill can be exported.';
+            if (! $allowed) {
+                if ($ipd->patient && $ipd->patient->organisation_id) {
+                    $message = 'TPA is set on the patient profile (' . ($ipd->patient->organisation->organisation_name ?? 'patient TPA') . ') but not saved on this IPD admission. Open Edit IPD → TPA & Insurance, confirm details, click Save, then export again.';
+                } else {
+                    $message = 'Save TPA & Insurance on this IPD (Edit IPD → TPA & Insurance → Save) before exporting the approval bill.';
+                }
+            }
+
+            return response()->json([
+                'allowed' => $allowed,
+                'message' => $message,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'allowed' => false,
+                'message' => 'Error checking approval bill: ' . $e->getMessage(),
+            ], 500);
         }
     }
 
@@ -1866,8 +2039,15 @@ class IpdBillingController extends Controller
 
             \Log::info('exportFinal started', ['ipd_id' => $ipdId]);
             
-            $ipd = IpdDetail::with(['patient.organisation', 'doctor', 'bedGroup', 'bedDetail', 'duePatientPartyDoctor'])
-                ->findOrFail($ipdId);
+            $ipd = IpdDetail::with([
+                'patient.organisation',
+                'doctor',
+                'bedGroup',
+                'bedDetail',
+                'duePatientPartyDoctor',
+                'organisation',
+                'insuranceCompany',
+            ])->findOrFail($ipdId);
             
             \Log::info('IPD found', ['ipd_no' => $ipd->ipd_no, 'discharged' => $ipd->discharged]);
 
@@ -1891,9 +2071,9 @@ class IpdBillingController extends Controller
             
             $dischargeDate = $dischargeCard->discharge_date;
             $dischargeTime = $dischargeCard->discharge_time;
-            $billingEndAt = !empty($dischargeTime)
-                ? Carbon::parse($dischargeDate . ' ' . $dischargeTime)->format('Y-m-d H:i:s')
-                : Carbon::parse($dischargeDate)->endOfDay()->format('Y-m-d H:i:s');
+            $dischargeAt = $this->resolveDischargeDateTimeForIpd($ipd)
+                ?? Carbon::parse($dischargeDate);
+            $billingEndAt = $dischargeAt->format('Y-m-d H:i:s');
             
             \Log::info('Discharge information retrieved', [
                 'discharge_date' => $dischargeDate,
@@ -1966,18 +2146,20 @@ class IpdBillingController extends Controller
             $doctorVisitGroupedByVisitType = $this->groupDoctorVisitsByVisitTypeForDisplay($doctorVisitGroupedForDisplay);
 
             // Package details (applied packages) for final bill PDF
-            $packageDetails = IpdPackage::where('ipd_id', $ipdId)
-                ->where('status', 'applied')
-                ->with('package')
-                ->orderBy('applied_date', 'asc')
-                ->get()
-                ->map(function ($ipdPackage) {
-                    return [
-                        'date' => $ipdPackage->applied_date,
-                        'package_name' => $ipdPackage->package->name ?? 'N/A',
-                        'amount' => $ipdPackage->final_amount ?? 0,
-                    ];
-                });
+            $packageDetails = $this->buildPackageDetailsForBillDisplay($ipdId);
+            $showOriginalAmount = false;
+
+            $isInsuranceFinalBill = $ipd->isInsuranceBilling();
+            $hasPackageCharges = $packageDetails->count() > 0;
+            $insuranceSummaryService = app(InsuranceFinalBillSummaryService::class);
+
+            // Package insurance final: show package + medicines/implants excluded from package
+            $excludedMedicineImplantCharges = collect();
+            if ($isInsuranceFinalBill && $hasPackageCharges) {
+                $excludedMedicineImplantCharges = $ipdChargesDetails
+                    ->filter(fn ($charge) => $insuranceSummaryService->isMedicineOrImplantCharge($charge))
+                    ->values();
+            }
 
             // Get hospital information
             $hospital = Hospital::first();
@@ -2002,11 +2184,34 @@ class IpdBillingController extends Controller
             // Due on account of patient party (under doctor) — deducted from balance
             $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
 
-            // Calculate balance
+            // Calculate balance (cash / internal final bill)
             $grandTotal = $breakup['total_charges'];
             $totalAdvance = $breakup['total_payments'];
             $balance = $grandTotal - $totalAdvance - $discount - $duePatientPartyAmount;
             $balance = max(0, $balance);
+
+            // Insurance final settlement (manual Approval Amount after insurer response)
+            $insuranceFinalSummary = null;
+            $dueOnAccountInWords = 'Zero Rupees Only';
+            $useInsurancePackageLayout = false;
+            if ($isInsuranceFinalBill) {
+                $summaryBreakup = $breakup;
+                if ($hasPackageCharges) {
+                    $useInsurancePackageLayout = true;
+                    // Visible lines only: package + excluded medicines/implants (no bed GST on packages)
+                    $packageTotal = (float) ($breakup['package_charges'] ?? 0);
+                    $excludedTotal = (float) $excludedMedicineImplantCharges->sum('net_amount');
+                    $summaryBreakup['total_charges'] = round($packageTotal + $excludedTotal, 2);
+                }
+                $insuranceFinalSummary = $insuranceSummaryService->build($ipd, $summaryBreakup, $payments);
+                try {
+                    if (class_exists(\App\Helpers\NumberToWords::class)) {
+                        $dueOnAccountInWords = \App\Helpers\NumberToWords::convert($insuranceFinalSummary['due_on_account']);
+                    }
+                } catch (\Throwable $e) {
+                    \Log::warning('Could not convert due-on-account to words: ' . $e->getMessage());
+                }
+            }
 
             // Convert amounts to words
             $grandTotalInWords = 'Zero Rupees Only';
@@ -2181,7 +2386,9 @@ class IpdBillingController extends Controller
                 'surgeonCharges', 'anesthesiaCharges', 'investigationCharges', 'totalPages',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise', 'doctorVisitGroupedForDisplay', 'doctorVisitGroupedByVisitType',
-                'gstChargesGrouped', 'logged_user'
+                'gstChargesGrouped', 'logged_user', 'showOriginalAmount',
+                'isInsuranceFinalBill', 'useInsurancePackageLayout', 'excludedMedicineImplantCharges',
+                'insuranceFinalSummary', 'dueOnAccountInWords'
             ));
             
             \Log::info('PDF view loaded, setting options');

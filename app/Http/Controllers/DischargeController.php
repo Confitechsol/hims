@@ -8,6 +8,7 @@ use App\Models\Doctor;
 use App\Models\IpdDetail;
 use App\Models\Patient;
 use App\Models\PatientBedHistory;
+use App\Services\DaywiseBedChargeService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -263,7 +264,7 @@ class DischargeController extends Controller
             ]);
 
             // -------------------------------
-            // 🔹 Mark Discharge as Draft in IPD
+            // 🔹 Draft: same as cash — save card only, do NOT close bed or finalise bed charges
             // -------------------------------
             if ($validated['isDraft'] === "true") {
                 IpdDetail::where('id', $validated['ipd_details_id'])
@@ -272,26 +273,28 @@ class DischargeController extends Controller
                 DB::commit();
                 return redirect()
                     ->back()
-                    ->with('success', 'Discharge details saved as draft.');
+                    ->with('success', 'Discharge details saved as draft. Bed charges will be decided on Final Discharge using discharge time.');
             }
 
             // -------------------------------
-            // 🔹 Close bed history & release bed(s) (same pattern as IPD bed transfer)
+            // 🔹 Final Discharge: close bed history, then apply discharge-time bed charge rule
+            //    Insurance: discharge-day bed charge only if final discharge time >= 3:00 PM
+            //    Cash: normal boundary (11:00) using final discharge datetime
             // -------------------------------
             $dischargeAt = $this->parseDischargeDateTimeForBedHistory(
                 $validated['discharge_date'] ?? null,
-                $validated['discharge_time'] ?? null
+                $validated['discharge_time'] ?? null,
+                (int) $validated['ipd_details_id']
             );
             $this->releaseBedsAndCloseHistory((int) $validated['ipd_details_id'], $dischargeAt);
 
-            // -------------------------------
-            // 🔹 Mark IPD as Discharged
-            // -------------------------------
             IpdDetail::where('id', $validated['ipd_details_id'])
                 ->update([
                     'discharged'      => 'yes',
                     'discharged_date' => $validated['discharge_date'],
                 ]);
+
+            $this->syncBedChargesOnFinalDischarge((int) $validated['ipd_details_id'], $dischargeAt);
 
             DB::commit();
 
@@ -546,7 +549,8 @@ class DischargeController extends Controller
             $discharge      = DischargeCard::findOrFail($id);
             $oldDischargeAt = $this->parseDischargeDateTimeForBedHistory(
                 $this->dischargeDateToString($discharge->discharge_date),
-                $discharge->discharge_time
+                $discharge->discharge_time,
+                (int) ($validated['ipd_details_id'] ?? $discharge->ipd_details_id)
             );
             // dd($discharge);
             $discharge->update([
@@ -617,36 +621,49 @@ class DischargeController extends Controller
             ]);
 
             // -------------------------------
-            // 🔹 Mark Discharge as Draft in IPD
+            // 🔹 Final Discharge from Draft/Edit (same as cash): close bed + apply discharge-time bed charge
             // -------------------------------
             if ($validated['is_draft'] == "false") {
+                $newDischargeAt = $this->parseDischargeDateTimeForBedHistory(
+                    $validated['discharge_date'],
+                    $validated['discharge_time'] ?? null,
+                    (int) $validated['ipd_details_id']
+                );
+
+                $ipd = IpdDetail::find((int) $validated['ipd_details_id']);
+                $wasAlreadyFinal = $ipd && ($ipd->discharged ?? 'no') === 'yes';
+
+                if ($wasAlreadyFinal) {
+                    $this->syncBedHistoryToDateOnDischargeEdit(
+                        (int) $validated['ipd_details_id'],
+                        $oldDischargeAt,
+                        $newDischargeAt
+                    );
+                } else {
+                    // Coming from draft → final: close active bed(s) at final discharge time
+                    $this->releaseBedsAndCloseHistory((int) $validated['ipd_details_id'], $newDischargeAt);
+                }
+
                 IpdDetail::where('id', $validated['ipd_details_id'])
                     ->update(['discharged' => 'yes', 'discharged_date' => $validated['discharge_date']]);
+
+                $this->syncBedChargesOnFinalDischarge((int) $validated['ipd_details_id'], $newDischargeAt);
 
                 DB::commit();
                 return redirect()
                     ->route('ipd', ['tab' => 'discharge'])
-                    ->with('success', 'Patient discharged successfully.');
+                    ->with('success', 'Patient discharged successfully. Bed charge applied based on final discharge time.');
             }
 
-            $newDischargeAt = $this->parseDischargeDateTimeForBedHistory(
-                $validated['discharge_date'],
-                $validated['discharge_time'] ?? null
-            );
-            $this->syncBedHistoryToDateOnDischargeEdit(
-                (int) $validated['ipd_details_id'],
-                $oldDischargeAt,
-                $newDischargeAt
-            );
-
+            // Still draft — keep beds open; no final bed-charge decision yet
             IpdDetail::where('id', $validated['ipd_details_id'])
-                ->update(['discharged_date' => $validated['discharge_date']]);
+                ->update(['discharged' => 'draft', 'discharged_date' => $validated['discharge_date']]);
 
             DB::commit();
 
             return redirect()
                 ->route('ipd', ['tab' => 'discharge'])
-                ->with('success', 'Discharge Updated successfully.');
+                ->with('success', 'Discharge draft updated. Finalise discharge to apply bed charges as per discharge time.');
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error($e);
@@ -674,22 +691,68 @@ class DischargeController extends Controller
 
     /**
      * Single datetime for bed history end / release, aligned with discharge card.
+     * Insurance without time → start of day (exclude discharge-day bed until known late time).
+     * Cash without time → end of day (existing behaviour).
      */
-    private function parseDischargeDateTimeForBedHistory(?string $dischargeDate, $dischargeTime): Carbon
+    private function parseDischargeDateTimeForBedHistory(?string $dischargeDate, $dischargeTime, ?int $ipdDetailsId = null): Carbon
     {
         $dischargeDate = $dischargeDate !== null ? trim($dischargeDate) : '';
         if ($dischargeDate === '') {
             return Carbon::now();
         }
         $timeStr = $dischargeTime !== null ? trim((string) $dischargeTime) : '';
-        if ($timeStr === '') {
-            return Carbon::parse($dischargeDate)->endOfDay();
+        if ($timeStr !== '') {
+            try {
+                return Carbon::parse($dischargeDate . ' ' . $timeStr);
+            } catch (\Throwable $e) {
+                // fall through
+            }
         }
-        try {
-            return Carbon::parse($dischargeDate . ' ' . $timeStr);
-        } catch (\Throwable $e) {
-            return Carbon::parse($dischargeDate)->endOfDay();
+
+        $ipd = $ipdDetailsId ? IpdDetail::find($ipdDetailsId) : null;
+        if ($ipd && $ipd->isInsuranceBilling()) {
+            return Carbon::parse($dischargeDate)->startOfDay();
         }
+
+        return Carbon::parse($dischargeDate)->endOfDay();
+    }
+
+    /**
+     * After final discharge: sync stored daywise bed charges through the final discharge datetime.
+     * Insurance: discharge-day charge included only if time >= 3:00 PM.
+     * Cash: normal billing boundary using discharge datetime.
+     */
+    private function syncBedChargesOnFinalDischarge(int $ipdDetailsId, Carbon $dischargeAt): void
+    {
+        $ipd = IpdDetail::find($ipdDetailsId);
+        if (! $ipd) {
+            return;
+        }
+
+        $history = PatientBedHistory::with('bedGroup')
+            ->where('ipd_id', $ipdDetailsId)
+            ->orderByDesc('from_date')
+            ->orderByDesc('id')
+            ->first();
+
+        if (! $history || ! $history->bed_group_id || ! $history->bed_id) {
+            return;
+        }
+
+        $fromDate = Carbon::parse($history->from_date);
+        $bedChargeRate = (float) ($history->bedGroup->bed_cost ?? 0);
+        if ($bedChargeRate <= 0) {
+            return;
+        }
+
+        app(DaywiseBedChargeService::class)->syncStoredChargesForBedSegment(
+            $ipd->fresh(),
+            $bedChargeRate,
+            (int) $history->bed_group_id,
+            (int) $history->bed_id,
+            $fromDate,
+            $dischargeAt
+        );
     }
 
     /**

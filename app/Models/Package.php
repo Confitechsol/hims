@@ -49,7 +49,8 @@ class Package extends Model
 
     public function isInsurance(): bool
     {
-        return $this->package_type === self::TYPE_INSURANCE;
+        return $this->package_type === self::TYPE_INSURANCE
+            || ! empty($this->insurance_company_id);
     }
 
     public function charges()
@@ -108,20 +109,43 @@ class Package extends Model
 
     public function scopeForInsuranceContext($query, ?int $insuranceCompanyId, ?int $panelId = null)
     {
-        return $query->where(function ($q) use ($insuranceCompanyId, $panelId) {
+        $panelIds = collect();
+
+        if ($panelId) {
+            $panelIds = collect([(int) $panelId]);
+        } elseif ($insuranceCompanyId) {
+            $panelIds = \Illuminate\Support\Facades\DB::table('insurance_company_panel')
+                ->where('insurance_company_id', (int) $insuranceCompanyId)
+                ->pluck('insurance_rate_panel_id');
+        }
+
+        return $query->where(function ($q) use ($insuranceCompanyId, $panelIds) {
             $q->where('package_type', self::TYPE_HOSPITAL);
 
-            if ($insuranceCompanyId || $panelId) {
-                $q->orWhere(function ($ins) use ($insuranceCompanyId, $panelId) {
+            if ($insuranceCompanyId || $panelIds->isNotEmpty()) {
+                $q->orWhere(function ($ins) use ($insuranceCompanyId, $panelIds) {
                     $ins->where('package_type', self::TYPE_INSURANCE);
 
-                    if ($panelId) {
-                        $ins->where('insurance_rate_panel_id', $panelId);
+                    if ($panelIds->isNotEmpty()) {
+                        $ins->where(function ($panelQ) use ($insuranceCompanyId, $panelIds) {
+                            $panelQ->whereIn('insurance_rate_panel_id', $panelIds);
+                            if ($insuranceCompanyId) {
+                                $panelQ->orWhere('insurance_company_id', (int) $insuranceCompanyId);
+                            }
+                        });
                     } elseif ($insuranceCompanyId) {
-                        $ins->where('insurance_company_id', $insuranceCompanyId);
+                        $ins->where('insurance_company_id', (int) $insuranceCompanyId);
                     }
                 });
             }
         });
+    }
+
+    /**
+     * IPD admission: insurance package rates apply when an insurer is selected (independent of TPA).
+     */
+    public static function resolveIpdInsurancePackageContext(?int $organisationId, ?int $insuranceCompanyId): ?int
+    {
+        return $insuranceCompanyId ? (int) $insuranceCompanyId : null;
     }
 }

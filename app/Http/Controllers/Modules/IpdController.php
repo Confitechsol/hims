@@ -16,9 +16,11 @@ use App\Models\IpdMedicine;
 use App\Models\IpdPatient;
 use App\Models\IpdPrescription;
 use App\Models\IpdPrescriptionTest;
+use App\Models\InsuranceCompany;
 use App\Models\MedicationReport;
 use App\Models\NurseNote;
 use App\Models\OperationTheatre;
+use App\Models\Organisation;
 use App\Models\Package;
 use App\Models\Pathology;
 use App\Models\PathologyBilling;
@@ -35,6 +37,7 @@ use App\Models\SymptomsClassification;
 use App\Services\BedOccupancyService;
 use App\Services\DaywiseBedChargeService;
 use App\Services\IpdPackageService;
+use App\Services\PackageDropdownService;
 use App\Services\PmsBridgeService;
 use Carbon\Carbon;
 use Exception;
@@ -139,9 +142,12 @@ class IpdController extends Controller
             // dd($ipd);
         }
 
+        $tpas = Organisation::orderBy('organisation_name')->get(['id', 'organisation_name', 'code']);
+        $insuranceCompanies = InsuranceCompany::orderBy('name')->get(['id', 'name', 'code']);
+
         // Return view with paginated data
         return view("admin.ipd.index", compact(
-            'ipd', 'doctors', 'isIpdTab', 'bedGroups', 'references'
+            'ipd', 'doctors', 'isIpdTab', 'bedGroups', 'references', 'tpas', 'insuranceCompanies'
         ));
     }
 
@@ -172,7 +178,14 @@ class IpdController extends Controller
             'symptoms_title.*'     => 'string',
             'symptoms_description' => 'nullable|string',
             'note'                 => 'nullable|string',
-            'apply_tpa'            => 'nullable|string|max:10',
+            'organisation_id'          => 'nullable|exists:organisation,id',
+            'insurance_company_id'     => 'nullable|exists:insurance_companies,id',
+            'is_cashless'              => 'nullable|boolean',
+            'insurance_policy_no'      => 'nullable|string|max:100',
+            'insurance_card_no'        => 'nullable|string|max:100',
+            'ccn_no'                   => 'nullable|string|max:100',
+            'initial_approval_amount'  => 'nullable|numeric|min:0',
+            'final_approval_amount'    => 'nullable|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -209,7 +222,7 @@ class IpdController extends Controller
             // 🔹 Create IPD record
             $ipd        = new IpdDetail();
             $ipdPatient = new IpdPatient();
-            $hasBed     = ! empty($request->bed_group) && ! empty($request->bed_number);
+            $hasBed     = $request->filled('bed_group') && $request->filled('bed_number');
             $bedHistory = new PatientBedHistory();
             // dd($opd);
             $ipd->hospital_id = $user->hospital_id;
@@ -241,6 +254,20 @@ class IpdController extends Controller
             $ipd->note                 = $request->note;
             $ipd->generated_by         = Auth::user()->id ?? null;
             $ipd->ipd_no               = $ipdNo;
+
+            $ipd->organisation_id       = $request->organisation_id ?: null;
+            $ipd->insurance_company_id  = $request->insurance_company_id ?: null;
+            $ipd->is_cashless           = $request->boolean('is_cashless');
+            $ipd->insurance_policy_no   = $request->insurance_policy_no;
+            $ipd->insurance_card_no     = $request->insurance_card_no;
+            $ipd->ccn_no                = $request->ccn_no;
+            $ipd->initial_approval_amount = $request->filled('initial_approval_amount')
+                ? (float) $request->initial_approval_amount
+                : null;
+            $ipd->final_approval_amount = $request->filled('final_approval_amount')
+                ? (float) $request->final_approval_amount
+                : null;
+
             // Save IPD Record
             $ipd->save();
 
@@ -320,7 +347,7 @@ class IpdController extends Controller
 
     public function edit(Request $request, $id)
     {
-        $ipd = IpdDetail::with(['patient', 'doctor', 'bedDetail', 'bedGroup.floorDetail', 'ipdPackages.package'])
+        $ipd = IpdDetail::with(['patient', 'doctor', 'bedDetail', 'bedGroup.floorDetail', 'ipdPackages.package', 'organisation', 'insuranceCompany'])
             ->where('id', $id)
             ->firstOrFail();
         $doctors = Doctor::all();
@@ -360,6 +387,9 @@ class IpdController extends Controller
             ->orderByDesc('id')
             ->first();
 
+        $tpas = Organisation::orderBy('organisation_name')->get(['id', 'organisation_name', 'code']);
+        $insuranceCompanies = InsuranceCompany::orderBy('name')->get(['id', 'name', 'code']);
+
         return view('admin.ipd.edit-ipd', compact(
             'ipd',
             'doctors',
@@ -370,7 +400,9 @@ class IpdController extends Controller
             'bedNumbers',
             'patients',
             'appliedPackage',
-            'currentBedCharge'
+            'currentBedCharge',
+            'tpas',
+            'insuranceCompanies'
         ));
 
     }
@@ -386,21 +418,34 @@ class IpdController extends Controller
             'date'           => 'nullable|date',
             'package_id'     => 'nullable|exists:packages,id',
             'package_rate'   => 'nullable|numeric|min:0',
+            'bed_group'      => 'required|exists:bed_group,id',
+            'bed_number'     => 'required|exists:bed,id',
             'bed_charge'     => 'required|numeric|min:0',
             'reference'            => 'required|string',
              'consultant_doctor'    => 'nullable|exists:doctor,id',
              'consultant_doctor2'   => 'nullable|exists:doctor,id',
              'consultant_doctor3'   => 'nullable|exists:doctor,id',
              'consultant_doctor4'   => 'nullable|exists:doctor,id',
-             'bed_group'           => 'required|exists:bed_group,id',
-             'bed_number'          => 'required|exists:bed,id',
              'symptoms_type'       => 'nullable|array',
              'symptoms_type.*'     => 'string',
              'symptoms_title'      => 'array',
              'symptoms_title.*'    => 'string',
              'symptoms_description'=> 'nullable|string',
              'note'                => 'nullable|string',
+             'organisation_id'     => 'nullable|exists:organisation,id',
+             'insurance_company_id'=> 'nullable|exists:insurance_companies,id',
+             'is_cashless'         => 'nullable|boolean',
+             'insurance_policy_no' => 'nullable|string|max:100',
+             'insurance_card_no'   => 'nullable|string|max:100',
+             'ccn_no'              => 'nullable|string|max:100',
+             'initial_approval_amount' => 'nullable|numeric|min:0',
+             'final_approval_amount'   => 'nullable|numeric|min:0',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         try {
             DB::beginTransaction();
             // $symptomTitle         = array_filter($request->symptoms_title, fn($title) => $title !== null && $title !== '');
@@ -414,42 +459,47 @@ class IpdController extends Controller
             //dd($id, IpdPatient::where('ipd_id', $id)->first());
             $ipdPatient = IpdPatient::where('ipd_id', $id)->firstOrFail();
 
+            $hasBed = $request->filled('bed_group') && $request->filled('bed_number');
+
             // Bed change or admission date change: validate occupancy for first bed period
             $newAdmissionDate = Carbon::parse($request->admission_date);
-            $targetBedId      = $request->bed_number ?? $allotedBed;
 
-            // Check availability of this bed at the new admission datetime
-            // For admission edit we care about occupancy at that exact moment,
-            // so use a zero-length window [admissionDate, admissionDate]
-            $availability = $bedOccupancyService->checkAvailability(
-                (int) $targetBedId,
-                $newAdmissionDate,
-                $newAdmissionDate->copy(),
-                null,
-                $ipd->id
-            );
-            if (! $availability['available']) {
-                return redirect()->back()->with('error', $availability['message'])->withInput();
-            }
+            if ($hasBed) {
+                $targetBedId = $request->bed_number;
 
-            if ($request->bed_number != $allotedBed) {
-                $newBedDetail             = Bed::where('id', $request->bed_number)->firstOrFail();
-                $allotedBedDetail         = Bed::where('id', $allotedBed)->firstOrFail();
-                $bedhistory               = PatientBedHistory::where('ipd_id', $id)->orderBy('from_date')->firstOrFail();
-                $bedhistory->bed_group_id = $request->bed_group;
-                $bedhistory->bed_id       = $request->bed_number;
-                $bedhistory->from_date    = $newAdmissionDate;
-                $bedhistory->save();
-                $newBedDetail->is_active = 'no';
-                $newBedDetail->save();
-                $allotedBedDetail->is_active = 'yes';
-                $allotedBedDetail->save();
-            } else {
-                // Same bed, just align first history from_date with edited admission date
-                $bedhistory = PatientBedHistory::where('ipd_id', $id)->orderBy('from_date')->first();
-                if ($bedhistory) {
-                    $bedhistory->from_date = $newAdmissionDate;
-                    $bedhistory->save();
+                $availability = $bedOccupancyService->checkAvailability(
+                    (int) $targetBedId,
+                    $newAdmissionDate,
+                    $newAdmissionDate->copy(),
+                    null,
+                    $ipd->id
+                );
+                if (! $availability['available']) {
+                    return redirect()->back()->with('error', $availability['message'])->withInput();
+                }
+
+                if ($request->bed_number != $allotedBed) {
+                    $newBedDetail             = Bed::where('id', $request->bed_number)->firstOrFail();
+                    $allotedBedDetail         = $allotedBed ? Bed::where('id', $allotedBed)->first() : null;
+                    $bedhistory               = PatientBedHistory::where('ipd_id', $id)->orderBy('from_date')->first();
+                    if ($bedhistory) {
+                        $bedhistory->bed_group_id = $request->bed_group;
+                        $bedhistory->bed_id       = $request->bed_number;
+                        $bedhistory->from_date    = $newAdmissionDate;
+                        $bedhistory->save();
+                    }
+                    $newBedDetail->is_active = 'no';
+                    $newBedDetail->save();
+                    if ($allotedBedDetail) {
+                        $allotedBedDetail->is_active = 'yes';
+                        $allotedBedDetail->save();
+                    }
+                } else {
+                    $bedhistory = PatientBedHistory::where('ipd_id', $id)->orderBy('from_date')->first();
+                    if ($bedhistory) {
+                        $bedhistory->from_date = $newAdmissionDate;
+                        $bedhistory->save();
+                    }
                 }
             }
             // dd($opd);
@@ -476,6 +526,20 @@ class IpdController extends Controller
             $ipd->symptoms_title       = $implodedSymptomTitle ?? "";
             $ipd->symptoms_description = $request->symptoms_description;
             $ipd->note                 = $request->note;
+
+            $ipd->organisation_id       = $request->organisation_id ?: null;
+            $ipd->insurance_company_id  = $request->insurance_company_id ?: null;
+            $ipd->is_cashless           = $request->boolean('is_cashless');
+            $ipd->insurance_policy_no   = $request->insurance_policy_no;
+            $ipd->insurance_card_no     = $request->insurance_card_no;
+            $ipd->ccn_no                = $request->ccn_no;
+            $ipd->initial_approval_amount = $request->filled('initial_approval_amount')
+                ? (float) $request->initial_approval_amount
+                : null;
+            $ipd->final_approval_amount = $request->filled('final_approval_amount')
+                ? (float) $request->final_approval_amount
+                : null;
+
             // Save IPD Record
             $ipd->save();
 
@@ -487,25 +551,27 @@ class IpdController extends Controller
             $ipdPatient->save();
 
             // Persist edited bed charge for the admission bed segment only (not later transfers).
-            $bedChargeRate = $request->bed_charge !== null && $request->bed_charge !== ''
-                ? (float) $request->bed_charge
-                : (float) (optional($ipd->bedGroup)->bed_cost ?? 0);
+            if ($hasBed) {
+                $bedChargeRate = $request->bed_charge !== null && $request->bed_charge !== ''
+                    ? (float) $request->bed_charge
+                    : (float) (optional($ipd->bedGroup)->bed_cost ?? 0);
 
-            $admissionBedHistory = PatientBedHistory::where('ipd_id', $ipd->id)
-                ->orderBy('from_date')
-                ->first();
-            $admissionSegmentTo = $admissionBedHistory && $admissionBedHistory->to_date
-                ? Carbon::parse($admissionBedHistory->to_date)
-                : null;
+                $admissionBedHistory = PatientBedHistory::where('ipd_id', $ipd->id)
+                    ->orderBy('from_date')
+                    ->first();
+                $admissionSegmentTo = $admissionBedHistory && $admissionBedHistory->to_date
+                    ? Carbon::parse($admissionBedHistory->to_date)
+                    : null;
 
-            app(DaywiseBedChargeService::class)->syncStoredChargesForBedSegment(
-                $ipd,
-                $bedChargeRate,
-                (int) $request->bed_group,
-                (int) $request->bed_number,
-                $newAdmissionDate,
-                $admissionSegmentTo
-            );
+                app(DaywiseBedChargeService::class)->syncStoredChargesForBedSegment(
+                    $ipd,
+                    $bedChargeRate,
+                    (int) $request->bed_group,
+                    (int) $request->bed_number,
+                    $newAdmissionDate,
+                    $admissionSegmentTo
+                );
+            }
 
             // Package update during admission edit:
             // - If there is an applied package, update its amount (per patient) when package_rate provided.
@@ -602,6 +668,33 @@ class IpdController extends Controller
                 'message'  => 'Bed group not found',
             ], 404);
         }
+    }
+
+    /**
+     * API: Insurance companies linked to a TPA (organisation).
+     */
+    public function getTpaInsuranceCompanies($organisationId)
+    {
+        $organisation = Organisation::with('insuranceCompanies')->find($organisationId);
+        if (!$organisation) {
+            return response()->json([], 404);
+        }
+
+        $companies = $organisation->insuranceCompanies;
+        if ($companies->isEmpty() && $organisation->insurance_company_id) {
+            $primary = InsuranceCompany::find($organisation->insurance_company_id);
+            if ($primary) {
+                $companies = collect([$primary]);
+            }
+        }
+
+        return response()->json(
+            $companies->map(fn (InsuranceCompany $c) => [
+                'id' => $c->id,
+                'name' => $c->name,
+                'code' => $c->code,
+            ])->values()
+        );
     }
 
     public function showIpd(Request $request, $id)
@@ -2275,18 +2368,21 @@ class IpdController extends Controller
             'applied_date' => 'nullable|date_format:Y-m-d',
             'notes'        => 'nullable|string|max:500',
             'package_rate' => 'nullable|numeric|min:0',
+            'approval_percentage' => 'nullable|numeric|min:0|max:100',
         ]);
 
         try {
             $packageService      = new IpdPackageService();
             $packageRateOverride = $request->filled('package_rate') ? (float) $request->package_rate : null;
+            $approvalPercentage  = $request->filled('approval_percentage') ? (float) $request->approval_percentage : null;
 
             $result = $packageService->applyPackage(
                 $id,
                 $request->package_id,
                 $request->applied_date,
                 $request->notes,
-                $packageRateOverride
+                $packageRateOverride,
+                $approvalPercentage
             );
 
             if ($result['success']) {
@@ -2350,12 +2446,41 @@ class IpdController extends Controller
     public function updatePackageAmount(Request $request, $id, $ipdPackageId)
     {
         $request->validate([
-            'package_rate' => 'required|numeric|min:0',
+            'package_rate' => 'nullable|numeric|min:0',
+            'approval_percentage' => 'nullable|numeric|min:0|max:100',
+            'applied_date' => 'nullable|date_format:Y-m-d',
+            'note' => 'nullable|string|max:500',
         ]);
+
+        if (! $request->has('package_rate')
+            && ! $request->exists('approval_percentage')
+            && ! $request->has('applied_date')
+            && ! $request->exists('note')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nothing to update.',
+            ], 422);
+        }
 
         try {
             $packageService = new IpdPackageService();
-            $result         = $packageService->updatePackageAmount($id, $ipdPackageId, $request->package_rate);
+            $newRate        = $request->has('package_rate') ? (float) $request->package_rate : null;
+            $approval       = $request->exists('approval_percentage')
+                ? ($request->input('approval_percentage') === '' || $request->input('approval_percentage') === null
+                    ? null
+                    : (float) $request->approval_percentage)
+                : false;
+            $appliedDate    = $request->has('applied_date') ? $request->applied_date : false;
+            $note           = $request->exists('note') ? $request->input('note') : false;
+
+            $result = $packageService->updatePackageAmount(
+                $id,
+                $ipdPackageId,
+                $newRate,
+                $approval,
+                $appliedDate,
+                $note
+            );
 
             if ($result['success']) {
                 return response()->json([
@@ -2384,17 +2509,25 @@ class IpdController extends Controller
     {
         try {
             $ipd = IpdDetail::findOrFail($id);
+            $bedGroupId = $ipd->bed_group_id ? (int) $ipd->bed_group_id : null;
+            $insuranceCompanyId = $ipd->insurance_company_id ? (int) $ipd->insurance_company_id : null;
 
-            // Get all active packages
-            $availablePackages = Package::where('is_active', true)
-                ->get(['id', 'name', 'package_rate', 'gst_amount', 'description']);
+            $packages = Package::query()
+                ->active()
+                ->forInsuranceContext($insuranceCompanyId, null)
+                ->with(['roomRates', 'insuranceRatePanel', 'insuranceCompany.tpas'])
+                ->orderBy('name')
+                ->get();
 
-            // Get applied packages
+            $dropdownService = app(PackageDropdownService::class);
+            $availablePackages = $dropdownService->mapPackagesForDropdown($packages, $bedGroupId);
+
             $packageService  = new IpdPackageService();
             $appliedPackages = $packageService->getAppliedPackages($id, 'applied');
 
             return response()->json([
                 'success'            => true,
+                'is_insurance_ipd'   => (bool) ($ipd->insurance_company_id || $ipd->is_cashless || $ipd->organisation_id),
                 'available_packages' => $availablePackages,
                 'applied_packages'   => $appliedPackages,
             ], 200);

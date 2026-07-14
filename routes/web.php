@@ -367,7 +367,7 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/tpamanagement', [TpamanagmentController::class, 'index'])->name('tpamanagement');
     Route::post('/tpamanagement/store', [TpamanagmentController::class, 'store'])->name('tpamanagement.store');
-    Route::put('/tpamanagement/update', [TpamanagmentController::class, 'update'])->name('tpamanagement.update');
+    Route::put('/tpamanagement/update/{id}', [TpamanagmentController::class, 'update'])->name('tpamanagement.update');
     Route::delete('/tpamanagement/destroy', [TpamanagmentController::class, 'destroy'])->name('tpamanagement.destroy');
 
     Route::get('/tpa_details/{id?}', [TpamanagmentController::class, 'detailsshow'])->name('tpa_details.show');
@@ -615,6 +615,7 @@ Route::get('/ipd', [IpdController::class, 'index'])->name('ipd');
 Route::post('/ipd/store', [IpdController::class, 'store'])->name('ipd.store');
 Route::get('/ipd/edit/{id}', [IpdController::class, 'edit'])->name('ipd.edit');
 Route::put('/ipd/update/{id}', [IpdController::class, 'update'])->name('ipd.update');
+Route::get('/ipd/api/tpa/{organisationId}/insurance-companies', [IpdController::class, 'getTpaInsuranceCompanies'])->name('ipd.api.tpa-insurance-companies');
 Route::get('/ipd/{id}/packages', [IpdController::class, 'getIpdPackages'])->name('ipd.packages');
 Route::post('/ipd/{id}/apply-package', [IpdController::class, 'applyPackage'])->name('ipd.apply-package');
 Route::delete('/ipd/{id}/remove-package', [IpdController::class, 'removePackage'])->name('ipd.remove-package');
@@ -695,7 +696,9 @@ Route::prefix('ipd/billing')->group(function () {
     Route::post('/{ipdId}/discount', [IpdBillingController::class, 'updateDiscount'])->name('ipd.billing.discount.update');
     Route::post('/{ipdId}/due-patient-party', [IpdBillingController::class, 'updateDuePatientParty'])->name('ipd.billing.due.patient.party.update');
     Route::get('/{ipdId}/check-discharged', [IpdBillingController::class, 'checkDischarged'])->name('ipd.billing.check.discharged');
+    Route::get('/{ipdId}/check-approval', [IpdBillingController::class, 'checkApprovalBill'])->name('ipd.billing.check.approval');
     Route::get('/{ipdId}/export-estimate', [IpdBillingController::class, 'exportEstimate'])->name('ipd.billing.export.estimate');
+    Route::get('/{ipdId}/export-approval', [IpdBillingController::class, 'exportApprovalBill'])->name('ipd.billing.export.approval');
     Route::get('/{ipdId}/export-final', [IpdBillingController::class, 'exportFinal'])->name('ipd.billing.export.final');
 });
 Route::get('/patient_profile', function () {

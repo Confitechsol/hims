@@ -10,9 +10,11 @@ class ImportInsurancePackages extends Command
     protected $signature = 'insurance:import-packages
         {file : Path to CSV or Excel file}
         {--replace : Delete existing insurance packages for each panel before import}
-        {--no-link : Skip auto-linking to hospital packages}';
+        {--link : Auto-link to hospital packages by name similarity}
+        {--dry-run : Preview insert/update/skip/deactivate counts without saving}
+        {--deactivate-missing : Mark panel packages not in the file as inactive}';
 
-    protected $description = 'Import insurance surgical packages from CSV/Excel (from PDF extract or template)';
+    protected $description = 'Import insurance surgical packages from CSV/Excel (GIPSA PPN layout or template CSV)';
 
     public function handle(InsurancePackageImportService $service): int
     {
@@ -29,12 +31,17 @@ class ImportInsurancePackages extends Command
         }
 
         $this->info('Importing insurance packages from: ' . $file);
+        if ($this->option('dry-run')) {
+            $this->warn('DRY RUN — no database changes will be saved.');
+        }
 
         try {
             $stats = $service->importFromFile(
                 $file,
                 (bool) $this->option('replace'),
-                !$this->option('no-link')
+                (bool) $this->option('link'),
+                (bool) $this->option('dry-run'),
+                (bool) $this->option('deactivate-missing')
             );
         } catch (\Throwable $e) {
             $this->error('Import failed: ' . $e->getMessage());
@@ -46,10 +53,15 @@ class ImportInsurancePackages extends Command
             ['Metric', 'Count'],
             [
                 ['Panels touched', $stats['panels']],
-                ['Packages imported/updated', $stats['packages']],
-                ['Room rate rows', $stats['room_rates']],
+                ['Rows processed', $stats['packages']],
+                ['Inserted', $stats['inserted']],
+                ['Updated', $stats['updated']],
+                ['Unchanged (skipped)', $stats['unchanged']],
+                ['Deactivated (not in file)', $stats['deactivated']],
+                ['Purged (panel replace)', $stats['purged']],
+                ['Room rate rows synced', $stats['room_rates']],
                 ['Linked to hospital package', $stats['linked']],
-                ['Skipped rows', $stats['skipped']],
+                ['Errored rows', $stats['skipped']],
             ]
         );
 

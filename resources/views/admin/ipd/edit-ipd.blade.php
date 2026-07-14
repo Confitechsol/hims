@@ -701,10 +701,13 @@
                                                 {{-- Package (same behavior as Add Admission) --}}
                                                 <div class="field-group">
                                                     <label class="form-label">Package (Optional)</label>
-                                                    <select class="form-select" name="package_id" id="package_select_admission_edit">
+                                                    <select class="form-select select2-input" name="package_id" id="package_select_admission_edit">
                                                         <option value="">-- Select Package --</option>
                                                     </select>
                                                     <small class="text-muted">Select a package to include it from day 1</small>
+                                                    <small class="text-muted d-block mt-1" id="package_bed_hint_edit" style="display:none;">
+                                                        Select bed group before package — amount may vary by room category. Bed group, bed number, and bed charge are required with package.
+                                                    </small>
                                                 </div>
 
                                                 <div class="field-group" id="package_amount_wrapper_admission_edit" style="display:none;">
@@ -783,6 +786,8 @@
                                         </div>
                                     </div>
 
+                                    @include('admin.ipd.partials.tpa_insurance_fields')
+
                                     <!-- Payment Information Section -->
                                     <div class="form-section mb-4">
                                         <div class="section-header">
@@ -806,10 +811,10 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="field-group">
+                                                <div class="field-group" id="edit_bed_group_field">
                                                     <label class="form-label">Bed Group <span
-                                                            class="required">*</span></label>
-                                                    <select class="form-select" name="bed_group" id="bed_group_select">
+                                                            class="required bed-field-required">*</span></label>
+                                                    <select class="form-select" name="bed_group" id="bed_group_select" required>
                                                         <option value="">Select</option>
                                                         @foreach ($bedGroups as $bedGroup)
                                                             <option value="{{ $bedGroup->id }}"
@@ -820,14 +825,16 @@
                                                     </select>
                                                 </div>
 
-                                                <div class="field-group">
+                                                <div class="field-group" id="edit_bed_number_field">
                                                     <label class="form-label">Bed Number <span
-                                                            class="required">*</span></label>
-                                                    <select class="form-select" name="bed_number" id="bed_number_select">
+                                                            class="required bed-field-required">*</span></label>
+                                                    <select class="form-select" name="bed_number" id="bed_number_select" required>
                                                         <option value="">Select</option>
-                                                        <option value="{{ $ipd->bed }}" selected>
-                                                            {{ $ipd->bedDetail->name }}
-                                                        </option>
+                                                        @if($ipd->bed && $ipd->bedDetail)
+                                                            <option value="{{ $ipd->bed }}" selected>
+                                                                {{ $ipd->bedDetail->name }}
+                                                            </option>
+                                                        @endif
                                                         @foreach ($bedNumbers as $bedNumber)
                                                             <option value="{{ $bedNumber->id }}"
                                                                 {{ old('bed_number', $ipd->bed ?? '') == $bedNumber->id ? 'selected' : '' }}>
@@ -837,11 +844,11 @@
                                                     </select>
                                                 </div>
                                                 {{-- Bed charge (same UX as Add Admission) --}}
-                                                <div class="field-group">
-                                                    <label class="form-label">Bed Charge (INR)</label>
+                                                <div class="field-group" id="edit_bed_charge_field">
+                                                    <label class="form-label">Bed Charge (INR) <span class="required bed-field-required">*</span></label>
                                                     <input type="number" class="form-control" name="bed_charge"
                                                         id="bed_charge_input_edit" step="0.01" min="0"
-                                                        placeholder="0.00"
+                                                        placeholder="0.00" required
                                                         value="{{ old('bed_charge', $currentBedCharge) }}">
                                                     <small class="text-muted">Auto-filled from bed group (editable)</small>
                                                 </div>
@@ -873,6 +880,7 @@
         </div>
     </div>
     @include('components.modals.patient-details-modal', ['patient' => $ipd->patient])
+    @include('admin.ipd.partials.package_select2_scripts')
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -885,6 +893,15 @@
             const packageAmountInputEdit = document.getElementById('package_amount_admission_edit');
             const appliedPackageId = @json($appliedPackage->package_id ?? null);
 
+            function updatePackageBedHintEdit() {
+                const hint = document.getElementById('package_bed_hint_edit');
+                const hasPackage = !!(packageSelectEdit && packageSelectEdit.value);
+                if (hint) {
+                    hint.style.display = hasPackage ? 'block' : 'none';
+                }
+            }
+
+            if (bedGroupSelect) {
             bedGroupSelect.addEventListener('change', function() {
                 const selectedId = this.value;
                 const baseUrl = "{{ route('getBedNumbers', ['id' => 'ID']) }}";
@@ -907,7 +924,7 @@
                                 //     typeof preSelectedBedGroup, selectedId ===
                                 //     preSelectedBedGroup);
 
-                                if (selectedId === preSelectedBedGroup.toString()) {
+                                if (preSelectedBedNumber && preSelectedBedGroup && selectedId === preSelectedBedGroup.toString()) {
                                     const selectedOption = document.createElement('option');
                                     selectedOption.value = preSelectedBedNumber.id;
                                     selectedOption.textContent = preSelectedBedNumber.name;
@@ -944,12 +961,17 @@
                         });
                 }
             });
+            }
 
             function buildPackageApiUrl() {
                 const params = new URLSearchParams();
                 const bgEl = document.getElementById('bed_group_select');
                 if (bgEl && bgEl.value) {
                     params.set('bed_group_id', bgEl.value);
+                }
+                const insEl = document.getElementById('insurance_company_id');
+                if (insEl && insEl.value) {
+                    params.set('insurance_company_id', insEl.value);
                 }
                 const base = "{{ route('packages.api.active') }}";
                 const qs = params.toString();
@@ -958,32 +980,40 @@
 
             function loadPackagesForEdit() {
                 if (!packageSelectEdit) return;
+                const current = packageSelectEdit.value;
                 fetch(buildPackageApiUrl())
                     .then(response => response.json())
                     .then(data => {
-                        const current = packageSelectEdit.value;
-                        packageSelectEdit.innerHTML = '<option value="">-- Select Package --</option>';
-
-                        if (data.success && data.packages) {
-                            data.packages.forEach(pkg => {
-                                const opt = document.createElement('option');
-                                opt.value = pkg.id;
-                                let label = `${pkg.name} - ₹${parseFloat(pkg.package_rate).toFixed(2)}`;
-                                if (pkg.package_type === 'insurance' && pkg.insurer_procedure_code) {
-                                    label += ` (${pkg.insurer_procedure_code})`;
-                                }
-                                opt.textContent = label;
-                                opt.dataset.rate = pkg.package_rate;
-                                packageSelectEdit.appendChild(opt);
-                            });
+                        if (window.IpdPackageSelect) {
+                            window.IpdPackageSelect.appendOptions(packageSelectEdit, data.success ? data.packages : []);
+                            window.IpdPackageSelect.initSelect2(packageSelectEdit, document.querySelector('.ipd-edit-form') || document.body);
+                        } else {
+                            packageSelectEdit.innerHTML = '<option value="">-- Select Package --</option>';
+                            if (data.success && data.packages) {
+                                data.packages.forEach(pkg => {
+                                    const opt = document.createElement('option');
+                                    opt.value = pkg.id;
+                                    opt.textContent = pkg.display_title || pkg.name;
+                                    opt.dataset.rate = pkg.package_rate;
+                                    packageSelectEdit.appendChild(opt);
+                                });
+                            }
                         }
 
                         if (appliedPackageId) {
                             packageSelectEdit.value = appliedPackageId;
+                            if (window.jQuery) {
+                                window.jQuery(packageSelectEdit).trigger('change');
+                            }
                             if (packageAmountWrapperEdit) packageAmountWrapperEdit.style.display = '';
                         } else if (current) {
                             packageSelectEdit.value = current;
+                            if (window.jQuery) {
+                                window.jQuery(packageSelectEdit).trigger('change');
+                            }
                         }
+
+                        updatePackageBedHintEdit();
                     })
                     .catch(error => {
                         console.error('Error loading packages:', error);
@@ -997,6 +1027,15 @@
 
                 bedGroupSelect?.addEventListener('change', loadPackagesForEdit);
 
+                const insuranceSelectEdit = document.getElementById('insurance_company_id');
+                if (insuranceSelectEdit) {
+                    if (window.jQuery) {
+                        window.jQuery(insuranceSelectEdit).on('change select2:select select2:clear', loadPackagesForEdit);
+                    } else {
+                        insuranceSelectEdit.addEventListener('change', loadPackagesForEdit);
+                    }
+                }
+
                 packageSelectEdit.addEventListener('change', function () {
                     const opt = this.options[this.selectedIndex];
                     if (this.value && opt && opt.dataset.rate !== undefined) {
@@ -1008,7 +1047,10 @@
                         if (packageAmountInputEdit) packageAmountInputEdit.value = '';
                         if (packageAmountWrapperEdit) packageAmountWrapperEdit.style.display = 'none';
                     }
+                    updatePackageBedHintEdit();
                 });
+
+                updatePackageBedHintEdit();
             }
 
             patientSelect.addEventListener('change', function() {
@@ -1511,66 +1553,3 @@
         });
     </script>
 @endsection
-
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const select = document.getElementById('package_select_admission_edit');
-    const amountWrapper = document.getElementById('package_amount_wrapper_admission_edit');
-    const amountInput = document.getElementById('package_amount_admission_edit');
-    if (!select) return;
-
-    const appliedPackageId = "{{ $appliedPackage->package_id ?? '' }}";
-
-    function buildPackageApiUrlPush() {
-        const params = new URLSearchParams();
-        const bg = document.getElementById('bed_group_select')?.value;
-        if (bg) params.set('bed_group_id', bg);
-        const base = "{{ route('packages.api.active') }}";
-        const qs = params.toString();
-        return qs ? `${base}?${qs}` : base;
-    }
-
-    function loadPackagesPush() {
-        fetch(buildPackageApiUrlPush())
-        .then(r => r.json())
-        .then(data => {
-            const cur = select.value;
-            select.innerHTML = '<option value="">-- Select Package --</option>';
-            if (data.success && data.packages) {
-                data.packages.forEach(pkg => {
-                    const opt = document.createElement('option');
-                    opt.value = pkg.id;
-                    opt.textContent = `${pkg.name} - ₹${parseFloat(pkg.package_rate).toFixed(2)}`;
-                    opt.dataset.rate = pkg.package_rate;
-                    select.appendChild(opt);
-                });
-            }
-            if (appliedPackageId) {
-                select.value = appliedPackageId;
-                if (amountWrapper) amountWrapper.style.display = '';
-            } else if (cur) {
-                select.value = cur;
-            }
-        })
-        .catch(() => {
-            select.innerHTML = '<option value="">Error loading packages</option>';
-        });
-    }
-
-    loadPackagesPush();
-    document.getElementById('bed_group_select')?.addEventListener('change', loadPackagesPush);
-
-    select.addEventListener('change', function () {
-        const opt = this.options[this.selectedIndex];
-        if (this.value && opt && opt.dataset.rate !== undefined) {
-            if (amountInput) amountInput.value = parseFloat(opt.dataset.rate || 0).toFixed(2);
-            if (amountWrapper) amountWrapper.style.display = '';
-        } else {
-            if (amountInput) amountInput.value = '';
-            if (amountWrapper) amountWrapper.style.display = 'none';
-        }
-    });
-});
-</script>
-@endpush

@@ -416,6 +416,7 @@
 
     {{-- create IPD modal --}}
     @include('components.modals.ipd-create-modal')
+    @include('admin.ipd.partials.package_select2_scripts')
 
     <div class="modal fade" id="pdfModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered">

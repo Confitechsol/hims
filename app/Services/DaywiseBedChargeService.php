@@ -6,6 +6,7 @@ use App\Models\IpdDaywiseBedCharge;
 use App\Models\PatientBedHistory;
 use App\Models\BedGroup;
 use App\Models\IpdDetail;
+use App\Services\InsuranceDischargeBedChargeService;
 use App\Support\BedBillingPeriod;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -290,12 +291,16 @@ class DaywiseBedChargeService
         }
 
         if ($segmentTo === null && $ipd->discharged === 'yes' && ! empty($ipd->discharged_date)) {
-            $endAt = Carbon::parse($ipd->discharged_date);
+            $endAt = app(InsuranceDischargeBedChargeService::class)->resolveDischargeAt($ipd)
+                ?? Carbon::parse($ipd->discharged_date);
         } elseif ($segmentTo !== null) {
             $endAt = $segmentTo->copy();
         } else {
             $endAt = Carbon::now();
         }
+
+        $insuranceBedService = app(InsuranceDischargeBedChargeService::class);
+        $skipDischargeChargeDate = $insuranceBedService->dischargeChargeDateToExclude($ipd, $endAt);
 
         $firstChargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($segmentFrom);
         $lastChargeDay = BedBillingPeriod::chargeLabelDayForMoment($endAt);
@@ -305,6 +310,15 @@ class DaywiseBedChargeService
 
         while ($current->lte($lastChargeDay)) {
             $chargeDate = $current->format('Y-m-d');
+
+            if ($skipDischargeChargeDate !== null && $chargeDate === $skipDischargeChargeDate) {
+                IpdDaywiseBedCharge::where('ipd_id', $ipd->id)
+                    ->where('charge_date', $chargeDate)
+                    ->delete();
+                $current->addDay();
+                continue;
+            }
+
             [$periodStart, $periodEnd] = BedBillingPeriod::windowForChargeCalendarDay($current->copy()->startOfDay());
 
             if ($periodStart->copy()->startOfDay()->lt($segmentCalendarDay)) {
