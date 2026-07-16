@@ -12,6 +12,15 @@ class ExpenseController extends Controller
      */
     private function hasPermissionSafe(int $permCatId, string $type): bool
     {
+        if (function_exists('isSuperAdmin') && isSuperAdmin()) {
+            return true;
+        }
+
+        $roleName = strtolower(trim((string) session('user_role_name', '')));
+        if (in_array($roleName, ['super admin', 'admin', 'administrator', 'adm'], true)) {
+            return true;
+        }
+
         $type = strtolower($type);
 
         if ($type === 'view' && function_exists('canView')) {

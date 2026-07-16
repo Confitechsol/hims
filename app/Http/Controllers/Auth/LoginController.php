@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\RolesPermission;
+use App\Models\PermissionCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -56,20 +57,24 @@ class LoginController extends Controller
             
             // Store role permissions in session
             if ($role) {
-                $permissions = RolesPermission::where('role_id', $role->id)
-                    ->where('hospital_id', $user->hospital_id ?? null)
-                    ->get()
-                    ->keyBy('perm_cat_id')
-                    ->map(function ($permission) {
-                        return [
-                            'can_view' => (bool) $permission->can_view,
-                            'can_add' => (bool) $permission->can_add,
-                            'can_edit' => (bool) $permission->can_edit,
-                            'can_delete' => (bool) $permission->can_delete,
-                        ];
-                    })
-                    ->toArray();
-                
+                if ($this->isAdministratorRole($role->name)) {
+                    $permissions = $this->buildFullPermissionsForAdministrator();
+                } else {
+                    $permissions = RolesPermission::where('role_id', $role->id)
+                        ->where('hospital_id', $user->hospital_id ?? null)
+                        ->get()
+                        ->keyBy('perm_cat_id')
+                        ->map(function ($permission) {
+                            return [
+                                'can_view' => (bool) $permission->can_view,
+                                'can_add' => (bool) $permission->can_add,
+                                'can_edit' => (bool) $permission->can_edit,
+                                'can_delete' => (bool) $permission->can_delete,
+                            ];
+                        })
+                        ->toArray();
+                }
+
                 Session::put('user_permissions', $permissions);
                 Session::put('user_role_id', $role->id);
                 Session::put('user_role_name', $role->name);
@@ -137,5 +142,35 @@ class LoginController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/login');
+    }
+
+    private function isAdministratorRole(?string $roleName): bool
+    {
+        $normalized = strtolower(trim((string) $roleName));
+
+        return in_array($normalized, [
+            'super admin',
+            'admin',
+            'administrator',
+            'adm',
+        ], true);
+    }
+
+    /**
+     * Administrator users should always have full module access in session.
+     */
+    private function buildFullPermissionsForAdministrator(): array
+    {
+        $full = [
+            'can_view' => true,
+            'can_add' => true,
+            'can_edit' => true,
+            'can_delete' => true,
+        ];
+
+        return PermissionCategory::query()
+            ->pluck('id')
+            ->mapWithKeys(fn ($id) => [(int) $id => $full])
+            ->toArray();
     }
 }
