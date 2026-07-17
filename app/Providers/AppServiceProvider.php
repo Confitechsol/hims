@@ -21,7 +21,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-
+        // Ensure permission helpers are always available (even if Composer files
+        // autoload was not regenerated on the server).
+        $helper = app_path('Helpers/PermissionHelper.php');
+        if (is_file($helper)) {
+            require_once $helper;
+        }
     }
 
     /**

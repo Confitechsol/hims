@@ -95,7 +95,12 @@ class IpdViewController extends Controller
             // Store in array using OPD number as key
             $ipdFindings[$pres->ipd_id] = $findings;
         }
-        $bedHistories    = PatientBedHistory::with('bedGroup', 'bed')->where('ipd_id', $id)->get();
+        $bedHistories    = PatientBedHistory::with('bedGroup', 'bed')
+            ->where('ipd_id', $id)
+            ->orderBy('from_date')
+            ->orderBy('id')
+            ->get();
+        $latestBedHistoryId = $bedHistories->last()?->id;
         $operationDetail = OperationTheatre::with('operation.category')->where('ipd_details_id', $id)->get();
 
         $pharmacyDetails     = Pharmacy::all();
@@ -247,6 +252,7 @@ class IpdViewController extends Controller
             'ipdPrescriptions',
             'ipdFindings',
             'bedHistories',
+            'latestBedHistoryId',
             'ipdCharges',
             'pharmacyDetails',
             'bedShiftHistory',

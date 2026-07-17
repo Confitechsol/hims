@@ -4592,6 +4592,18 @@
                                                                             title="Edit">
                                                                             <i class="ti ti-edit"></i>
                                                                         </button>
+                                                                        @if (isset($latestBedHistoryId) && (int) $history->id === (int) $latestBedHistoryId)
+                                                                            <button type="button"
+                                                                                class="btn btn-sm btn-soft-danger delete-bed-history-btn ms-1"
+                                                                                data-history-id="{{ $history->id }}"
+                                                                                data-ipd-id="{{ $ipd->id }}"
+                                                                                data-bed-group="{{ $history->bedGroup->name ?? '-' }}"
+                                                                                data-bed-name="{{ $history->bed->name ?? '-' }}"
+                                                                                data-from-date="{{ $history->from_date ? \Carbon\Carbon::parse($history->from_date)->format('d/m/Y h:i A') : '-' }}"
+                                                                                title="Delete latest bed assignment">
+                                                                                <i class="ti ti-trash"></i>
+                                                                            </button>
+                                                                        @endif
                                                                         </td>
                                                                     @endif
                                                                 </tr>
@@ -4667,6 +4679,44 @@
                                 <button type="button" class="btn btn-secondary"
                                     data-bs-dismiss="modal">Cancel</button>
                                 <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {{-- Delete latest Bed History Modal --}}
+            <div class="modal fade" id="deleteBedHistoryModal" tabindex="-1"
+                aria-labelledby="deleteBedHistoryModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title" id="deleteBedHistoryModalLabel">
+                                <i class="ti ti-trash me-2"></i>Delete Latest Bed Assignment
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <form id="deleteBedHistoryForm" method="POST" action="{{ route('ipd.bedHistory.delete') }}">
+                            @csrf
+                            @method('DELETE')
+                            <input type="hidden" name="bed_history_id" id="delete_bed_history_id">
+                            <input type="hidden" name="ipd_id" id="delete_ipd_id" value="{{ $ipd->id }}">
+                            <div class="modal-body">
+                                <p class="mb-2">This will remove the latest bed assignment for this patient.</p>
+                                <ul class="mb-3">
+                                    <li><strong>Bed Group:</strong> <span id="delete_bed_group_label">-</span></li>
+                                    <li><strong>Bed:</strong> <span id="delete_bed_name_label">-</span></li>
+                                    <li><strong>From:</strong> <span id="delete_from_date_label">-</span></li>
+                                </ul>
+                                <p class="text-muted small mb-0">
+                                    If this was a transfer, the previous bed will become active again.
+                                    If this is the only bed record, the patient will have no assigned bed until reassigned.
+                                    Estimate and final bill will be updated accordingly.
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-danger">Delete</button>
                             </div>
                         </form>
                     </div>
@@ -6746,6 +6796,17 @@
                         $('#edit_bed_group').html('<option value="">Select Bed Group</option>');
                         showModal();
                     });
+            });
+
+            // Delete latest bed history
+            $(document).on('click', '.delete-bed-history-btn', function() {
+                var btn = $(this);
+                $('#delete_bed_history_id').val(btn.data('history-id'));
+                $('#delete_ipd_id').val(btn.data('ipd-id'));
+                $('#delete_bed_group_label').text(btn.data('bed-group') || '-');
+                $('#delete_bed_name_label').text(btn.data('bed-name') || '-');
+                $('#delete_from_date_label').text(btn.data('from-date') || '-');
+                new bootstrap.Modal(document.getElementById('deleteBedHistoryModal')).show();
             });
 
             // Add Bed History - reuse same modal in create mode

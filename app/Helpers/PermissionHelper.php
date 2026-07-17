@@ -12,6 +12,10 @@ if (!function_exists('hasPermission')) {
      */
     function hasPermission($permCatId, $permissionType = 'view')
     {
+        if (isSuperAdmin()) {
+            return true;
+        }
+
         // Get permissions from session
         $permissions = session('user_permissions', []);
         
@@ -151,8 +155,14 @@ if (!function_exists('isSuperAdmin')) {
      */
     function isSuperAdmin()
     {
-        $roleName = getUserRoleName();
-        return $roleName === 'Super Admin' || $roleName === 'Admin';
+        $roleName = strtolower(trim((string) getUserRoleName()));
+
+        return in_array($roleName, [
+            'super admin',
+            'admin',
+            'administrator',
+            'adm',
+        ], true);
     }
 }
 

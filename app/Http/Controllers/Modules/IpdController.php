@@ -34,6 +34,7 @@ use App\Models\RadiologyReport;
 use App\Models\Staff;
 use App\Models\Symptom;
 use App\Models\SymptomsClassification;
+use App\Services\BedHistoryDeleteService;
 use App\Services\BedOccupancyService;
 use App\Services\DaywiseBedChargeService;
 use App\Services\IpdPackageService;
@@ -743,7 +744,12 @@ class IpdController extends Controller
             // Store in array using OPD number as key
             $ipdFindings[$pres->ipd_id] = $findings;
         }
-        $bedHistories    = PatientBedHistory::with('bedGroup', 'bed')->where('ipd_id', $id)->get();
+        $bedHistories    = PatientBedHistory::with('bedGroup', 'bed')
+            ->where('ipd_id', $id)
+            ->orderBy('from_date')
+            ->orderBy('id')
+            ->get();
+        $latestBedHistoryId = $bedHistories->last()?->id;
         $operationDetail = OperationTheatre::with('operation.category')->where('ipd_details_id', $id)->get();
 
         // Load pathology and radiology tests for prescription modal
@@ -754,7 +760,7 @@ class IpdController extends Controller
         // $opdSymptoms       = [];
 
         // Store in array using OPD number as key
-        return view('admin.ipd.ipd_view', compact('ipd', 'symptoms', 'nurseNotes', 'medicationReport', 'labInvestigations', 'ipdPrescriptions', 'ipdFindings', 'bedHistories', 'operationDetail', 'ipdCharges', 'pathologies', 'radiologies'));
+        return view('admin.ipd.ipd_view', compact('ipd', 'symptoms', 'nurseNotes', 'medicationReport', 'labInvestigations', 'ipdPrescriptions', 'ipdFindings', 'bedHistories', 'latestBedHistoryId', 'operationDetail', 'ipdCharges', 'pathologies', 'radiologies'));
     }
 
     public function getNurses(Request $request)
@@ -2138,6 +2144,28 @@ class IpdController extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', 'Failed to add bed history: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Delete the latest bed history segment (undo last bed assignment/transfer).
+     */
+    public function deleteBedHistory(Request $request, BedHistoryDeleteService $bedHistoryDeleteService)
+    {
+        $request->validate([
+            'bed_history_id' => 'required|exists:patient_bed_history,id',
+            'ipd_id'         => 'required|exists:ipd_details,id',
+        ]);
+
+        $result = $bedHistoryDeleteService->deleteLatest(
+            (int) $request->ipd_id,
+            (int) $request->bed_history_id
+        );
+
+        if (!$result['success']) {
+            return redirect()->back()->with('error', $result['message']);
+        }
+
+        return redirect()->back()->with('success', $result['message']);
     }
 
 // public function storeDischarge(Request $request)

@@ -364,6 +364,32 @@ class DaywiseBedChargeService
     }
 
     /**
+     * Remove stored daywise bed charges for a deleted bed segment date range.
+     */
+    public function purgeStoredChargesForSegment(int $ipdId, Carbon $segmentFrom, ?Carbon $segmentTo = null): int
+    {
+        $endAt = $segmentTo ? $segmentTo->copy() : Carbon::now();
+        $firstChargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($segmentFrom);
+        $lastChargeDay = BedBillingPeriod::chargeLabelDayForMoment($endAt);
+
+        if ($firstChargeDay->gt($lastChargeDay)) {
+            return 0;
+        }
+
+        $deleted = 0;
+        $current = $firstChargeDay->copy();
+
+        while ($current->lte($lastChargeDay)) {
+            $deleted += IpdDaywiseBedCharge::where('ipd_id', $ipdId)
+                ->whereDate('charge_date', $current->format('Y-m-d'))
+                ->delete();
+            $current->addDay();
+        }
+
+        return $deleted;
+    }
+
+    /**
      * Get bed charge from bed group
      *
      * @param int|null $bedGroupId Bed group ID

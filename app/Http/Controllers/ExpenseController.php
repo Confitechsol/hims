@@ -7,11 +7,53 @@ use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
 {
+    /**
+     * Permission fallback for environments where helper files are not autoloaded.
+     */
+    private function hasPermissionSafe(int $permCatId, string $type): bool
+    {
+        if (function_exists('isSuperAdmin') && isSuperAdmin()) {
+            return true;
+        }
+
+        $roleName = strtolower(trim((string) session('user_role_name', '')));
+        if (in_array($roleName, ['super admin', 'admin', 'administrator', 'adm'], true)) {
+            return true;
+        }
+
+        $type = strtolower($type);
+
+        if ($type === 'view' && function_exists('canView')) {
+            return canView($permCatId);
+        }
+        if ($type === 'add' && function_exists('canAdd')) {
+            return canAdd($permCatId);
+        }
+        if ($type === 'edit' && function_exists('canEdit')) {
+            return canEdit($permCatId);
+        }
+        if ($type === 'delete' && function_exists('canDelete')) {
+            return canDelete($permCatId);
+        }
+
+        // Fallback to session structure used by PermissionHelper::hasPermission()
+        $permissions = session('user_permissions', []);
+        $key = 'can_' . $type;
+
+        return isset($permissions[$permCatId][$key]) && $permissions[$permCatId][$key] === true;
+    }
+
      function index(Request $request){
         // Check if user can view expense (permission category ID: 12)
+<<<<<<< HEAD
         // if (!canView(12)) {
         //     abort(403, 'You do not have permission to view expense records.');
         // }
+=======
+        if (!$this->hasPermissionSafe(12, 'view')) {
+            abort(403, 'You do not have permission to view expense records.');
+        }
+>>>>>>> 8e0c1c7e2bde3349c257e41eef1ec8c9ef61c2b4
 
      //   $expenses = Expense::with('expenseHead')->get();
           $expenses = Expense::with(['expenseHead']);
@@ -45,9 +87,15 @@ class ExpenseController extends Controller
     public function create(Request $request)
     {
         // Check if user can add expense (permission category ID: 12)
+<<<<<<< HEAD
         // if (!canAdd(12)) {
         //     abort(403, 'You do not have permission to create expense records.');
         // }
+=======
+        if (!$this->hasPermissionSafe(12, 'add')) {
+            abort(403, 'You do not have permission to create expense records.');
+        }
+>>>>>>> 8e0c1c7e2bde3349c257e41eef1ec8c9ef61c2b4
         
         $validated = $request->validate([
             'expense_name' => 'required',
@@ -112,9 +160,15 @@ class ExpenseController extends Controller
     public function update(Request $request, $id)
     {
         // Check if user can edit expense (permission category ID: 12)
+<<<<<<< HEAD
         // if (!canEdit(12)) {
         //     abort(403, 'You do not have permission to edit expense records.');
         // }
+=======
+        if (!$this->hasPermissionSafe(12, 'edit')) {
+            abort(403, 'You do not have permission to edit expense records.');
+        }
+>>>>>>> 8e0c1c7e2bde3349c257e41eef1ec8c9ef61c2b4
         
         $expense = Expense::findOrFail($id);
 
@@ -187,9 +241,15 @@ class ExpenseController extends Controller
     public function delete($id)
     {
         // Check if user can delete expense (permission category ID: 12)
+<<<<<<< HEAD
         // if (!canDelete(12)) {
         //     abort(403, 'You do not have permission to delete expense records.');
         // }
+=======
+        if (!$this->hasPermissionSafe(12, 'delete')) {
+            abort(403, 'You do not have permission to delete expense records.');
+        }
+>>>>>>> 8e0c1c7e2bde3349c257e41eef1ec8c9ef61c2b4
         
         $expense = Expense::findOrFail($id);
 
