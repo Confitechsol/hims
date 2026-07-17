@@ -16,7 +16,7 @@
 
             @page {
                 size: A4;
-                margin-top: 120px;
+                margin-top: 220px;
                 margin-bottom: 80px;
                 margin-left: 20px;
                 margin-right: 20px;
@@ -32,20 +32,10 @@
             padding: 0;
         }
 
-        /* Fixed header - repeats on all pages */
-        /* header {
-                position: fixed;
-                top: -240px;
-                left: 20px;
-                right: 20px;
-                height: auto;
-                padding: 0;
-            } */
-
-
+        /* Fixed header - repeats on all pages (letterhead + title) */
             header {
                 position: fixed;
-                top: -100px;
+                top: -200px;
                 left: 20px;
                 right: 20px;
                 height: auto;
@@ -111,6 +101,58 @@
         /* Reduce gap between admission info (header) and patient info */
         main > .patient_info:first-child {
             margin-top: -12px;
+        }
+
+        header .top_head {
+            margin-bottom: 8px;
+        }
+
+        .top_head {
+            width: 100%;
+            margin-bottom: 8px;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .top_head table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            margin: 0;
+            padding: 0;
+            max-width: 100%;
+        }
+
+        .top_head td {
+            vertical-align: top;
+            padding: 0 5px;
+            margin: 0;
+        }
+
+        .first_logo {
+            font-size: 9px;
+            width: 20%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .second_logo {
+            font-size: 9px;
+            width: 30%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .about_info {
+            font-size: 9px;
+            width: 35%;
+            text-align: right;
+            vertical-align: top;
+        }
+
+        .about_info p {
+            margin: 1px 0;
+            line-height: 1.25;
         }
 
         .heading {
@@ -321,35 +363,73 @@
     <!-- Fixed Header - repeats on all pages -->
     <header>
         <div class="header-content">
-        <!-- Title -->
-        <div class="heading">
-            <h4 class="red">{{ $billHeading ?? 'ESTIMATE COPY' }}</h4>
-        </div>
+            <!-- Samaritan letterhead (same as final bill) -->
+            <div class="top_head">
+                <table style="width: 100%; table-layout: fixed; border-collapse: collapse; margin: 0; padding: 0;">
+                    <tr>
+                        <td class="second_logo"
+                            style="width: 30%; padding: 0 5px; margin: 0; vertical-align: middle;">
+                            @if (file_exists(public_path('assets/images/nabh-logo.png')))
+                                <div style="text-align: center;">
+                                    <img src="{{ public_path('assets/images/nabh-logo.png') }}" alt="NABH"
+                                        style="height: 70px; width:auto; display: inline-block;">
+                                </div>
+                            @endif
+                            <p style="margin: 0; font-size: 10px; text-align: center;">NABH/PESHCO-2018-3150/L-03</p>
+                        </td>
+                        <td class="first_logo text-center"
+                            style="width: 20%; padding: 0 5px; margin: 0 auto; vertical-align: middle;">
+                            @if (file_exists(public_path('assets/images/logo.webp')))
+                                <img src="{{ public_path('assets/images/logo.webp') }}" alt="LOGO"
+                                    style="height: 50px; display: block; margin: 0 auto 3px auto;">
+                            @endif
+                        </td>
+                        <td class="about_info"
+                            style="width: 35%; padding: 0 5px; margin: 0; vertical-align: top; text-align: right;">
+                            <p style="margin: 1px 0;"><strong>{{ $hospital->name ?? 'Hospital Name' }}</strong></p>
+                            <p style="margin: 1px 0;">{{ $hospital->address ?? 'Hospital Address' }}</p>
+                            <p style="margin: 1px 0;">Phone - {{ $hospital->phone ?? 'Phone Number' }}</p>
+                            @if(!empty($hospital->hospital_landline_1) || !empty($hospital->hospital_landline_2))
+                                <p style="margin: 1px 0;">Landline -
+                                    @if(!empty($hospital->hospital_landline_1)){{ $hospital->hospital_landline_1 }}@endif
+                                    @if(!empty($hospital->hospital_landline_1) && !empty($hospital->hospital_landline_2)),
+                                    @endif
+                                    @if(!empty($hospital->hospital_landline_2)){{ $hospital->hospital_landline_2 }}@endif
+                                </p>
+                            @endif
+                            <p style="margin: 1px 0;">E-mail: {{ $hospital->email ?? 'Email' }}</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
 
-        <!-- Thick Horizontal Line -->
-        <div style="border-top: 2px solid #282828; margin: 1px 0;"></div>
+            <!-- Title -->
+            <div class="heading" style="margin: 5px 0;">
+                <h4 class="red" style="margin: 0; font-size: 14px;">{{ $billHeading ?? 'ESTIMATE COPY' }}</h4>
+            </div>
 
-        <!-- Estimate/Admission Reference Section -->
-        <div class="patient_info" style="margin-bottom: 0;">
-            <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
-                <tr>
-                    <td style="text-align: left; width: 33.33%; padding: 3px 4px;">
-                        <strong>ADM No.</strong> : <span class="red">{{ $ipd->ipd_no }}</span>
-                    </td>
-                    <td style="text-align: center; width: 33.33%; padding: 3px 4px;">
-                        <strong>Estimate Date</strong> : {{ \Carbon\Carbon::now()->format('d/m/Y') }}
-                    </td>
-                    <td style="text-align: right; width: 33.34%; padding: 3px 4px;">
-                        <strong>Estimate Time</strong> : {{ \Carbon\Carbon::now('Asia/Kolkata')->format('H:i:s') }}
-                    </td>
-                </tr>
-            </table>
-        </div>
+            <!-- Thick Horizontal Line -->
+            <div style="border-top: 2px solid #282828; margin: 5px 0;"></div>
 
-        <!-- Thick Horizontal Line -->
-       {{--  <div style="border-top: 2px solid #282828; margin: 1px 0;"></div> --}}
+            <!-- Estimate/Admission Reference Section -->
+            <div class="patient_info" style="margin-bottom: 5px;">
+                <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                    <tr>
+                        <td style="text-align: left; width: 33.33%; padding: 3px 4px;">
+                            <strong>ADM No.</strong> : <span class="red">{{ $ipd->ipd_no }}</span>
+                        </td>
+                        <td style="text-align: center; width: 33.33%; padding: 3px 4px;">
+                            <strong>Estimate Date</strong> : {{ \Carbon\Carbon::now()->format('d/m/Y') }}
+                        </td>
+                        <td style="text-align: right; width: 33.34%; padding: 3px 4px;">
+                            <strong>Estimate Time</strong> : {{ \Carbon\Carbon::now('Asia/Kolkata')->format('H:i:s') }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
 
-        
+            <!-- Thick Horizontal Line -->
+            <div style="border-top: 2px solid #282828; margin: 5px 0;"></div>
         </div>
     </header>
 
