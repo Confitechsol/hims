@@ -59,7 +59,7 @@
                                     </div>
 
                                 </div> --}}
-                                    <x-table-actions.actions id="expense" name="Expense" :canAdd="canAdd(12)" />
+                                    <x-table-actions.actions id="expense" name="Expense" />
                                     <!-- Table start -->
                                     <div class="table-responsive table-nowrap">
                                         <table class="table" id="expense">
@@ -97,7 +97,7 @@
                                                         </td>
                                                         <td>
                                                             <div class="d-flex">
-                                                                @if(canEdit(12))
+                                                                {{-- @if() --}}
                                                                 <button
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
                                                                     data-id="{{ $expense->id }}"
@@ -115,9 +115,9 @@
                                                                     data-attach_document="{{ $expense->attach_document ?? '' }}">
                                                                     <i class="ti ti-pencil"></i>
                                                                 </button>
-                                                                @endif
-                                                                @if(canDelete(12))
-                                                                <form method="POST" action="{{ route('expense.delete', $expense->id) }}" class="ms-2">
+                                                                {{-- @endif --}}
+                                                                {{-- @if(Delete(can12)) --}}
+                                                                <form method="POST" action="{{ route('expense.delete', $expense->id) }}" class="ms-2" onsubmit="return confirm('Are you sure you want to delete this expense?')">
                                                                     @csrf
                                                                     @method('DELETE')
                                                                     <input type="hidden" name="id" value="{{ $expense->id }}">
@@ -126,7 +126,7 @@
                                                                         <i class="ti ti-trash"></i>
                                                                     </button>
                                                                 </form>
-                                                                @endif
+                                                                {{-- @endif --}}
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -204,7 +204,7 @@
         ];
     @endphp
 
-    @if(canAdd(12))
+    {{-- @if(canAdd(12)) --}}
     <x-modals.form-modal type="add" id="createModal" title="Add Expense" action="{{ route('expense.create') }}"
         :fields="[
             [
@@ -240,8 +240,8 @@
             ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6'],
             ['name' => 'description', 'label' => 'Description', 'type' => 'text', 'required' => true, 'size' => '6'],
         ]" :columns="3" />
-    @endif
-    @if(canEdit(12))
+    {{-- @endif --}}
+    {{-- @if(canEdit(12)) --}}
     <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit Expense"
         action="{{ url('/expense/update') }}" :fields="[
             ['name' => 'id', 'type' => 'hidden', 'required' => true],
@@ -278,10 +278,28 @@
             ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6'],
             ['name' => 'description', 'label' => 'Description', 'type' => 'text', 'size' => '6'],
         ]" :columns="3" />
-    @endif
+    {{-- @endif --}}
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const table = document.getElementById('expense');
+            const searchInput = document.getElementById('search-input');
+
+            if (table && searchInput) {
+                const rows = Array.from(table.querySelectorAll('tbody tr'));
+                const updateSearch = function() {
+                    const term = searchInput.value.trim().toLowerCase();
+                    rows.forEach(function(row) {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(term) ? '' : 'none';
+                    });
+                };
+
+                searchInput.addEventListener('input', updateSearch);
+                searchInput.addEventListener('keyup', updateSearch);
+                updateSearch();
+            }
+
             function toggleExpenseChequeFields(modal) {
                 if (!modal) return;
                 var paymentSelect = modal.querySelector('select[name="payment_mode"], [data-field="payment_mode"]');
