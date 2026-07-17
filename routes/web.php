@@ -675,6 +675,7 @@ Route::delete('/ipd_charge/{charge}', [IpdController::class, 'deleteIpdCharge'])
 Route::post('/assignNewBed', [IpdController::class, 'assignNewBed'])->name('assignNewBed');
 Route::post('/ipd/bed-history/store', [IpdController::class, 'storeBedHistory'])->name('ipd.bedHistory.store');
 Route::post('/ipd/bed-history/update', [IpdController::class, 'updateBedHistory'])->name('ipd.bedHistory.update');
+Route::delete('/ipd/bed-history/delete', [IpdController::class, 'deleteBedHistory'])->name('ipd.bedHistory.delete');
 //
 Route::get('/ipd/{id}/pdf', [PdfController::class, 'generatePdf'])->name('ipd.pdf');
 
