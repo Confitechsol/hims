@@ -8,6 +8,22 @@
                 <h5 class="mb-0" style="color: #750096"><i class="fas fa-edit me-2"></i>Edit Pathology Bill</h5>
             </div>
             <div class="card-body">
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error!</strong> {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+                @if($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Validation Errors:</strong>
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <form action="{{ route('pathology.billing.update', $bill->id) }}" method="POST" id="pathologyBillForm">
                     @csrf
                     @method('PUT')
@@ -26,8 +42,8 @@
                         <div class="col-md-3">
                             <label class="form-label">Case Reference</label>
                             <div class="autocomplete-container">
-                                <input type="text" id="prescription_search" class="form-control" placeholder="Search prescriptions" autocomplete="off" value="{{ $prescriptionNumber ?? '' }}">
-                                <input type="hidden" name="case_reference_id" id="case_reference_id" value="{{ $bill->case_reference_id ?? '' }}">
+                                <input type="text" name="prescription_search" id="prescription_search" class="form-control" placeholder="Search prescriptions" autocomplete="off" value="{{ old('prescription_search', $prescriptionNumber ?? '') }}">
+                                <input type="hidden" name="case_reference_id" id="case_reference_id" value="{{ old('case_reference_id', $caseReferenceId ?? '') }}">
                                 <div id="prescription_suggestions" class="autocomplete-suggestions"></div>
                             </div>
                         </div>
@@ -96,6 +112,7 @@
                                         @foreach($bill->reports as $index => $report)
                                         <tr class="test-row">
                                             <td>
+                                                <input type="hidden" name="tests[{{ $index }}][report_id]" class="report_id" value="{{ $report->id }}">
                                                 <select name="tests[{{ $index }}][pathology_id]" class="form-select test_name" required>
                                                     <option value="">Select Test</option>
                                                     @if(isset($tests) && count($tests) > 0)
@@ -347,6 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const tbody = $('#testTableBody');
         const newRow = tbody.find('tr:first').clone();
         newRow.find('input, select').val('');
+        newRow.find('.report_id').attr('name', `tests[${testRowCount}][report_id]`).val('');
         newRow.find('select').attr('name', `tests[${testRowCount}][pathology_id]`);
         newRow.find('.report_days').attr('name', `tests[${testRowCount}][report_days]`);
         newRow.find('.report_date').attr('name', `tests[${testRowCount}][report_date]`).val(today);
@@ -562,7 +580,7 @@ function initPrescriptionAutocomplete() {
 
 function loadPatientPrescriptions(patientId) {
     console.log('Loading prescriptions for patient ID:', patientId);
-    const showCaseRefId = '{{ $bill->case_reference_id ?? '' }}';
+    const showCaseRefId = '{{ $caseReferenceId ?? '' }}';
     let url = `{{ url('/pathology/billing/api/patient-prescriptions') }}/${patientId}`;
     if (showCaseRefId) {
         url += '?show_case_ref_id=' + encodeURIComponent(showCaseRefId);
@@ -687,6 +705,7 @@ function loadPrescriptionTests(prescriptionId) {
                     newRow.find('.test_amount').val(test.amount || 0);
                     
                     // Update names
+                    newRow.find('.report_id').attr('name', `tests[${testRowCount}][report_id]`).val('');
                     newRow.find('select').attr('name', `tests[${testRowCount}][pathology_id]`);
                     newRow.find('.report_days').attr('name', `tests[${testRowCount}][report_days]`);
                     newRow.find('.report_date').attr('name', `tests[${testRowCount}][report_date]`);

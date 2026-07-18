@@ -95,6 +95,7 @@ class PathologyBillingController extends Controller
             'organisation_id' => 'nullable|exists:organisation,id',
             'activate_tpa' => 'nullable',
             'tests' => 'required|array|min:1',
+            'tests.*.report_id' => 'nullable|integer|exists:pathology_report,id',
             'tests.*.pathology_id' => 'required|exists:pathology,id',
             'tests.*.report_days' => 'required|integer|min:0',
             'tests.*.report_date' => 'required|date',
@@ -117,24 +118,11 @@ class PathologyBillingController extends Controller
                 }
             }
             
-            // Create pathology bill
-            // Ensure case_reference_id is null if empty or invalid
-            $caseReferenceId = null;
-            if (!empty($validated['case_reference_id'])) {
-                $caseRefId = $validated['case_reference_id'];
-                // Verify it exists in the database
-                if (CaseReference::where('id', $caseRefId)->exists()) {
-                    $caseReferenceId = $caseRefId;
-                } else {
-                    \Log::warning('Invalid case_reference_id provided: ' . $caseRefId . '. Setting to null.');
-                    $caseReferenceId = null;
-                }
-            }
-            
             $bill = PathologyBilling::create([
                 'date' => $validated['date'],
                 'patient_id' => $validated['patient_id'],
-                'case_reference_id' => $caseReferenceId,
+                // The selector contains either an OPD visit ID or an IPD prescription ID.
+                'case_reference_id' => $validated['case_reference_id'],
                 'doctor_id' => $validated['doctor_id'] ?? null,
                 'doctor_name' => $doctorName ?? '',
                 'total' => $validated['total'],
@@ -215,7 +203,14 @@ class PathologyBillingController extends Controller
      */
     public function edit($id)
     {
-        $bill = PathologyBilling::with(['patient.organisation', 'doctor', 'reports.pathology', 'organisation', 'prescription'])->findOrFail($id);
+        $bill = PathologyBilling::with([
+            'patient.organisation',
+            'doctor',
+            'reports.pathology',
+            'reports.prescriptionTestInstance.prescription',
+            'organisation',
+            'prescription',
+        ])->findOrFail($id);
         $patients = Patient::select('id', 'patient_name', 'mobileno')->get();
         $doctors = Doctor::select('id', 'name', 'surname', 'doctor_id')
             ->where(function($query) {
@@ -226,13 +221,55 @@ class PathologyBillingController extends Controller
             ->get();
         $tests = Pathology::with(['category'])->get();
         
-        // Get prescription number for display
-        $prescriptionNumber = '';
-        if ($bill->prescription) {
-            $prescriptionNumber = $bill->prescription->prescription_number ?? 'IPDP' . str_pad($bill->prescription->id, 4, '0', STR_PAD_LEFT);
-        }
+        $linkedPrescription = $bill->prescription
+            ?? collect($bill->reports)->first(fn ($report) => $report->prescriptionTestInstance?->prescription)
+                ?->prescriptionTestInstance?->prescription
+            ?? $this->inferLegacyPrescription($bill);
+        $caseReferenceId = $bill->case_reference_id ?? $linkedPrescription?->id;
+        $prescriptionNumber = $linkedPrescription
+            ? ($linkedPrescription->prescription_number ?? 'IPDP' . str_pad($linkedPrescription->id, 4, '0', STR_PAD_LEFT))
+            : (OpdDetail::find($caseReferenceId)?->opd_no ?? '');
         
-        return view('admin.pathology.billing.edit', compact('bill', 'patients', 'doctors', 'tests', 'prescriptionNumber'));
+        return view('admin.pathology.billing.edit', compact(
+            'bill',
+            'patients',
+            'doctors',
+            'tests',
+            'prescriptionNumber',
+            'caseReferenceId'
+        ));
+    }
+
+    /**
+     * Recover an IPD prescription for older bills whose case link was not saved.
+     * Only return an unambiguous same-date prescription containing every billed test.
+     */
+    private function inferLegacyPrescription(PathologyBilling $bill): ?IpdPrescription
+    {
+        $reportDates = collect($bill->reports)
+            ->pluck('reporting_date')
+            ->filter()
+            ->map(fn ($date) => date('Y-m-d', strtotime($date)))
+            ->unique()
+            ->values();
+        $testIds = collect($bill->reports)->pluck('pathology_id')->filter()->unique()->values();
+
+        if ($reportDates->count() !== 1 || $testIds->isEmpty()) {
+            return null;
+        }
+
+        $query = IpdPrescription::whereHas(
+            'ipd',
+            fn ($ipdQuery) => $ipdQuery->where('patient_id', $bill->patient_id)
+        )->where('date', $reportDates->first());
+
+        foreach ($testIds as $testId) {
+            $query->whereHas('tests', fn ($testQuery) => $testQuery->where('pathology_id', $testId));
+        }
+
+        $candidates = $query->limit(2)->get();
+
+        return $candidates->count() === 1 ? $candidates->first() : null;
     }
 
     /**
@@ -257,6 +294,7 @@ class PathologyBillingController extends Controller
             'organisation_id' => 'nullable|exists:organisation,id',
             'activate_tpa' => 'nullable',
             'tests' => 'required|array|min:1',
+            'tests.*.report_id' => 'nullable|integer|exists:pathology_report,id',
             'tests.*.pathology_id' => 'required|exists:pathology,id',
             'tests.*.prescription_test_id' => 'nullable|exists:ipd_prescription_test,id',
             'tests.*.report_days' => 'required|integer|min:0',
@@ -269,6 +307,15 @@ class PathologyBillingController extends Controller
         
         try {
             $bill = PathologyBilling::findOrFail($id);
+
+            // Do not trust hidden summary fields: derive totals from submitted editable amounts.
+            $total = collect($validated['tests'])->sum(fn ($test) => (float) $test['amount']);
+            $tax = collect($validated['tests'])->sum(function ($test) {
+                return (float) $test['amount'] * (float) ($test['tax_percentage'] ?? 0) / 100;
+            });
+            $discountPercentage = (float) ($validated['discount_percentage'] ?? 0);
+            $discount = $total * $discountPercentage / 100;
+            $netAmount = $total - $discount + $tax;
             
             // Get doctor name if doctor_id is provided
             $doctorName = $validated['doctor_name'] ?? null;
@@ -286,46 +333,52 @@ class PathologyBillingController extends Controller
                 'case_reference_id' => $validated['case_reference_id'] ?? null,
                 'doctor_id' => $validated['doctor_id'] ?? null,
                 'doctor_name' => $doctorName ?? '',
-                'total' => $validated['total'],
-                'discount_percentage' => $validated['discount_percentage'] ?? 0,
-                'discount' => $validated['discount'] ?? 0,
+                'total' => round($total, 2),
+                'discount_percentage' => $discountPercentage,
+                'discount' => round($discount, 2),
                 'tax_percentage' => $validated['tax_percentage'] ?? 0,
-                'tax' => $validated['tax'] ?? 0,
-                'net_amount' => $validated['net_amount'],
+                'tax' => round($tax, 2),
+                'net_amount' => round($netAmount, 2),
                 'note' => $validated['note'] ?? null,
                 'organisation_id' => ($request->has('activate_tpa') && $request->activate_tpa) ? ($validated['organisation_id'] ?? null) : null,
             ]);
 
-            // Delete existing reports
-            PathologyReport::where('pathology_bill_id', $bill->id)->delete();
-
-            // Create new pathology reports
+            // Update existing rows in place so report results/parameters remain linked.
+            $retainedReportIds = [];
             foreach ($validated['tests'] as $test) {
-                $prescriptionTestInstance = null;
-                $instanceNumber = null;
-                $customerType = 'OPD';
-                
-                // If prescription_test_id is provided, link to it
+                $report = !empty($test['report_id'])
+                    ? PathologyReport::where('pathology_bill_id', $bill->id)->find($test['report_id'])
+                    : null;
+
+                $prescriptionTestInstance = $report?->prescriptionTestInstance;
                 if (!empty($test['prescription_test_id'])) {
                     $prescriptionTestInstance = IpdPrescriptionTest::find($test['prescription_test_id']);
-                    if ($prescriptionTestInstance) {
-                        $instanceNumber = $prescriptionTestInstance->instance_number;
-                        $customerType = 'IPD'; // If linked to prescription, it's IPD
-                    }
                 }
-                
-                PathologyReport::create([
+
+                $values = [
                     'pathology_bill_id' => $bill->id,
                     'pathology_id' => $test['pathology_id'],
                     'ipd_prescription_test_id' => $prescriptionTestInstance?->id,
-                    'instance_number' => $instanceNumber,
+                    'instance_number' => $prescriptionTestInstance?->instance_number ?? $report?->instance_number,
                     'patient_id' => $validated['patient_id'],
                     'reporting_date' => $test['report_date'],
                     'tax_percentage' => $test['tax_percentage'] ?? 0,
                     'apply_charge' => $test['amount'],
-                    'customer_type' => $customerType,
-                ]);
+                    'customer_type' => $prescriptionTestInstance ? 'IPD' : ($report?->customer_type ?? 'OPD'),
+                ];
+
+                if ($report) {
+                    $report->update($values);
+                } else {
+                    $report = PathologyReport::create($values);
+                }
+                $retainedReportIds[] = $report->id;
             }
+
+            // Rows explicitly removed in the edit UI should be removed from this bill.
+            PathologyReport::where('pathology_bill_id', $bill->id)
+                ->whereNotIn('id', $retainedReportIds)
+                ->delete();
 
             DB::commit();
             
