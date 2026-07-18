@@ -145,16 +145,24 @@ class IpdBillingController extends Controller
         $request->validate([
             'mou_discount' => 'nullable|numeric|min:0',
             'special_discount' => 'nullable|numeric|min:0',
+            'initial_approval_amount' => 'nullable|numeric|min:0',
             'final_approval_amount' => 'nullable|numeric|min:0',
         ]);
 
         $ipd = IpdDetail::findOrFail($ipdId);
         $ipd->mou_discount = (float) ($request->input('mou_discount') ?? 0);
         $ipd->special_discount = (float) ($request->input('special_discount') ?? 0);
-        if ($request->exists('final_approval_amount')) {
-            $ipd->final_approval_amount = $request->filled('final_approval_amount')
-                ? (float) $request->input('final_approval_amount')
-                : null;
+        if ($ipd->isInsuranceBilling()) {
+            if ($request->exists('initial_approval_amount')) {
+                $ipd->initial_approval_amount = $request->filled('initial_approval_amount')
+                    ? (float) $request->input('initial_approval_amount')
+                    : null;
+            }
+            if ($request->exists('final_approval_amount')) {
+                $ipd->final_approval_amount = $request->filled('final_approval_amount')
+                    ? (float) $request->input('final_approval_amount')
+                    : null;
+            }
         }
         $ipd->save();
 
@@ -167,13 +175,20 @@ class IpdBillingController extends Controller
         $netBalance = max(0, $outstanding - $totalDiscount - $duePatientPartyAmount);
         $approvalAmount = (float) ($ipd->final_approval_amount ?? 0);
         $balanceAmount = max(0, (float) ($breakup['total_charges'] ?? 0) - $approvalAmount);
+        $initialApprovalAmount = (float) ($ipd->initial_approval_amount ?? 0);
+        $requestFurtherApproval = max(
+            0,
+            (float) ($breakup['total_charges'] ?? 0) - (float) $ipd->mou_discount - $initialApprovalAmount
+        );
 
         return response()->json([
             'success' => true,
-            'message' => 'Discount saved. It will apply to the final bill only.',
+            'message' => 'Billing values saved successfully.',
             'mou_discount' => $ipd->mou_discount,
             'special_discount' => $ipd->special_discount,
+            'initial_approval_amount' => $ipd->initial_approval_amount,
             'final_approval_amount' => $ipd->final_approval_amount,
+            'request_further_approval' => $requestFurtherApproval,
             'total_discount' => $totalDiscount,
             'due_patient_party_amount' => $duePatientPartyAmount,
             'outstanding' => $outstanding,
@@ -232,7 +247,7 @@ class IpdBillingController extends Controller
             return ['total' => 0, 'details' => []];
         }
 
-        $admissionAt = Carbon::parse($ipd->date);
+        $admissionAt = Carbon::parse($ipd->date ?? $ipd->created_at ?? now());
         // For non-discharged preview/breakup, calculate up to current moment.
         // Date-only end values use discharge card time when available (insurance discharge-day rule).
         if ($endDate === null) {
@@ -262,6 +277,21 @@ class IpdBillingController extends Controller
             ->orderBy('from_date', 'asc')
             ->get();
 
+        // Defensive fallback for imported/legacy admissions: the current IPD bed
+        // remains billable even if its history row was never created.
+        if ($bedHistories->isEmpty() && $ipd->bed && $ipd->bed_group_id) {
+            $currentBed = new PatientBedHistory([
+                'ipd_id' => $ipd->id,
+                'bed_group_id' => $ipd->bed_group_id,
+                'bed_id' => $ipd->bed,
+                'from_date' => $admissionAt,
+                'is_active' => 'yes',
+            ]);
+            $currentBed->setRelation('bedGroup', $ipd->bedGroup()->first());
+            $currentBed->setRelation('bed', $ipd->bedDetail()->first());
+            $bedHistories = collect([$currentBed]);
+        }
+
         // Fallback: daywise bed charges (created on admission/transfer) if no history or to fill gaps
         $daywiseCharges = IpdDaywiseBedCharge::where('ipd_id', $ipdId)
             ->with(['bedGroup', 'bed'])
@@ -276,9 +306,14 @@ class IpdBillingController extends Controller
         $totalCgst = 0;
         $totalSgst = 0;
         $details = [];
-        $currentDate = Carbon::parse($ipd->date)->startOfDay();
+        // Admission immediately incurs the first bed day. The line is labelled with
+        // the next billing day, even when the estimate is generated before 11:00.
+        $firstChargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($admissionAt);
         $lastChargeDay = $this->resolveChargeLabelDayForMoment($endAt);
-        $admissionCalendarDay = $admissionAt->copy()->startOfDay();
+        if ($endAt->gt($admissionAt) && $lastChargeDay->lt($firstChargeDay)) {
+            $lastChargeDay = $firstChargeDay->copy();
+        }
+        $currentDate = $firstChargeDay->copy();
 
         // Pre-compute the most recent custom bed charge for each bed group during its history periods
         // This ensures a custom charge set on admission/transfer applies to all subsequent days in that period
@@ -323,20 +358,16 @@ class IpdBillingController extends Controller
 
             [$periodStart, $periodEnd] = BedBillingPeriod::windowForChargeCalendarDay($currentDate->copy()->startOfDay());
 
-            // Never bill a window whose start date is before admission calendar date.
-            // Example: admitted 22nd => skip 21st->22nd window.
-            if ($periodStart->copy()->startOfDay()->lt($admissionCalendarDay)) {
-                $currentDate->addDay();
-                continue;
-            }
-
             // Respect requested end moment (discharge datetime for final bill).
-            if ($periodEnd->lte($admissionAt) || $periodStart->gte($endAt)) {
+            $isFirstAdmissionDay = $currentDate->isSameDay($firstChargeDay);
+            if ($periodEnd->lte($admissionAt) || (! $isFirstAdmissionDay && $periodStart->gte($endAt))) {
                 $currentDate->addDay();
                 continue;
             }
 
-            $effectiveStart = $periodStart->copy()->max($admissionAt);
+            $effectiveStart = $isFirstAdmissionDay
+                ? $admissionAt->copy()
+                : $periodStart->copy()->max($admissionAt);
             $effectiveEnd = $periodEnd->copy()->min($endAt);
             if ($effectiveStart->gte($effectiveEnd)) {
                 $currentDate->addDay();
@@ -1575,11 +1606,10 @@ class IpdBillingController extends Controller
             $bedChargesDetails = collect($bedChargesData['details']);
             $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
             $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
-            if (($breakup['package_charges'] ?? 0) > 0) {
-                $bedChargesDetails = collect();
-                $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
-                $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
-            }
+            // Always show the assigned bed/rate in estimate and approval PDFs.
+            // calculateBreakup() may still exclude it from payable totals when a package covers bed.
+            $bedChargesDisplayTotal = $bedChargesGroupedForDisplay->sum('bed_charge');
+            $bedChargesCoveredByPackage = ($breakup['package_charges'] ?? 0) > 0;
 
             $ipdChargesDetails = IpdCharges::where('ipd_id', $ipdId)
                 ->with(['charge', 'chargeCategory'])
@@ -1813,6 +1843,7 @@ class IpdBillingController extends Controller
             // First pass: Render to get accurate page count
             $tempPdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
+                'bedChargesDisplayTotal', 'bedChargesCoveredByPackage',
                 'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'doctorVisitGroupedByVisitType', 'packageDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise', 'investigationBrief', 'viewMode',
@@ -1856,6 +1887,7 @@ class IpdBillingController extends Controller
             // Second pass: Render with accurate page count stored in view
             $pdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
+                'bedChargesDisplayTotal', 'bedChargesCoveredByPackage',
                 'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'doctorVisitGroupedByVisitType', 'packageDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise', 'investigationBrief', 'viewMode',

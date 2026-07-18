@@ -824,7 +824,7 @@
                         <div class="row g-3">
                             <div class="col-md-3">
                                 <label class="form-label">Admission Date & Time<span class="required">*</span></label>
-                                <input type="datetime-local" class="form-control" name="admission_date">
+                                <input type="datetime-local" class="form-control" name="admission_date" required>
                             </div>
                             <!-- <div class="col-md-3">
                                 <label class="form-label">Case</label>
@@ -916,20 +916,20 @@
                             </div>
                             <div class="col-md-6" id="admission_bed_group_field">
                                 <label class="form-label">Bed Group <span class="required bed-field-required">*</span></label>
-                                <select class="form-select" name="bed_group" id="bed_group_select">
+                                <select class="form-select" name="bed_group" id="bed_group_select" required>
                                     <option value="">Loading...</option>
                                 </select>
                             </div>
                             <div class="col-md-6" id="admission_bed_number_field">
                                 <label class="form-label">Bed Number <span class="required bed-field-required">*</span></label>
-                                <select class="form-select" name="bed_number" id="bed_number_select">
+                                <select class="form-select" name="bed_number" id="bed_number_select" required>
                                     <option value="">Loading...</option>
                                 </select>
                             </div>
                             <div class="col-md-6" id="admission_bed_charge_field">
                                 <label class="form-label">Bed Charge (INR) <span class="required bed-field-required">*</span></label>
                                 <input type="number" class="form-control" name="bed_charge" id="bed_charge_input" 
-                                    step="0.01" min="0" placeholder="0.00">
+                                    step="0.01" min="0.01" placeholder="0.00" required>
                                 <small class="text-muted">Auto-filled from bed group (editable)</small>
                             </div>
                             <div class="col-md-6">

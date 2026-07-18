@@ -157,7 +157,7 @@ class IpdController extends Controller
         //dd($request->all());
         $validator = Validator::make($request->all(), [
             'patient_id'           => 'nullable|exists:patients,id',
-            'admission_date'       => 'date',
+            'admission_date'       => 'required|date',
             'patient_type'         => 'string',
             'case'                 => 'nullable|numeric',
             'casualty'             => 'string',
@@ -170,7 +170,7 @@ class IpdController extends Controller
             'live_consultation'    => 'nullable|string|max:100',
             'bed_group'            => 'required|exists:bed_group,id',
             'bed_number'           => 'required|exists:bed,id',
-            'bed_charge'           => 'required|numeric|min:0',
+            'bed_charge'           => 'required|numeric|gt:0',
             'package_id'           => 'nullable|exists:packages,id',
             'package_rate'         => 'nullable|numeric|min:0',
             'symptoms_type'        => 'nullable|array',
@@ -427,7 +427,7 @@ class IpdController extends Controller
             'package_rate'   => 'nullable|numeric|min:0',
             'bed_group'      => 'required|exists:bed_group,id',
             'bed_number'     => 'required|exists:bed,id',
-            'bed_charge'     => 'required|numeric|min:0',
+            'bed_charge'     => 'required|numeric|gt:0',
             'reference'            => 'required|string',
              'consultant_doctor'    => 'nullable|exists:doctor,id',
              'consultant_doctor2'   => 'nullable|exists:doctor,id',

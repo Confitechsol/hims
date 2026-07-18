@@ -570,7 +570,12 @@
         <table class="charges-table">
             <thead>
                 <tr>
-                    <th colspan="4">Bed Charges</th>
+                    <th colspan="4">
+                        Bed Charges
+                        @if($bedChargesCoveredByPackage ?? false)
+                            (Included in Package)
+                        @endif
+                    </th>
                 </tr>
                 <tr>
                     <th>Bed / Rate</th>
@@ -590,7 +595,7 @@
                 @endforeach
                 <tr style="font-weight: bold;">
                     <td colspan="3" class="text-right">Subtotal:</td>
-                    <td class="text-right">Rs. {{ number_format($breakup['bed_charges'], 2) }}</td>
+                    <td class="text-right">Rs. {{ number_format($bedChargesDisplayTotal ?? $breakup['bed_charges'], 2) }}</td>
                 </tr>
             </tbody>
         </table>

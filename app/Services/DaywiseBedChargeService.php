@@ -304,6 +304,9 @@ class DaywiseBedChargeService
 
         $firstChargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($segmentFrom);
         $lastChargeDay = BedBillingPeriod::chargeLabelDayForMoment($endAt);
+        if ($endAt->gt($segmentFrom) && $lastChargeDay->lt($firstChargeDay)) {
+            $lastChargeDay = $firstChargeDay->copy();
+        }
         $segmentCalendarDay = $segmentFrom->copy()->startOfDay();
         $updated = 0;
         $current = $firstChargeDay->copy();
@@ -320,13 +323,14 @@ class DaywiseBedChargeService
             }
 
             [$periodStart, $periodEnd] = BedBillingPeriod::windowForChargeCalendarDay($current->copy()->startOfDay());
+            $isFirstSegmentDay = $current->isSameDay($firstChargeDay);
 
             if ($periodStart->copy()->startOfDay()->lt($segmentCalendarDay)) {
                 $current->addDay();
                 continue;
             }
 
-            if ($periodEnd->lte($segmentFrom) || $periodStart->gte($endAt)) {
+            if ($periodEnd->lte($segmentFrom) || (! $isFirstSegmentDay && $periodStart->gte($endAt))) {
                 $current->addDay();
                 continue;
             }

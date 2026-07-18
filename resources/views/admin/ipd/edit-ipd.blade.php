@@ -847,7 +847,7 @@
                                                 <div class="field-group" id="edit_bed_charge_field">
                                                     <label class="form-label">Bed Charge (INR) <span class="required bed-field-required">*</span></label>
                                                     <input type="number" class="form-control" name="bed_charge"
-                                                        id="bed_charge_input_edit" step="0.01" min="0"
+                                                        id="bed_charge_input_edit" step="0.01" min="0.01"
                                                         placeholder="0.00" required
                                                         value="{{ old('bed_charge', $currentBedCharge) }}">
                                                     <small class="text-muted">Auto-filled from bed group (editable)</small>

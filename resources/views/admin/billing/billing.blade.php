@@ -539,6 +539,9 @@
                     const formData = new FormData(form);
                     formData.set('mou_discount', form.mou_discount.value ? parseFloat(form.mou_discount.value) : 0);
                     formData.set('special_discount', form.special_discount.value ? parseFloat(form.special_discount.value) : 0);
+                    if (form.initial_approval_amount) {
+                        formData.set('initial_approval_amount', form.initial_approval_amount.value ? parseFloat(form.initial_approval_amount.value) : 0);
+                    }
                     if (form.final_approval_amount) {
                         formData.set('final_approval_amount', form.final_approval_amount.value ? parseFloat(form.final_approval_amount.value) : 0);
                     }
@@ -574,7 +577,15 @@
                             }
                             if (netBalanceEl) netBalanceEl.textContent = '₹ ' + (data.net_balance != null ? data.net_balance.toFixed(2) : (data.outstanding - (data.total_discount || 0) - (data.due_patient_party_amount || 0)).toFixed(2));
                             const previewFinal = document.getElementById('previewFinalApproval');
+                            const previewInitial = document.getElementById('previewInitialApproval');
+                            const previewFurther = document.getElementById('previewRequestFurtherApproval');
                             const previewBal = document.getElementById('previewInsuranceBalance');
+                            if (previewInitial && data.initial_approval_amount != null) {
+                                previewInitial.textContent = '₹ ' + parseFloat(data.initial_approval_amount || 0).toFixed(2);
+                            }
+                            if (previewFurther && data.request_further_approval != null) {
+                                previewFurther.textContent = '₹ ' + parseFloat(data.request_further_approval || 0).toFixed(2);
+                            }
                             if (previewFinal && data.final_approval_amount != null) {
                                 previewFinal.textContent = '₹ ' + parseFloat(data.final_approval_amount || 0).toFixed(2);
                             }

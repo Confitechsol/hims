@@ -211,10 +211,10 @@
         <!-- Discount (Final Bill & Insurance Approval Bill) -->
         <div class="card mb-3">
             <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="fas fa-percent me-2"></i> Discount &amp; Final Approval (Final Bill)</h6>
+                <h6 class="mb-0"><i class="fas fa-percent me-2"></i> Discount &amp; Insurance Approval Amounts</h6>
             </div>
             <div class="card-body">
-                <p class="text-muted small mb-3">MOU discount applies on Approval Bill and Final Bill. Final Approval Amount is entered manually after insurer response (Insurance Final Bill only).</p>
+                <p class="text-muted small mb-3">MOU discount applies on Approval Bill and Final Bill. Approval amount fields are available only for insurance patients.</p>
                 <form id="discountForm" class="row g-3">
                     @csrf
                     <input type="hidden" name="ipd_id" value="{{ $ipd->id }}">
@@ -227,6 +227,11 @@
                         <input type="number" step="0.01" min="0" class="form-control" id="special_discount" name="special_discount" placeholder="0.00" value="{{ number_format((float)($ipd->special_discount ?? 0), 2, '.', '') }}">
                     </div>
                     @if(!empty($isInsuranceIpd))
+                    <div class="col-md-3">
+                        <label for="initial_approval_amount" class="form-label">Initial Approval Amount (₹)</label>
+                        <input type="number" step="0.01" min="0" class="form-control" id="initial_approval_amount" name="initial_approval_amount" placeholder="0.00" value="{{ number_format((float)($ipd->initial_approval_amount ?? 0), 2, '.', '') }}">
+                        <small class="text-muted">Initial insurer authorization</small>
+                    </div>
                     <div class="col-md-3">
                         <label for="final_approval_amount" class="form-label">Final Approval Amount (₹)</label>
                         <input type="number" step="0.01" min="0" class="form-control" id="final_approval_amount" name="final_approval_amount" placeholder="0.00" value="{{ number_format((float)($ipd->final_approval_amount ?? 0), 2, '.', '') }}">
@@ -253,8 +258,7 @@
             </div>
             <div class="card-body">
                 <p class="text-muted small mb-3">
-                    Set <strong>Initial Approval Amount</strong> on IPD admission (Edit IPD → TPA &amp; Insurance).
-                    Enter <strong>MOU Discount</strong> above before exporting.
+                    Enter <strong>Initial Approval Amount</strong> and <strong>MOU Discount</strong> above before exporting.
                 </p>
                 <div class="row g-3">
                     <div class="col-md-3">
@@ -272,13 +276,13 @@
                     <div class="col-md-3">
                         <div class="border rounded p-3 h-100">
                             <small class="text-muted d-block">Initial Approval Amount</small>
-                            <strong class="text-primary">₹ {{ number_format($initialApprovalAmount ?? 0, 2) }}</strong>
+                            <strong class="text-primary" id="previewInitialApproval">₹ {{ number_format($initialApprovalAmount ?? 0, 2) }}</strong>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="border rounded p-3 h-100 bg-light">
                             <small class="text-muted d-block">Request for Further Approval</small>
-                            <strong class="text-danger">₹ {{ number_format($requestFurtherApproval ?? 0, 2) }}</strong>
+                            <strong class="text-danger" id="previewRequestFurtherApproval">₹ {{ number_format($requestFurtherApproval ?? 0, 2) }}</strong>
                         </div>
                     </div>
                 </div>
