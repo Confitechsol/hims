@@ -34,8 +34,9 @@ class RadiologyBillingController extends Controller
     }
 
     $search = $request->input('search');
-    $query = RadiologyBilling::with(['patient', 'doctor'])
-        ->orderBy('id', 'desc');
+    $query = RadiologyBilling::with(['patient', 'doctor', 'organisation'])
+        ->orderByDesc('date')
+        ->orderByDesc('id');
 
     if (!empty($search)) {
         $query->where(function ($q) use ($search) {

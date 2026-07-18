@@ -33,7 +33,9 @@ class PathologyBillingController extends Controller
     }
 
     $search = $request->input('search');
-        $query = PathologyBilling::with(['patient', 'doctor', 'organisation']);
+        $query = PathologyBilling::with(['patient', 'doctor', 'organisation'])
+            ->orderByDesc('date')
+            ->orderByDesc('id');
       
             if (!empty($search)) {
         $query->where(function ($q) use ($search) {

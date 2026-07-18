@@ -53,7 +53,7 @@
                                     <tr>
                                         <td>RADB{{ str_pad($bill->id, 2, '0', STR_PAD_LEFT) }}</td>
                                         <td>{{ $bill->case_reference_id ?? '-' }}</td>
-                                        <td>{{ $bill->date ? date('m/d/Y h:i A', strtotime($bill->date)) : '-' }}</td>
+                                        <td>{{ $bill->date ? date('d/m/Y', strtotime($bill->date)) : '-' }}</td>
                                         <td>{{ $bill->patient->patient_name ?? '-' }} ({{ $bill->patient_id ?? '-' }})</td>
                                         <td>{{ $bill->doctor_name ?? '-' }}</td>
                                         <td>
