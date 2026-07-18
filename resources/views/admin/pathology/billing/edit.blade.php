@@ -126,7 +126,7 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <input type="number" name="tests[{{ $index }}][amount]" class="form-control test_amount" value="{{ $report->apply_charge ?? 0 }}" step="0.01" min="0" readonly>
+                                                <input type="number" name="tests[{{ $index }}][amount]" class="form-control test_amount" value="{{ $report->apply_charge ?? 0 }}" step="0.01" min="0">
                                             </td>
                                             <td>
                                                 <button type="button" class="btn btn-sm btn-danger remove-row">
@@ -434,6 +434,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Stored current amount as original for test', testId, ':', currentAmount);
             }
         }
+    });
+
+    // Insurance/TPA rates are suggested amounts; permit manual billing override.
+    $(document).on('input change', '.test_amount', function() {
+        calculateTotals();
     });
     
     // Calculate totals on page load
