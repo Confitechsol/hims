@@ -512,13 +512,7 @@
                             <tr>
                                 <td class="patient_label">Patient Name</td>
                                 <td class="patient_colon">:</td>
-                                <td class="patient_value">
-                                    {{ strtoupper($ipd->patient->patient_name ?? 'N/A') }}@php
-                                        $tpaTag = $ipd->organisation->organisation_name
-                                            ?? ($ipd->patient->organisation->organisation_name ?? null);
-                                    @endphp
-                                    @if($tpaTag)
-                                    ({{ strtoupper($tpaTag) }})@endif</td>
+                                <td class="patient_value">{{ strtoupper($ipd->patient->patient_name ?? 'N/A') }}</td>
                             </tr>
                             <tr>
                                 <td class="patient_label">Address</td>

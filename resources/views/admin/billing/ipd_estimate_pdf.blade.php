@@ -471,7 +471,7 @@
                             <tr>
                                 <td class="patient_label">Patient Name</td>
                                 <td class="patient_colon">:</td>
-                                <td class="patient_value">{{ strtoupper($ipd->patient->patient_name ?? 'N/A') }}@if($ipd->patient->organisation) ({{ strtoupper($ipd->patient->organisation->organisation_name ?? '') }})@endif</td>
+                                <td class="patient_value">{{ strtoupper($ipd->patient->patient_name ?? 'N/A') }}</td>
                             </tr>
                             <tr>
                                 <td class="patient_label">Address</td>
