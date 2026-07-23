@@ -1,8 +1,10 @@
-@if(isset($packageDetails) && $packageDetails->count() > 0)
+@if(isset($packageDetails) && collect($packageDetails)->count() > 0)
     @php
+        $billPackageRows = collect($packageDetails);
         $showOriginalAmount = !empty($showOriginalAmount);
-        $headerColspan = $showOriginalAmount ? 4 : 3;
-        $subtotalColspan = $showOriginalAmount ? 3 : 2;
+        $showProcedureColumn = (bool) ($showPackageProcedureColumn ?? ($billPackageRows->count() > 1));
+        $headerColspan = 2 + ($showProcedureColumn ? 1 : 0) + ($showOriginalAmount ? 1 : 0);
+        $subtotalColspan = $headerColspan - 1;
     @endphp
     <table class="charges-table">
         <thead>
@@ -10,7 +12,9 @@
                 <th colspan="{{ $headerColspan }}">Package Charges</th>
             </tr>
             <tr>
-                <th>Procedure</th>
+                @if($showProcedureColumn)
+                    <th>Procedure</th>
+                @endif
                 <th>Package Name</th>
                 @if($showOriginalAmount)
                     <th class="text-right">Original Amount</th>
@@ -19,9 +23,11 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($packageDetails as $pkg)
+            @foreach($billPackageRows as $pkg)
                 <tr>
-                    <td>{{ $pkg['procedure_label'] ?? 'N/A' }}</td>
+                    @if($showProcedureColumn)
+                        <td>{{ $pkg['procedure_label'] ?? 'N/A' }}</td>
+                    @endif
                     <td>{{ $pkg['package_name_display'] ?? ($pkg['package_name'] ?? 'N/A') }}</td>
                     @if($showOriginalAmount)
                         <td class="text-right">Rs. {{ number_format($pkg['original_amount'] ?? 0, 2) }}</td>

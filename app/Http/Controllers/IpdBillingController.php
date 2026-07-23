@@ -1719,6 +1719,7 @@ class IpdBillingController extends Controller
 
             // Package details (applied packages) for estimate / approval PDF
             $packageDetails = $this->buildPackageDetailsForBillDisplay($ipdId);
+            $showPackageProcedureColumn = $packageDetails->count() > 1;
             $showOriginalAmount = $isApprovalBill && $request->boolean('show_original_amount');
             
             // Get payment details
@@ -1848,7 +1849,7 @@ class IpdBillingController extends Controller
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise', 'investigationBrief', 'viewMode',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
-                'hospital', 'logged_user', 'billHeading', 'isApprovalBill', 'showInsuranceSection', 'showOriginalAmount',
+                'hospital', 'logged_user', 'billHeading', 'isApprovalBill', 'showInsuranceSection', 'showOriginalAmount', 'showPackageProcedureColumn',
                 'grandTotal', 'totalAdvance', 'mouDiscountAmount', 'initialApprovalAmount',
                 'requestFurtherApproval', 'requestFurtherApprovalInWords'
             ));
@@ -1893,7 +1894,7 @@ class IpdBillingController extends Controller
                 'investigationDatewise', 'investigationBrief', 'viewMode',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
                 'hospital', 'totalPages', 'gstChargesGrouped', 'logged_user',
-                'billHeading', 'isApprovalBill', 'showInsuranceSection', 'showOriginalAmount',
+                'billHeading', 'isApprovalBill', 'showInsuranceSection', 'showOriginalAmount', 'showPackageProcedureColumn',
                 'grandTotal', 'totalAdvance', 'mouDiscountAmount', 'initialApprovalAmount',
                 'requestFurtherApproval', 'requestFurtherApprovalInWords'
             ));
@@ -2179,6 +2180,7 @@ class IpdBillingController extends Controller
 
             // Package details (applied packages) for final bill PDF
             $packageDetails = $this->buildPackageDetailsForBillDisplay($ipdId);
+            $showPackageProcedureColumn = $packageDetails->count() > 1;
             $showOriginalAmount = false;
 
             $isInsuranceFinalBill = $ipd->isInsuranceBilling();
@@ -2418,7 +2420,7 @@ class IpdBillingController extends Controller
                 'surgeonCharges', 'anesthesiaCharges', 'investigationCharges', 'totalPages',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise', 'doctorVisitGroupedForDisplay', 'doctorVisitGroupedByVisitType',
-                'gstChargesGrouped', 'logged_user', 'showOriginalAmount',
+                'gstChargesGrouped', 'logged_user', 'showOriginalAmount', 'showPackageProcedureColumn',
                 'isInsuranceFinalBill', 'useInsurancePackageLayout', 'excludedMedicineImplantCharges',
                 'insuranceFinalSummary', 'dueOnAccountInWords'
             ));

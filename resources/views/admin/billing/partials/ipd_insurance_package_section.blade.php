@@ -15,7 +15,7 @@
                 <tr>
                     <td>
                         PACKAGE - ({{ $pkg['package_name_display'] ?? ($pkg['package_name'] ?? 'N/A') }})
-                        @if(!empty($pkg['procedure_label']))
+                        @if($packageDetails->count() > 1 && !empty($pkg['procedure_label']))
                             <span style="font-size: 8px; color: #555;"> — {{ $pkg['procedure_label'] }}</span>
                         @endif
                     </td>

@@ -628,7 +628,9 @@
         @if(!empty($useInsurancePackageLayout))
             @include('admin.billing.partials.ipd_insurance_package_section')
         @else
-            @include('admin.billing.partials.ipd_package_charges_table')
+            @include('admin.billing.partials.ipd_package_charges_table', [
+                'showPackageProcedureColumn' => $showPackageProcedureColumn ?? (isset($packageDetails) && collect($packageDetails)->count() > 1),
+            ])
 
         <!-- Bed Charges (grouped by bed and date range) -->
         @if(isset($bedChargesGroupedForDisplay) && $bedChargesGroupedForDisplay->count() > 0)
