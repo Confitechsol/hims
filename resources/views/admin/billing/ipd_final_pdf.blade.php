@@ -525,12 +525,7 @@
                                 <td class="patient_colon">:</td>
                                 <td class="patient_value">
                                     @if($ipd->patient && $ipd->patient->address)
-                                        @php
-                                            $addressLines = array_filter(array_map('trim', explode(',', $ipd->patient->address)));
-                                        @endphp
-                                        @foreach($addressLines as $line)
-                                            {{ $line }}<br>
-                                        @endforeach
+                                        {{ trim(preg_replace('/\s*,\s*/', ', ', $ipd->patient->address)) }}
                                     @else
                                         N/A
                                     @endif

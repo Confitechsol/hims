@@ -212,23 +212,25 @@
 </div>
 <x-modals.form-modal type="add" id="add_tpa" title="Add TPA" action="{{route('tpamanagement.store')}}" :fields="[
         ['name' => 'insurance_company_id', 'label' => 'Insurance Company', 'type' => 'select', 'required' => true, 'options' => $insuranceCompanies->toArray(), 'size' => '12'],
+        ['name' => 'use_insurance_as_tpa', 'label' => 'Use Insurance Name as TPA Name', 'type' => 'checkbox', 'checkbox_label' => 'Use selected Insurance Company name as TPA Organisation Name', 'size' => '12'],
         ['name' => 'organisation_name', 'label' => 'organisation Name', 'type' => 'text', 'required' => true,'size'=>'5'],
-        ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true,'size'=>'3'],
-        ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true,'size'=>'4'],
-        ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => true,'size'=>'12'],
-        ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text', 'required' => true,'size'=>'6'],
-        ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => true,'size'=>'6'],
-        ['name' => 'poilicy_no', 'label' => 'Poilicy No', 'type' => 'text', 'required' => true,'size'=>'6'],
-        ['name' => 'e_card_no', 'label' => 'E Card No', 'type' => 'text', 'required' => true,'size'=>'6'],
-        ['name' => 'e_card_upload', 'label' => 'E Card Upload', 'type' => 'file', 'required' => true,'size'=>'12'],
+        ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => false,'size'=>'3'],
+        ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => false,'size'=>'4'],
+        ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => false,'size'=>'12'],
+        ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text', 'required' => false,'size'=>'6'],
+        ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => false,'size'=>'6'],
+        ['name' => 'poilicy_no', 'label' => 'Poilicy No', 'type' => 'text', 'required' => false,'size'=>'6'],
+        ['name' => 'e_card_no', 'label' => 'E Card No', 'type' => 'text', 'required' => false,'size'=>'6'],
+        ['name' => 'e_card_upload', 'label' => 'E Card Upload', 'type' => 'file', 'required' => false,'size'=>'12'],
         ]" :columns="3" />
  <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit TPA"
     action="{{ url('tpamanagement/update') }}" :fields="[
         ['name' => 'id', 'type' => 'hidden', 'required' => true],
         ['name' => 'insurance_company_id', 'label' => 'Insurance Company', 'type' => 'select', 'required' => true, 'options' => $insuranceCompanies->toArray(), 'size' => '12'],
+        ['name' => 'use_insurance_as_tpa', 'label' => 'Use Insurance Name as TPA Name', 'type' => 'checkbox', 'checkbox_label' => 'Use selected Insurance Company name as TPA Organisation Name', 'size' => '12'],
         ['name' => 'organisation_name', 'label' => 'organisation Name', 'type' => 'text', 'required' => true,'size'=>'5'],
-        ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => true,'size'=>'3'],
-        ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => true,'size'=>'4'],
+        ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => false,'size'=>'3'],
+        ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => false,'size'=>'4'],
         ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => false,'size'=>'12'],
         ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text', 'required' => false,'size'=>'6'],
         ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => false,'size'=>'6'],
@@ -242,6 +244,104 @@
 <!-- row end -->
 
 <script>
+   function getSelectedInsuranceName(selectEl) {
+       if (!selectEl || selectEl.selectedIndex < 0) {
+           return '';
+       }
+       const option = selectEl.options[selectEl.selectedIndex];
+       return option && option.value ? option.text.trim() : '';
+   }
+
+   function syncTpaOrganisationName(modalId, restoreManual) {
+       const modal = document.getElementById(modalId);
+       if (!modal) {
+           return;
+       }
+
+       const form = modal.querySelector('form');
+       const insuranceSelect = form.querySelector('[data-field="insurance_company_id"]');
+       const orgNameInput = form.querySelector('[data-field="organisation_name"]');
+       const checkbox = form.querySelector('[data-field="use_insurance_as_tpa"]');
+
+       if (!insuranceSelect || !orgNameInput || !checkbox) {
+           return;
+       }
+
+       if (checkbox.checked) {
+           if (restoreManual && form.dataset.manualOrganisationName !== undefined) {
+               orgNameInput.value = form.dataset.manualOrganisationName;
+           } else {
+               orgNameInput.value = getSelectedInsuranceName(insuranceSelect);
+           }
+           orgNameInput.readOnly = true;
+       } else {
+           orgNameInput.readOnly = false;
+           if (restoreManual && form.dataset.manualOrganisationName !== undefined) {
+               orgNameInput.value = form.dataset.manualOrganisationName;
+           }
+       }
+   }
+
+   function initTpaInsuranceNameSync(modalId) {
+       const modal = document.getElementById(modalId);
+       if (!modal || modal.dataset.tpaSyncInit === '1') {
+           return;
+       }
+
+       const form = modal.querySelector('form');
+       const insuranceSelect = form.querySelector('[data-field="insurance_company_id"]');
+       const orgNameInput = form.querySelector('[data-field="organisation_name"]');
+       const checkbox = form.querySelector('[data-field="use_insurance_as_tpa"]');
+
+       if (!insuranceSelect || !orgNameInput || !checkbox) {
+           return;
+       }
+
+       modal.dataset.tpaSyncInit = '1';
+
+       checkbox.addEventListener('change', function() {
+           if (this.checked) {
+               form.dataset.manualOrganisationName = orgNameInput.value;
+               syncTpaOrganisationName(modalId, false);
+           } else {
+               syncTpaOrganisationName(modalId, true);
+           }
+       });
+
+       insuranceSelect.addEventListener('change', function() {
+           if (checkbox.checked) {
+               syncTpaOrganisationName(modalId, false);
+           }
+       });
+
+       modal.addEventListener('shown.bs.modal', function() {
+           const insuranceName = getSelectedInsuranceName(insuranceSelect);
+           const orgName = orgNameInput.value.trim();
+
+           if (insuranceName && orgName === insuranceName) {
+               checkbox.checked = true;
+               orgNameInput.readOnly = true;
+           } else {
+               checkbox.checked = false;
+               orgNameInput.readOnly = false;
+               form.dataset.manualOrganisationName = orgName;
+           }
+       });
+
+       if (modalId === 'add_tpa') {
+           modal.addEventListener('hidden.bs.modal', function() {
+               checkbox.checked = false;
+               orgNameInput.readOnly = false;
+               delete form.dataset.manualOrganisationName;
+           });
+       }
+   }
+
+   document.addEventListener('DOMContentLoaded', function() {
+       initTpaInsuranceNameSync('add_tpa');
+       initTpaInsuranceNameSync('edit_modal');
+   });
+
    function dataSearch(){
     const data=document.querySelector('#language-search');
     let table = document.querySelector("#table");

@@ -42,12 +42,14 @@
                             @endif
                             <div class="col-md-{{ isset($field['size']) ? $field['size'] : 12 / $columns }}">
                                 <div class="mb-3">
+                                    @if ($field['type'] !== 'checkbox')
                                     <label for="{{ $field['name'] }}" class="form-label">
                                         {{ $field['label'] ?? ucfirst($field['name']) }}
                                         @if (!empty($field['required']))
                                             <span class="text-danger">*</span>
                                         @endif
                                     </label>
+                                    @endif
                                     @if ($field['type'] === 'select')
                                         <select name="{{ $field['name'] }}" id="{{ $field['name'] }}" class="form-select" data-field="{{ $field['name'] }}"
                                         @if (!empty($field['required'])) required @endif
@@ -61,7 +63,16 @@
                                         <textarea name="{{ $field['name'] }}" id="{{ $field['name'] }}" class="form-control"
                                             data-field="{{ $field['name'] }}" rows="3">{{ $field['value'] ?? old($field['name']) }}</textarea>
                                     @elseif($field['type'] === 'img')
-                                    <img src="" data-field="{{ $field['name'] }}" alt="">        
+                                    <img src="" data-field="{{ $field['name'] }}" alt="">
+                                    @elseif($field['type'] === 'checkbox')
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" id="{{ $id }}_{{ $field['name'] }}"
+                                                data-field="{{ $field['name'] }}"
+                                                @if (!empty($field['value'])) checked @endif>
+                                            <label class="form-check-label" for="{{ $id }}_{{ $field['name'] }}">
+                                                {{ $field['checkbox_label'] ?? ($field['label'] ?? ucfirst($field['name'])) }}
+                                            </label>
+                                        </div>
                                     @else
                                         <input type="{{ $field['type'] ?? 'text' }}" name="{{ $field['name'] }}"
                                         @if(isset($field['readonly'])) readonly @endif
@@ -191,6 +202,10 @@
                             // File inputs cannot be prefilled and we intentionally do not display filenames here.
                             if (input.type === 'file') {
                                 // Skip populating file inputs or any filename display.
+                                return;
+                            }
+
+                            if (input.type === 'checkbox') {
                                 return;
                             }
 

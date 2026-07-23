@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Organisation;
 use App\Models\InsuranceCompany;
 use App\Models\ChargeTypeMaster;
@@ -63,32 +64,37 @@ class TpamanagmentController extends Controller
         $request->validate([
             'insurance_company_id' => 'required|exists:insurance_companies,id',
             'organisation_name' => 'required|string|max:255',
-            'code' => 'required|string|max:100|unique:organisation,code',
-            'contact_no' => 'required|string|max:15|different:contact_person_phone',
-            'address' => 'required|string|max:500',
-            'contact_person_name' => 'required|string|max:255',
-            'contact_person_phone' => 'required|string|max:15|different:contact_no',
-            'poilicy_no' => 'required|string|max:255',
-            'e_card_no' => 'required|string|max:255',
-            'e_card_upload' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'code' => [
+                'nullable',
+                'string',
+                'max:100',
+                Rule::unique('organisation', 'code')->where(fn ($query) => $query->whereNotNull('code')->where('code', '!=', '')),
+            ],
+            'contact_no' => 'nullable|string|max:15|different:contact_person_phone',
+            'address' => 'nullable|string|max:500',
+            'contact_person_name' => 'nullable|string|max:255',
+            'contact_person_phone' => 'nullable|string|max:15|different:contact_no',
+            'poilicy_no' => 'nullable|string|max:255',
+            'e_card_no' => 'nullable|string|max:255',
+            'e_card_upload' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
         $organisation = new Organisation();
         $organisation->insurance_company_id = $request->insurance_company_id;
         $organisation->organisation_name = $request->organisation_name;
-        $organisation->code = $request->code;
-        $organisation->contact_no = $request->contact_no;
-        $organisation->address = $request->address;
-        $organisation->contact_person_name = $request->contact_person_name;
-        $organisation->contact_person_phone = $request->contact_person_phone;
-        $organisation->poilicy_no = $request->poilicy_no;
-        $organisation->e_card_no = $request->e_card_no;
-        // Handle file upload
-        if ($request->hasFile('e_card_upload')) {       
+        $organisation->code = $request->input('code', '');
+        $organisation->contact_no = $request->input('contact_no', '');
+        $organisation->address = $request->input('address', '');
+        $organisation->contact_person_name = $request->input('contact_person_name', '');
+        $organisation->contact_person_phone = $request->input('contact_person_phone', '');
+        $organisation->poilicy_no = $request->input('poilicy_no', '');
+        $organisation->e_card_no = $request->input('e_card_no', '');
+        $organisation->e_card_upload = '';
+        if ($request->hasFile('e_card_upload')) {
             $file = $request->file('e_card_upload');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('uploads/e_cards'), $filename);
-            $organisation->e_card_upload = 'uploads/e_cards/' . $filename;  
+            $organisation->e_card_upload = 'uploads/e_cards/' . $filename;
         }
 
         $organisation->save();
@@ -104,11 +110,18 @@ class TpamanagmentController extends Controller
             'id' => 'required|exists:organisation,id',
             'insurance_company_id' => 'required|exists:insurance_companies,id',
             'organisation_name' => 'required|string|max:255',
-            'code' => 'required|string|max:100|unique:organisation,code,' . $id,
-            'contact_no' => 'required|string|max:15',
+            'code' => [
+                'nullable',
+                'string',
+                'max:100',
+                Rule::unique('organisation', 'code')
+                    ->ignore($id)
+                    ->where(fn ($query) => $query->whereNotNull('code')->where('code', '!=', '')),
+            ],
+            'contact_no' => 'nullable|string|max:15|different:contact_person_phone',
             'address' => 'nullable|string|max:500',
             'contact_person_name' => 'nullable|string|max:255',
-            'contact_person_phone' => 'nullable|string|max:15',
+            'contact_person_phone' => 'nullable|string|max:15|different:contact_no',
             'poilicy_no' => 'nullable|string|max:255',
             'e_card_no' => 'nullable|string|max:255',
             'e_card_upload' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
@@ -118,13 +131,13 @@ class TpamanagmentController extends Controller
 
         $organisation->insurance_company_id = $request->insurance_company_id;
         $organisation->organisation_name = $request->organisation_name;
-        $organisation->code = $request->code;
-        $organisation->contact_no = $request->contact_no;
-        $organisation->address = $request->address;
-        $organisation->contact_person_name = $request->contact_person_name;
-        $organisation->contact_person_phone = $request->contact_person_phone;
-        $organisation->poilicy_no = $request->poilicy_no;
-        $organisation->e_card_no = $request->e_card_no;
+        $organisation->code = $request->input('code', '');
+        $organisation->contact_no = $request->input('contact_no', '');
+        $organisation->address = $request->input('address', '');
+        $organisation->contact_person_name = $request->input('contact_person_name', '');
+        $organisation->contact_person_phone = $request->input('contact_person_phone', '');
+        $organisation->poilicy_no = $request->input('poilicy_no', '');
+        $organisation->e_card_no = $request->input('e_card_no', '');
 
         if ($request->hasFile('e_card_upload')) {
             $file = $request->file('e_card_upload');
