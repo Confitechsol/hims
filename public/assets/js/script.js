@@ -45,12 +45,10 @@ Template Name: Preclinic - Bootstrap Admin Template
 			}
 			var $currentLink = $(this);
 			if(!$currentLink.hasClass('subdrop')) {
-				// Close ALL other open submenus throughout the entire sidebar
-				$('.sidebar-menu a.subdrop').each(function() {
-					if($(this)[0] !== $currentLink[0]) { // Check if not the same element
-						$(this).removeClass('subdrop');
-						$(this).next('ul').slideUp(250);
-					}
+				// Close only sibling submenus at the same level (keep parent menus open).
+				$currentLink.parent('li.submenu').siblings('li.submenu').each(function() {
+					$(this).children('a.subdrop').removeClass('subdrop');
+					$(this).children('ul').slideUp(250);
 				});
 				// Open this submenu
 				$currentLink.next('ul').slideDown(350);
@@ -66,12 +64,12 @@ Template Name: Preclinic - Bootstrap Admin Template
 			$(this).children('ul').hide();
 		});
 
-		// Expand only the submenu(s) that contain a child link with the 'active' class
-		$('.sidebar-menu li.submenu').filter(function() {
-			return $(this).find('> ul a.active').length > 0;
-		}).each(function() {
-			$(this).children('a').addClass('subdrop');
-			$(this).children('ul').show();
+		// Expand every submenu that contains the active page link (supports nested menus).
+		$('.sidebar-menu a.active').each(function() {
+			$(this).parents('li.submenu').each(function() {
+				$(this).children('a').first().addClass('subdrop');
+				$(this).children('ul').first().show();
+			});
 		});
 	}
 

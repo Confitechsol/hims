@@ -540,14 +540,15 @@
                             </ul>
                         </li>
                         <li class="submenu">
-                            <a href="javascript:void(0);">
+                            <a href="javascript:void(0);"
+                                class="{{ request()->routeIs('inventory-reports') || request()->routeIs('finance') || request()->routeIs('reports.*') ? 'active subdrop' : '' }}">
                                 <i class="ti ti-report"></i><span>Reports</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
                                 <li><a href="{{ route('inventory-reports') }}"
                                         class="{{ request()->routeIs('inventory-reports') ? 'active' : '' }}">Inventory
-                                        Reports</i>
+                                        Reports</a></li>
                                 <li class="submenu">
                                     <a href="javascript:void(0);"
                                         class="{{ request()->routeIs('finance') || request()->routeIs('reports.ipd-final-bill-register*') ? 'active subdrop' : '' }}">
