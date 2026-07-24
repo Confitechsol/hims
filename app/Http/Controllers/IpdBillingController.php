@@ -16,6 +16,7 @@ use App\Models\PatientBedHistory;
 use App\Models\BedGroup;
 use App\Models\Doctor;
 use App\Services\InsuranceDischargeBedChargeService;
+use App\Services\DaywiseBedChargeService;
 use App\Services\IpdPackageService;
 use App\Services\InsuranceFinalBillSummaryService;
 use App\Support\BedBillingPeriod;
@@ -425,9 +426,19 @@ class IpdBillingController extends Controller
                     }
                 }
 
-                // If no explicit daywise charge found, fall back to bed group master rate
+                // If no explicit daywise charge found, resolve custom segment rate then bed group master.
                 if ($bedCost <= 0) {
-                    $bedCost = (float) ($activeBed->bedGroup->bed_cost ?? 0);
+                    $segmentFrom = Carbon::parse($activeBed->from_date);
+                    $segmentTo = $activeBed->to_date ? Carbon::parse($activeBed->to_date) : null;
+                    $resolvedRate = app(DaywiseBedChargeService::class)->resolveBedChargeRate(
+                        $ipdId,
+                        (int) $activeBed->bed_group_id,
+                        $segmentFrom,
+                        $segmentTo
+                    );
+                    $bedCost = $resolvedRate > 0
+                        ? $resolvedRate
+                        : (float) ($activeBed->bedGroup->bed_cost ?? 0);
                     $bedChargeRate = $bedCost;
                     $gstRate = $activeBed->bedGroup->gst_rate ?? 0;
                     $sacHsnCode = $activeBed->bedGroup->sac_hsn_code ?? null;

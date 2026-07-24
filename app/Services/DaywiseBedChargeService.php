@@ -366,6 +366,34 @@ class DaywiseBedChargeService
             $current->addDay();
         }
 
+        // Post-midnight grace: no billable day yet, but keep the segment rate on the first
+        // charge label day so estimate/billing can resolve the admission bed charge after 11 AM.
+        if ($updated === 0 && $bedChargeRate > 0 && $endAt->lte($billableAnchor)) {
+            $periodDates = BedBillingPeriod::periodStorageDatesForChargeDay(
+                $firstChargeDay->copy()->startOfDay(),
+                $segmentFrom
+            );
+            if ($periodDates !== null) {
+                $this->storeDaywiseCharge([
+                    'hospital_id' => $ipd->hospital_id,
+                    'branch_id' => $ipd->branch_id,
+                    'ipd_id' => $ipd->id,
+                    'case_reference_id' => $ipd->case_reference_id,
+                    'patient_id' => $ipd->patient_id,
+                    'charge_date' => $firstChargeDay->format('Y-m-d'),
+                    'period_start_date' => $periodDates['period_start_date'],
+                    'period_end_date' => $periodDates['period_end_date'],
+                    'bed_group_id' => $bedGroupId,
+                    'bed_id' => $bedId,
+                    'bed_charge' => $bedChargeRate,
+                    'bed_charge_rate' => $bedChargeRate,
+                    'no_of_days' => 1,
+                    'is_active' => 'yes',
+                ]);
+                $updated = 1;
+            }
+        }
+
         return $updated;
     }
 
