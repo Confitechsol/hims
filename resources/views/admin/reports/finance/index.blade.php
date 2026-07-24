@@ -111,7 +111,7 @@
                             <a href="{{ route('reports.ipd-final-bill-register') }}">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-file-invoice"></i>
-                                    <p>IPD Final Bill Register</p>
+                                    <p>Final Bill Register</p>
                                 </div>
                             </a>
                         </div>

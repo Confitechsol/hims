@@ -1500,6 +1500,94 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * Final bill amount for Final Bill Register Home Amt column.
+     * Total final bill charges minus MOU discount and hospital (special) discount.
+     */
+    private function resolveFinalBillGrandTotal(IpdDetail $ipd, array $breakup): float
+    {
+        $totalCharges = round((float) ($breakup['total_charges'] ?? 0), 2);
+        $mouDiscount = round((float) ($ipd->mou_discount ?? 0), 2);
+        $hospitalDiscount = round((float) ($ipd->special_discount ?? 0), 2);
+
+        return max(0, round($totalCharges - $mouDiscount - $hospitalDiscount, 2));
+    }
+
+    /**
+     * Day-wise register column totals for one discharged IPD (cash + insurance final bills).
+     *
+     * Home Amt = final bill total after excluding MOU and hospital discounts.
+     * Disc Amt = MOU + hospital discount (shown separately).
+     * Other columns are category breakdowns only.
+     *
+     * @return array{
+     *     bed_charges: float,
+     *     diagnosis_charges: float,
+     *     other_charges: float,
+     *     service_charges: float,
+     *     home_amount: float,
+     *     discount_amount: float,
+     *     doctor_visit_amount: float,
+     *     package_amount: float
+     * }
+     */
+    public function getFinalBillRegisterDaySummary(int $ipdId): array
+    {
+        $empty = [
+            'bed_charges' => 0.0,
+            'diagnosis_charges' => 0.0,
+            'other_charges' => 0.0,
+            'service_charges' => 0.0,
+            'home_amount' => 0.0,
+            'discount_amount' => 0.0,
+            'doctor_visit_amount' => 0.0,
+            'package_amount' => 0.0,
+        ];
+
+        $ipd = IpdDetail::find($ipdId);
+        if (!$ipd || $ipd->discharged !== 'yes') {
+            return $empty;
+        }
+
+        $billingEndAt = $this->resolveDischargeDateTimeForIpd($ipd);
+        if (!$billingEndAt) {
+            $dischargeCard = DischargeCard::where('ipd_details_id', $ipdId)->first();
+            if (!$dischargeCard || !$dischargeCard->discharge_date) {
+                return $empty;
+            }
+            $billingEndAt = Carbon::parse($dischargeCard->discharge_date);
+        }
+
+        $billingEndAtStr = $billingEndAt->format('Y-m-d H:i:s');
+        $breakup = $this->calculateBreakup($ipdId, $billingEndAtStr);
+
+        $bedCharges = round((float) ($breakup['bed_charges'] ?? 0), 2);
+        $serviceCharges = round(
+            (float) ($breakup['cgst_charges'] ?? 0) + (float) ($breakup['sgst_charges'] ?? 0),
+            2
+        );
+        $diagnosisCharges = round(
+            (float) ($breakup['pathology_charges'] ?? 0) + (float) ($breakup['radiology_charges'] ?? 0),
+            2
+        );
+        $otherCharges = round((float) ($breakup['ipd_charges'] ?? 0), 2);
+        $doctorVisit = round((float) ($breakup['doctor_visit_charges'] ?? 0), 2);
+        $package = round((float) ($breakup['package_charges'] ?? 0), 2);
+        $discount = round((float) ($ipd->mou_discount ?? 0) + (float) ($ipd->special_discount ?? 0), 2);
+        $homeAmount = $this->resolveFinalBillGrandTotal($ipd, $breakup);
+
+        return [
+            'bed_charges' => $bedCharges,
+            'diagnosis_charges' => $diagnosisCharges,
+            'other_charges' => $otherCharges,
+            'service_charges' => $serviceCharges,
+            'home_amount' => $homeAmount,
+            'discount_amount' => $discount,
+            'doctor_visit_amount' => $doctorVisit,
+            'package_amount' => $package,
+        ];
+    }
+
+    /**
      * Build pathology and radiology line items date-wise for PDF (estimate/final).
      * Returns collection of ['date' => ..., 'type' => 'pathology'|'radiology', 'test_name' => ..., 'amount' => ...] sorted by date.
      */
