@@ -43,7 +43,8 @@ class DaywiseBedChargeService
             $endTime = $dayPeriod['end'];
 
             $admissionAt = Carbon::parse($ipd->date);
-            $effective = BedBillingPeriod::effectiveWindow($startTime, $endTime, $admissionAt);
+            $billableAnchor = BedBillingPeriod::billableAnchorAt($admissionAt);
+            $effective = BedBillingPeriod::effectiveWindow($startTime, $endTime, $billableAnchor);
             if ($effective === null) {
                 DB::rollBack();
                 return [
@@ -127,7 +128,7 @@ class DaywiseBedChargeService
 
             $periodDates = BedBillingPeriod::periodStorageDatesForChargeDay(
                 Carbon::parse($chargeDate)->startOfDay(),
-                $admissionAt
+                $billableAnchor
             );
             $periodStartDate = $periodDates['period_start_date'];
             $periodEndDate = $periodDates['period_end_date'];
@@ -302,9 +303,10 @@ class DaywiseBedChargeService
         $insuranceBedService = app(InsuranceDischargeBedChargeService::class);
         $skipDischargeChargeDate = $insuranceBedService->dischargeChargeDateToExclude($ipd, $endAt);
 
+        $billableAnchor = BedBillingPeriod::billableAnchorAt($segmentFrom);
         $firstChargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($segmentFrom);
         $lastChargeDay = BedBillingPeriod::chargeLabelDayForMoment($endAt);
-        if ($endAt->gt($segmentFrom) && $lastChargeDay->lt($firstChargeDay)) {
+        if ($endAt->gt($billableAnchor) && $lastChargeDay->lt($firstChargeDay)) {
             $lastChargeDay = $firstChargeDay->copy();
         }
         $segmentCalendarDay = $segmentFrom->copy()->startOfDay();
@@ -330,14 +332,14 @@ class DaywiseBedChargeService
                 continue;
             }
 
-            if ($periodEnd->lte($segmentFrom) || (! $isFirstSegmentDay && $periodStart->gte($endAt))) {
+            if ($periodEnd->lte($billableAnchor) || (! $isFirstSegmentDay && $periodStart->gte($endAt))) {
                 $current->addDay();
                 continue;
             }
 
             $periodDates = BedBillingPeriod::periodStorageDatesForChargeDay(
                 $current->copy()->startOfDay(),
-                $segmentFrom
+                $billableAnchor
             );
             if ($periodDates === null) {
                 $current->addDay();

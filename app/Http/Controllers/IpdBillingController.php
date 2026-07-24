@@ -248,6 +248,7 @@ class IpdBillingController extends Controller
         }
 
         $admissionAt = Carbon::parse($ipd->date ?? $ipd->created_at ?? now());
+        $billableAnchor = BedBillingPeriod::billableAnchorAt($admissionAt);
         // For non-discharged preview/breakup, calculate up to current moment.
         // Date-only end values use discharge card time when available (insurance discharge-day rule).
         if ($endDate === null) {
@@ -306,11 +307,10 @@ class IpdBillingController extends Controller
         $totalCgst = 0;
         $totalSgst = 0;
         $details = [];
-        // Admission immediately incurs the first bed day. The line is labelled with
-        // the next billing day, even when the estimate is generated before 11:00.
+        // First billable day uses billable anchor (post-midnight pre-11 AM admissions start at 11:00).
         $firstChargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($admissionAt);
         $lastChargeDay = $this->resolveChargeLabelDayForMoment($endAt);
-        if ($endAt->gt($admissionAt) && $lastChargeDay->lt($firstChargeDay)) {
+        if ($endAt->gt($billableAnchor) && $lastChargeDay->lt($firstChargeDay)) {
             $lastChargeDay = $firstChargeDay->copy();
         }
         $currentDate = $firstChargeDay->copy();
@@ -360,14 +360,14 @@ class IpdBillingController extends Controller
 
             // Respect requested end moment (discharge datetime for final bill).
             $isFirstAdmissionDay = $currentDate->isSameDay($firstChargeDay);
-            if ($periodEnd->lte($admissionAt) || (! $isFirstAdmissionDay && $periodStart->gte($endAt))) {
+            if ($periodEnd->lte($billableAnchor) || (! $isFirstAdmissionDay && $periodStart->gte($endAt))) {
                 $currentDate->addDay();
                 continue;
             }
 
             $effectiveStart = $isFirstAdmissionDay
-                ? $admissionAt->copy()
-                : $periodStart->copy()->max($admissionAt);
+                ? $billableAnchor->copy()
+                : $periodStart->copy()->max($billableAnchor);
             $effectiveEnd = $periodEnd->copy()->min($endAt);
             if ($effectiveStart->gte($effectiveEnd)) {
                 $currentDate->addDay();

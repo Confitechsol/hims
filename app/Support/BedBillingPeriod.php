@@ -21,6 +21,40 @@ class BedBillingPeriod
     }
 
     /**
+     * Daily boundary on the anchor's calendar day (default 11:00 AM).
+     */
+    public static function boundaryOnCalendarDay(Carbon $calendarDayStart): Carbon
+    {
+        return $calendarDayStart->copy()->startOfDay()->setTime(
+            self::boundaryHour(),
+            self::boundaryMinute(),
+            0
+        );
+    }
+
+    /**
+     * True when admission/segment starts after midnight and before the daily boundary (11:00 AM).
+     * Hospital policy: no bed charge until the boundary on that calendar day.
+     */
+    public static function isPostMidnightPreBoundaryAdmission(Carbon $anchorAt): bool
+    {
+        return $anchorAt->lt(self::boundaryOnCalendarDay($anchorAt->copy()->startOfDay()));
+    }
+
+    /**
+     * First billable moment for bed charges.
+     * Post-midnight admissions before 11:00 AM start billing at 11:00 AM same day; all others at actual anchor time.
+     */
+    public static function billableAnchorAt(Carbon $anchorAt): Carbon
+    {
+        if (self::isPostMidnightPreBoundaryAdmission($anchorAt)) {
+            return self::boundaryOnCalendarDay($anchorAt->copy()->startOfDay());
+        }
+
+        return $anchorAt->copy();
+    }
+
+    /**
      * Nominal window for the same convention as {@see calculateBedChargesFromHistory}:
      * $chargeCalendarDay = startOfDay of the "current" day in the loop (charge_date / label day).
      *
@@ -72,12 +106,11 @@ class BedBillingPeriod
     }
 
     /**
-     * First charge label day from anchor calendar date (not overlap based).
-     * Example: admission on 6th any time => first label day 7th (period 6th->7th).
+     * First charge label day from billable anchor (not raw admission when grace period applies).
      */
     public static function firstChargeCalendarDayFromAnchorDate(Carbon $anchorAt): Carbon
     {
-        return $anchorAt->copy()->startOfDay()->addDay();
+        return self::billableAnchorAt($anchorAt)->copy()->startOfDay()->addDay();
     }
 
     /**
@@ -86,7 +119,7 @@ class BedBillingPeriod
     public static function periodStorageDatesForChargeDay(Carbon $chargeCalendarDayStart, Carbon $anchorAt): ?array
     {
         [$ps, $pe] = self::windowForChargeCalendarDay($chargeCalendarDayStart);
-        $eff = self::effectiveWindow($ps, $pe, $anchorAt);
+        $eff = self::effectiveWindow($ps, $pe, self::billableAnchorAt($anchorAt));
         if ($eff === null) {
             return null;
         }
