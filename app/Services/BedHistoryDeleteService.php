@@ -156,7 +156,8 @@ class BedHistoryDeleteService
             (int) $ipd->id,
             (int) $previous->bed_group_id,
             $previousFrom,
-            null
+            null,
+            (int) $previousBedId
         );
 
         $this->daywiseBedChargeService->syncStoredChargesForBedSegment(

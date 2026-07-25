@@ -316,32 +316,31 @@ class IpdBillingController extends Controller
         }
         $currentDate = $firstChargeDay->copy();
 
-        // Pre-compute the most recent custom bed charge for each bed group during its history periods
-        // This ensures a custom charge set on admission/transfer applies to all subsequent days in that period
-        $bedGroupCustomCharges = []; // Format: ['bed_group_id|history_index' => daywise_charge_object]
+        // Pre-compute custom bed charge for each bed segment (match by bed_id — admit/transfer rate).
+        $bedSegmentCustomCharges = []; // Format: ['bed_id|history_index' => daywise_charge_object]
         foreach ($bedHistories as $historyIndex => $history) {
             $bedHistoryFromDate = Carbon::parse($history->from_date);
             $bedHistoryToDate = $history->to_date ? Carbon::parse($history->to_date) : Carbon::now();
-            
-            // Find the most recent custom bed charge for this bed group within this history period
+
             $mostRecentDaywise = null;
             $mostRecentDate = null;
-            
+
             foreach ($daywiseCharges as $date => $daywise) {
-                if ((int)$daywise->bed_group_id === (int)$history->bed_group_id) {
-                    $daywiseDateCarbon = Carbon::parse($daywise->charge_date)->startOfDay();
-                    
-                    if ($daywiseDateCarbon->gte($bedHistoryFromDate->copy()->startOfDay()) && $daywiseDateCarbon->lte($bedHistoryToDate->copy()->endOfDay())) {
-                        if ($mostRecentDate === null || $daywiseDateCarbon->gt($mostRecentDate)) {
-                            $mostRecentDate = $daywiseDateCarbon;
-                            $mostRecentDaywise = $daywise;
-                        }
+                if ((int) $daywise->bed_id !== (int) $history->bed_id) {
+                    continue;
+                }
+                $daywiseDateCarbon = Carbon::parse($daywise->charge_date)->startOfDay();
+
+                if ($daywiseDateCarbon->gte($bedHistoryFromDate->copy()->startOfDay()) && $daywiseDateCarbon->lte($bedHistoryToDate->copy()->endOfDay())) {
+                    if ($mostRecentDate === null || $daywiseDateCarbon->gt($mostRecentDate)) {
+                        $mostRecentDate = $daywiseDateCarbon;
+                        $mostRecentDaywise = $daywise;
                     }
                 }
             }
-            
-            if ($mostRecentDaywise && isset($mostRecentDaywise->bed_charge) && (float)$mostRecentDaywise->bed_charge > 0) {
-                $bedGroupCustomCharges[$history->bed_group_id . '|' . $historyIndex] = $mostRecentDaywise;
+
+            if ($mostRecentDaywise && isset($mostRecentDaywise->bed_charge) && (float) $mostRecentDaywise->bed_charge > 0) {
+                $bedSegmentCustomCharges[$history->bed_id . '|' . $historyIndex] = $mostRecentDaywise;
             }
         }
 
@@ -405,20 +404,20 @@ class IpdBillingController extends Controller
                 $gstRate = 0;
                 $sacHsnCode = null;
 
-                $customChargeKey = $activeBed->bed_group_id . '|' . $activeBedHistoryIndex;
+                $customChargeKey = $activeBed->bed_id . '|' . $activeBedHistoryIndex;
 
                 // Prefer custom rate set at admit/transfer for the whole bed segment.
-                if (isset($bedGroupCustomCharges[$customChargeKey])) {
-                    $daywise = $bedGroupCustomCharges[$customChargeKey];
+                if (isset($bedSegmentCustomCharges[$customChargeKey])) {
+                    $daywise = $bedSegmentCustomCharges[$customChargeKey];
                     if ($daywise && isset($daywise->bed_charge) && (float) $daywise->bed_charge > 0) {
                         $bedCost = (float) $daywise->bed_charge;
-                        $bedChargeRate = (float) ($daywise->bed_charge_rate ?? $activeBed->bedGroup->bed_cost ?? 0);
+                        $bedChargeRate = (float) ($daywise->bed_charge_rate ?? $daywise->bed_charge ?? $activeBed->bedGroup->bed_cost ?? 0);
                         $gstRate = $daywise->bedGroup->gst_rate ?? $activeBed->bedGroup->gst_rate ?? 0;
                         $sacHsnCode = $daywise->bedGroup->sac_hsn_code ?? $activeBed->bedGroup->sac_hsn_code ?? null;
                     }
                 } elseif ($daywiseCharges->has($chargeDate)) {
                     $daywise = $daywiseCharges->get($chargeDate);
-                    if ($daywise && isset($daywise->bed_charge) && (float) $daywise->bed_charge > 0) {
+                    if ($daywise && (int) $daywise->bed_id === (int) $activeBed->bed_id && isset($daywise->bed_charge) && (float) $daywise->bed_charge > 0) {
                         $bedCost = (float) $daywise->bed_charge;
                         $bedChargeRate = (float) ($daywise->bed_charge_rate ?? $activeBed->bedGroup->bed_cost ?? 0);
                         $gstRate = $daywise->bedGroup->gst_rate ?? $activeBed->bedGroup->gst_rate ?? 0;
@@ -426,7 +425,7 @@ class IpdBillingController extends Controller
                     }
                 }
 
-                // If no explicit daywise charge found, resolve custom segment rate then bed group master.
+                // No row for this charge date: resolve segment custom rate, else bed group master.
                 if ($bedCost <= 0) {
                     $segmentFrom = Carbon::parse($activeBed->from_date);
                     $segmentTo = $activeBed->to_date ? Carbon::parse($activeBed->to_date) : null;
@@ -434,7 +433,8 @@ class IpdBillingController extends Controller
                         $ipdId,
                         (int) $activeBed->bed_group_id,
                         $segmentFrom,
-                        $segmentTo
+                        $segmentTo,
+                        (int) $activeBed->bed_id
                     );
                     $bedCost = $resolvedRate > 0
                         ? $resolvedRate

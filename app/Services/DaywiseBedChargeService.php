@@ -110,7 +110,8 @@ class DaywiseBedChargeService
                 $ipdId,
                 (int) $lastBed->bed_group_id,
                 $segmentFrom,
-                $segmentTo
+                $segmentTo,
+                (int) $lastBed->bed_id
             );
             
             if ($bedChargeRate <= 0) {
@@ -238,17 +239,18 @@ class DaywiseBedChargeService
     }
 
     /**
-     * Resolve per-day bed rate: custom admit/transfer rate for the bed segment, else bed group master.
+     * Resolve per-day bed rate for a bed segment.
+     * Custom rate from admission/transfer (stored daywise) always wins over bed group master.
      */
     public function resolveBedChargeRate(
         int $ipdId,
         int $bedGroupId,
         Carbon $segmentFrom,
-        ?Carbon $segmentTo = null
+        ?Carbon $segmentTo = null,
+        ?int $bedId = null
     ): float {
         $firstChargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($segmentFrom);
         $query = IpdDaywiseBedCharge::where('ipd_id', $ipdId)
-            ->where('bed_group_id', $bedGroupId)
             ->where('is_active', 'yes')
             ->whereDate('charge_date', '>=', $firstChargeDay->format('Y-m-d'));
 
@@ -260,17 +262,31 @@ class DaywiseBedChargeService
             );
         }
 
-        $custom = $query->orderByDesc('charge_date')->get()->first(function ($row) {
-            return (float) ($row->bed_charge_rate ?? $row->bed_charge ?? 0) > 0;
-        });
+        $candidates = $query->orderByDesc('charge_date')->get();
 
-        if ($custom) {
-            $rate = (float) ($custom->bed_charge_rate ?? $custom->bed_charge ?? 0);
-            if ($rate > 0) {
-                return $rate;
+        $pickRate = static function ($row): float {
+            return (float) ($row->bed_charge_rate ?? $row->bed_charge ?? 0);
+        };
+
+        // Same bed as admission/transfer — custom rate applies for the whole segment.
+        if ($bedId !== null) {
+            $byBed = $candidates->first(function ($row) use ($bedId, $pickRate) {
+                return (int) $row->bed_id === (int) $bedId && $pickRate($row) > 0;
+            });
+            if ($byBed) {
+                return $pickRate($byBed);
             }
         }
 
+        // Legacy: custom rate stored under this bed group in the segment window.
+        $byGroup = $candidates->first(function ($row) use ($bedGroupId, $pickRate) {
+            return (int) $row->bed_group_id === (int) $bedGroupId && $pickRate($row) > 0;
+        });
+        if ($byGroup) {
+            return $pickRate($byGroup);
+        }
+
+        // No custom rate on admit/transfer — use bed group master.
         $bedGroup = BedGroup::find($bedGroupId);
 
         return (float) ($bedGroup->bed_cost ?? 0);
