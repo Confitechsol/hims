@@ -541,7 +541,7 @@
                         </li>
                         <li class="submenu">
                             <a href="javascript:void(0);"
-                                class="{{ request()->routeIs('inventory-reports') || request()->routeIs('finance') || request()->routeIs('reports.*') ? 'active subdrop' : '' }}">
+                                class="{{ request()->routeIs('inventory-reports') || request()->routeIs('finance') || request()->routeIs('reports.*') ? 'subdrop' : '' }}">
                                 <i class="ti ti-report"></i><span>Reports</span>
                                 <span class="menu-arrow"></span>
                             </a>
@@ -551,7 +551,7 @@
                                         Reports</a></li>
                                 <li class="submenu">
                                     <a href="javascript:void(0);"
-                                        class="{{ request()->routeIs('finance') || request()->routeIs('reports.ipd-final-bill-register*') ? 'active subdrop' : '' }}">
+                                        class="{{ request()->routeIs('finance') || request()->routeIs('reports.ipd-final-bill-register*') ? 'subdrop' : '' }}">
                                         <span>Finance Report</span>
                                         <span class="menu-arrow"></span>
                                     </a>
@@ -566,7 +566,7 @@
                                 </li>
                                 <li class="submenu">
                                     <a href="javascript:void(0);"
-                                        class="{{ request()->routeIs('reports.money-receipt-register*') || request()->routeIs('reports.cash-register*') || request()->routeIs('reports.expense-register*') || request()->routeIs('reports.daily-collection*') ? 'active subdrop' : '' }}">
+                                        class="{{ request()->routeIs('reports.money-receipt-register*') || request()->routeIs('reports.cash-register*') || request()->routeIs('reports.expense-register*') || request()->routeIs('reports.daily-collection*') ? 'subdrop' : '' }}">
                                         <i class="ti ti-report-money"></i><span>Accounting Report</span>
                                         <span class="menu-arrow"></span>
                                     </a>

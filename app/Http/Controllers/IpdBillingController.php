@@ -1705,10 +1705,16 @@ class IpdBillingController extends Controller
             $bedChargesDetails = collect($bedChargesData['details']);
             $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
             $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
-            // Always show the assigned bed/rate in estimate and approval PDFs.
-            // calculateBreakup() may still exclude it from payable totals when a package covers bed.
-            $bedChargesDisplayTotal = $bedChargesGroupedForDisplay->sum('bed_charge');
             $bedChargesCoveredByPackage = ($breakup['package_charges'] ?? 0) > 0;
+            // Approval bill: omit bed/GST lines when a package covers bed (same as final bill).
+            if ($isApprovalBill && $bedChargesCoveredByPackage) {
+                $bedChargesDetails = collect();
+                $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
+                $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
+                $bedChargesDisplayTotal = 0;
+            } else {
+                $bedChargesDisplayTotal = $bedChargesGroupedForDisplay->sum('bed_charge');
+            }
 
             $ipdChargesDetails = IpdCharges::where('ipd_id', $ipdId)
                 ->with(['charge', 'chargeCategory'])

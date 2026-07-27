@@ -32,45 +32,90 @@ Template Name: Preclinic - Bootstrap Admin Template
 		$('.sidebar-overlay').removeClass('opened');
 	});
 
-	// Sidebar
-	var Sidemenu = function() {
-		this.$menuItem = $('.sidebar-menu a');
-	};
+	// Sidebar — single init, supports nested submenus (Reports → Finance Report).
+	var sidebarMenuInitialized = false;
 
-	function init() {
-		var $this = Sidemenu;
-		$('.sidebar-menu a').on('click', function(e) {
-			if($(this).parent().hasClass('submenu')) {
-				e.preventDefault();
-			}
-			var $currentLink = $(this);
-			if(!$currentLink.hasClass('subdrop')) {
-				// Close only sibling submenus at the same level (keep parent menus open).
-				$currentLink.parent('li.submenu').siblings('li.submenu').each(function() {
-					$(this).children('a.subdrop').removeClass('subdrop');
-					$(this).children('ul').slideUp(250);
-				});
-				// Open this submenu
-				$currentLink.next('ul').slideDown(350);
-				$currentLink.addClass('subdrop');
-			} else if($currentLink.hasClass('subdrop')) {
-				$currentLink.removeClass('subdrop');
-				$currentLink.next('ul').slideUp(350);
-			}
-		});
-		// Collapse all submenus initially
-		$('.sidebar-menu li.submenu').each(function() {
-			$(this).children('a').removeClass('subdrop');
-			$(this).children('ul').hide();
+	function expandSidebarSubmenus() {
+		// Server-marked open menus (Blade subdrop).
+		$('.sidebar-menu li.submenu > a.subdrop').each(function () {
+			$(this).next('ul').show();
 		});
 
-		// Expand every submenu that contains the active page link (supports nested menus).
-		$('.sidebar-menu a.active').each(function() {
-			$(this).parents('li.submenu').each(function() {
+		// Leaf link active: open every ancestor submenu.
+		$('.sidebar-menu li.submenu ul a.active').each(function () {
+			$(this).parents('li.submenu').each(function () {
 				$(this).children('a').first().addClass('subdrop');
 				$(this).children('ul').first().show();
 			});
 		});
+
+		// Submenu trigger itself marked active (e.g. Finance Report header on finance pages).
+		$('.sidebar-menu li.submenu > a.active').each(function () {
+			$(this).addClass('subdrop');
+			$(this).next('ul').show();
+			$(this).parents('li.submenu').each(function () {
+				$(this).children('a').first().addClass('subdrop');
+				$(this).children('ul').first().show();
+			});
+		});
+	}
+
+	function initSidebarMenu() {
+		if (sidebarMenuInitialized) {
+			return;
+		}
+		sidebarMenuInitialized = true;
+
+		$(document).off('click.sidebarMenu', '.sidebar-menu li.submenu > a');
+		$(document).on('click.sidebarMenu', '.sidebar-menu li.submenu > a', function (e) {
+			if ($(this).attr('href') && $(this).attr('href') !== 'javascript:void(0);') {
+				return;
+			}
+
+			e.preventDefault();
+			e.stopPropagation();
+
+			var $currentLink = $(this);
+			var $submenuUl = $currentLink.next('ul');
+			var hasActiveChild = $submenuUl.find('> li a.active').length > 0;
+
+			if ($currentLink.hasClass('subdrop')) {
+				// Keep open when this section contains the current page.
+				if (!hasActiveChild) {
+					$currentLink.removeClass('subdrop');
+					$submenuUl.slideUp(250);
+				}
+				return;
+			}
+
+			// Close sibling submenus at the same level only.
+			$currentLink.parent('li.submenu').siblings('li.submenu').each(function () {
+				var $siblingLink = $(this).children('a').first();
+				var $siblingUl = $siblingLink.next('ul');
+				if ($siblingUl.find('> li a.active').length === 0) {
+					$siblingLink.removeClass('subdrop');
+					$siblingUl.slideUp(250);
+				}
+			});
+
+			$currentLink.addClass('subdrop');
+			$submenuUl.slideDown(350);
+		});
+
+		// Reset visibility then restore from active routes / server subdrop.
+		$('.sidebar-menu li.submenu').each(function () {
+			var $link = $(this).children('a').first();
+			var $ul = $link.next('ul');
+			if (!$link.hasClass('subdrop')) {
+				$ul.hide();
+			}
+		});
+
+		expandSidebarSubmenus();
+	}
+
+	function init() {
+		initSidebarMenu();
 	}
 
 		//Trial Item

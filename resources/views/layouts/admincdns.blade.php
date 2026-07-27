@@ -345,7 +345,7 @@
 
 
 <script src="{{ asset('assets/plugins/apexchart/apexcharts.min.js') }}" type="e56d8e3ed6c4bef649884303-text/javascript"></script>
-<script src="{{ asset('assets/js/script.js') }}"></script>
+<script src="{{ asset('assets/js/script.js') }}?v={{ @filemtime(public_path('assets/js/script.js')) ?: '1' }}"></script>
 {{-- <script src="/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js"
     data-cf-settings="e56d8e3ed6c4bef649884303-|49" defer></script> --}}
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
