@@ -1706,8 +1706,8 @@ class IpdBillingController extends Controller
             $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
             $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
             $bedChargesCoveredByPackage = ($breakup['package_charges'] ?? 0) > 0;
-            // Approval bill: omit bed/GST lines when a package covers bed (same as final bill).
-            if ($isApprovalBill && $bedChargesCoveredByPackage) {
+            // Estimate & approval: omit bed/GST lines when a package covers bed (same as final bill).
+            if ($bedChargesCoveredByPackage) {
                 $bedChargesDetails = collect();
                 $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
                 $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
