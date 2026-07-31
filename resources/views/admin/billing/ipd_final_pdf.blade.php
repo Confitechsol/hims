@@ -710,8 +710,14 @@
             </table>
         @endif
 
-        <!-- IPD Charges -->
-        @if(isset($ipdChargesDetails) && $ipdChargesDetails->count() > 0)
+        @endif {{-- end standard (non-insurance-package) package / bed / GST layout --}}
+
+        <!-- IPD Charges (package-insurance: excludes medicines shown under excluded section) -->
+        @php
+            $ipdChargesTableRows = $ipdChargesForDisplay ?? $ipdChargesDetails ?? collect();
+            $ipdChargesTableSubtotal = $ipdChargesDisplaySubtotal ?? ($breakup['ipd_charges'] ?? 0);
+        @endphp
+        @if($ipdChargesTableRows->count() > 0)
             <table class="charges-table">
                 <thead>
                     <tr>
@@ -726,7 +732,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($ipdChargesDetails as $charge)
+                    @foreach($ipdChargesTableRows as $charge)
                         <tr>
                             <td>{{ \Carbon\Carbon::parse($charge->date)->format('d-m-Y') }}</td>
                             <td>{{ $charge->chargeCategory->name ?? 'N/A' }}</td>
@@ -737,7 +743,7 @@
                     @endforeach
                     <tr style="font-weight: bold;">
                         <td colspan="4" class="text-right">Subtotal:</td>
-                        <td class="text-right">Rs. {{ number_format($breakup['ipd_charges'] ?? 0, 2) }}</td>
+                        <td class="text-right">Rs. {{ number_format($ipdChargesTableSubtotal, 2) }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -881,8 +887,6 @@
                 </tbody>
             </table>
         @endif
-
-        @endif {{-- end non-package layout --}}
 
         <!-- Payment Details -->
         @if(isset($payments) && $payments->count() > 0)

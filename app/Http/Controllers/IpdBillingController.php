@@ -2294,10 +2294,16 @@ class IpdBillingController extends Controller
 
             // Package insurance final: show package + medicines/implants excluded from package
             $excludedMedicineImplantCharges = collect();
+            $ipdChargesForDisplay = $ipdChargesDetails;
+            $ipdChargesDisplaySubtotal = (float) ($breakup['ipd_charges'] ?? 0);
             if ($isInsuranceFinalBill && $hasPackageCharges) {
                 $excludedMedicineImplantCharges = $ipdChargesDetails
                     ->filter(fn ($charge) => $insuranceSummaryService->isMedicineOrImplantCharge($charge))
                     ->values();
+                $ipdChargesForDisplay = $ipdChargesDetails
+                    ->filter(fn ($charge) => ! $insuranceSummaryService->isMedicineOrImplantCharge($charge))
+                    ->values();
+                $ipdChargesDisplaySubtotal = round((float) $ipdChargesForDisplay->sum('net_amount'), 2);
             }
 
             // Get hospital information
@@ -2337,10 +2343,6 @@ class IpdBillingController extends Controller
                 $summaryBreakup = $breakup;
                 if ($hasPackageCharges) {
                     $useInsurancePackageLayout = true;
-                    // Visible lines only: package + excluded medicines/implants (no bed GST on packages)
-                    $packageTotal = (float) ($breakup['package_charges'] ?? 0);
-                    $excludedTotal = (float) $excludedMedicineImplantCharges->sum('net_amount');
-                    $summaryBreakup['total_charges'] = round($packageTotal + $excludedTotal, 2);
                 }
                 $insuranceFinalSummary = $insuranceSummaryService->build($ipd, $summaryBreakup, $payments);
                 try {
@@ -2527,6 +2529,7 @@ class IpdBillingController extends Controller
                 'investigationDatewise', 'doctorVisitGroupedForDisplay', 'doctorVisitGroupedByVisitType',
                 'gstChargesGrouped', 'logged_user', 'showOriginalAmount', 'showPackageProcedureColumn',
                 'isInsuranceFinalBill', 'useInsurancePackageLayout', 'excludedMedicineImplantCharges',
+                'ipdChargesForDisplay', 'ipdChargesDisplaySubtotal',
                 'insuranceFinalSummary', 'dueOnAccountInWords'
             ));
             
