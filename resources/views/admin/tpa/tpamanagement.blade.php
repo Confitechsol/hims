@@ -129,14 +129,14 @@
                                                             class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
                                                             data-id="{{ $item["id"] }}"
                                                             data-insurance_company_id="{{ $item->insurance_company_id }}"
-                                                            data-organisation_name="{{$item->organisation_name}}"
-                                                            data-code="{{$item->code}}"
-                                                            data-contact_no="{{$item->contact_no}}"
-                                                            data-address="{{$item->address}}"
-                                                            data-contact_person_name="{{$item->contact_person_name}}"
-                                                            data-contact_person_phone="{{$item->contact_person_phone}}"
-                                                            data-poilicy_no="{{$item->poilicy_no}}"
-                                                            data-e_card_no="{{$item->e_card_no}}"
+                                                            data-organisation_name="{{ $item->organisation_name }}"
+                                                            data-code="{{ $item->code ?? '' }}"
+                                                            data-contact_no="{{ $item->contact_no ?? '' }}"
+                                                            data-address="{{ $item->address ?? '' }}"
+                                                            data-contact_person_name="{{ $item->contact_person_name ?? '' }}"
+                                                            data-contact_person_phone="{{ $item->contact_person_phone ?? '' }}"
+                                                            data-poilicy_no="{{ $item->poilicy_no ?? '' }}"
+                                                            data-e_card_no="{{ $item->e_card_no ?? '' }}"
                                                             data-e_card_image="/{{$item->e_card_upload}}"
                                                             data-e_card_upload="">
                                                             <i class="ti ti-pencil"></i>
@@ -210,35 +210,47 @@
         </div>
     </div>
 </div>
-<x-modals.form-modal type="add" id="add_tpa" title="Add TPA" action="{{route('tpamanagement.store')}}" :fields="[
-        ['name' => 'insurance_company_id', 'label' => 'Insurance Company', 'type' => 'select', 'required' => true, 'options' => $insuranceCompanies->toArray(), 'size' => '12'],
-        ['name' => 'use_insurance_as_tpa', 'label' => 'Use Insurance Name as TPA Name', 'type' => 'checkbox', 'checkbox_label' => 'Use selected Insurance Company name as TPA Organisation Name', 'size' => '12'],
-        ['name' => 'organisation_name', 'label' => 'organisation Name', 'type' => 'text', 'required' => true,'size'=>'5'],
-        ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => false,'size'=>'3'],
-        ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => false,'size'=>'4'],
-        ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => false,'size'=>'12'],
-        ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text', 'required' => false,'size'=>'6'],
-        ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => false,'size'=>'6'],
-        ['name' => 'poilicy_no', 'label' => 'Poilicy No', 'type' => 'text', 'required' => false,'size'=>'6'],
-        ['name' => 'e_card_no', 'label' => 'E Card No', 'type' => 'text', 'required' => false,'size'=>'6'],
-        ['name' => 'e_card_upload', 'label' => 'E Card Upload', 'type' => 'file', 'required' => false,'size'=>'12'],
-        ]" :columns="3" />
- <x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit TPA"
-    action="{{ url('tpamanagement/update') }}" :fields="[
-        ['name' => 'id', 'type' => 'hidden', 'required' => true],
-        ['name' => 'insurance_company_id', 'label' => 'Insurance Company', 'type' => 'select', 'required' => true, 'options' => $insuranceCompanies->toArray(), 'size' => '12'],
-        ['name' => 'use_insurance_as_tpa', 'label' => 'Use Insurance Name as TPA Name', 'type' => 'checkbox', 'checkbox_label' => 'Use selected Insurance Company name as TPA Organisation Name', 'size' => '12'],
-        ['name' => 'organisation_name', 'label' => 'organisation Name', 'type' => 'text', 'required' => true,'size'=>'5'],
-        ['name' => 'code', 'label' => 'Code', 'type' => 'text', 'required' => false,'size'=>'3'],
-        ['name' => 'contact_no', 'label' => 'Phone', 'type' => 'text', 'required' => false,'size'=>'4'],
-        ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'required' => false,'size'=>'12'],
-        ['name' => 'contact_person_name', 'label' => 'Contact Person Name', 'type' => 'text', 'required' => false,'size'=>'6'],
-        ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone', 'type' => 'text', 'required' => false,'size'=>'6'],
-        ['name' => 'poilicy_no', 'label' => 'Poilicy No', 'type' => 'text', 'required' => false,'size'=>'6'],
-        ['name' => 'e_card_no', 'label' => 'E Card No', 'type' => 'text', 'required' => false,'size'=>'6'],
-        ['name' => 'e_card_image', 'label' => 'E Card Current Image', 'type' => 'img', 'required' => false,'size'=>'12'],
-        ['name' => 'e_card_upload', 'label' => 'E Card Image Update', 'type' => 'file', 'required' => false ,'size'=>'12'],
-    ]" :columns="3" />
+@php
+    $tpaOptionalContactFields = [
+        ['name' => 'code', 'label' => 'Code (optional)', 'type' => 'text', 'required' => false, 'size' => '3'],
+        ['name' => 'contact_no', 'label' => 'Phone (optional)', 'type' => 'text', 'required' => false, 'size' => '4'],
+        ['name' => 'address', 'label' => 'Address (optional)', 'type' => 'text', 'required' => false, 'size' => '12'],
+        ['name' => 'contact_person_name', 'label' => 'Contact Person Name (optional)', 'type' => 'text', 'required' => false, 'size' => '6'],
+        ['name' => 'contact_person_phone', 'label' => 'Contact Person Phone (optional)', 'type' => 'text', 'required' => false, 'size' => '6'],
+    ];
+    $tpaAddFields = array_merge(
+        [
+            ['name' => 'insurance_company_id', 'label' => 'Insurance Company', 'type' => 'select', 'required' => true, 'options' => $insuranceCompanies->toArray(), 'size' => '12'],
+            ['name' => 'use_insurance_as_tpa', 'label' => 'Use Insurance Name as TPA Name', 'type' => 'checkbox', 'checkbox_label' => 'Use selected Insurance Company name as TPA Organisation Name', 'size' => '12'],
+            ['name' => 'organisation_name', 'label' => 'Organisation Name', 'type' => 'text', 'required' => true, 'size' => '5'],
+        ],
+        $tpaOptionalContactFields,
+        [
+            ['name' => 'poilicy_no', 'label' => 'Policy No (optional)', 'type' => 'text', 'required' => false, 'size' => '6'],
+            ['name' => 'e_card_no', 'label' => 'E Card No (optional)', 'type' => 'text', 'required' => false, 'size' => '6'],
+            ['name' => 'e_card_upload', 'label' => 'E Card Upload (optional)', 'type' => 'file', 'required' => false, 'size' => '12'],
+        ]
+    );
+    $tpaEditFields = array_merge(
+        [
+            ['name' => 'id', 'type' => 'hidden', 'required' => true],
+            ['name' => 'insurance_company_id', 'label' => 'Insurance Company', 'type' => 'select', 'required' => true, 'options' => $insuranceCompanies->toArray(), 'size' => '12'],
+            ['name' => 'use_insurance_as_tpa', 'label' => 'Use Insurance Name as TPA Name', 'type' => 'checkbox', 'checkbox_label' => 'Use selected Insurance Company name as TPA Organisation Name', 'size' => '12'],
+            ['name' => 'organisation_name', 'label' => 'Organisation Name', 'type' => 'text', 'required' => true, 'size' => '5'],
+        ],
+        $tpaOptionalContactFields,
+        [
+            ['name' => 'poilicy_no', 'label' => 'Policy No (optional)', 'type' => 'text', 'required' => false, 'size' => '6'],
+            ['name' => 'e_card_no', 'label' => 'E Card No (optional)', 'type' => 'text', 'required' => false, 'size' => '6'],
+            ['name' => 'e_card_image', 'label' => 'E Card Current Image', 'type' => 'img', 'required' => false, 'size' => '12'],
+            ['name' => 'e_card_upload', 'label' => 'E Card Image Update (optional)', 'type' => 'file', 'required' => false, 'size' => '12'],
+        ]
+    );
+@endphp
+<x-modals.form-modal type="add" id="add_tpa" title="Add TPA" action="{{ route('tpamanagement.store') }}" :fields="$tpaAddFields" :columns="3" />
+<x-modals.form-modal method="put" type="edit" id="edit_modal" title="Edit TPA"
+    action="{{ url('tpamanagement/update') }}" :fields="$tpaEditFields" :columns="3" />
+
     
    
 <!-- row end -->

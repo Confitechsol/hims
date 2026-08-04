@@ -10,6 +10,7 @@ use App\Models\ChargeTypeMaster;
 use App\Models\Charge;
 use App\Models\ChargeCategory;
 use App\Models\OrganisationsCharge;
+use Illuminate\Support\Facades\Schema;
 
 class TpamanagmentController extends Controller
 {
@@ -59,36 +60,73 @@ class TpamanagmentController extends Controller
 
     }
 
-    function store(Request $request)
+    /**
+     * Optional organisation text fields: store null when left blank (requires nullable DB columns).
+     */
+    protected function organisationOptionalField(Request $request, string $key): ?string
     {
-        $request->validate([
+        $value = trim((string) ($request->input($key) ?? ''));
+
+        return $value === '' ? null : $value;
+    }
+
+    protected function fillOrganisationFromRequest(Organisation $organisation, Request $request): void
+    {
+        $organisation->insurance_company_id = $request->insurance_company_id;
+        $organisation->organisation_name = $request->organisation_name;
+        $organisation->code = $this->organisationOptionalField($request, 'code');
+        $organisation->contact_no = $this->organisationOptionalField($request, 'contact_no');
+        $organisation->address = $this->organisationOptionalField($request, 'address');
+        $organisation->contact_person_name = $this->organisationOptionalField($request, 'contact_person_name');
+        $organisation->contact_person_phone = $this->organisationOptionalField($request, 'contact_person_phone');
+        $organisation->poilicy_no = $this->organisationOptionalField($request, 'poilicy_no');
+        $organisation->e_card_no = $this->organisationOptionalField($request, 'e_card_no');
+
+        if (! Schema::hasColumn($organisation->getTable(), 'hospital_id')) {
+            return;
+        }
+        if ($organisation->hospital_id === null || $organisation->hospital_id === '') {
+            $organisation->hospital_id = '';
+        }
+        if ($organisation->branch_id === null || $organisation->branch_id === '') {
+            $organisation->branch_id = '';
+        }
+    }
+
+    /**
+     * Shared validation for Add TPA and Edit TPA (optional contact fields).
+     *
+     * @return array<string, mixed>
+     */
+    protected function organisationStoreUpdateRules(?int $ignoreOrganisationId = null): array
+    {
+        return [
             'insurance_company_id' => 'required|exists:insurance_companies,id',
             'organisation_name' => 'required|string|max:255',
             'code' => [
                 'nullable',
                 'string',
                 'max:100',
-                Rule::unique('organisation', 'code')->where(fn ($query) => $query->whereNotNull('code')->where('code', '!=', '')),
+                Rule::unique('organisation', 'code')
+                    ->when($ignoreOrganisationId, fn ($rule) => $rule->ignore($ignoreOrganisationId))
+                    ->where(fn ($query) => $query->whereNotNull('code')->where('code', '!=', '')),
             ],
-            'contact_no' => 'nullable|string|max:15|different:contact_person_phone',
+            'contact_no' => 'nullable|string|max:15',
             'address' => 'nullable|string|max:500',
             'contact_person_name' => 'nullable|string|max:255',
-            'contact_person_phone' => 'nullable|string|max:15|different:contact_no',
+            'contact_person_phone' => 'nullable|string|max:15',
             'poilicy_no' => 'nullable|string|max:255',
             'e_card_no' => 'nullable|string|max:255',
             'e_card_upload' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-        ]);
+        ];
+    }
+
+    function store(Request $request)
+    {
+        $request->validate($this->organisationStoreUpdateRules());
 
         $organisation = new Organisation();
-        $organisation->insurance_company_id = $request->insurance_company_id;
-        $organisation->organisation_name = $request->organisation_name;
-        $organisation->code = $request->input('code', '');
-        $organisation->contact_no = $request->input('contact_no', '');
-        $organisation->address = $request->input('address', '');
-        $organisation->contact_person_name = $request->input('contact_person_name', '');
-        $organisation->contact_person_phone = $request->input('contact_person_phone', '');
-        $organisation->poilicy_no = $request->input('poilicy_no', '');
-        $organisation->e_card_no = $request->input('e_card_no', '');
+        $this->fillOrganisationFromRequest($organisation, $request);
         $organisation->e_card_upload = '';
         if ($request->hasFile('e_card_upload')) {
             $file = $request->file('e_card_upload');
@@ -106,38 +144,14 @@ class TpamanagmentController extends Controller
     {
         $request->merge(['id' => $id]);
 
-        $request->validate([
-            'id' => 'required|exists:organisation,id',
-            'insurance_company_id' => 'required|exists:insurance_companies,id',
-            'organisation_name' => 'required|string|max:255',
-            'code' => [
-                'nullable',
-                'string',
-                'max:100',
-                Rule::unique('organisation', 'code')
-                    ->ignore($id)
-                    ->where(fn ($query) => $query->whereNotNull('code')->where('code', '!=', '')),
-            ],
-            'contact_no' => 'nullable|string|max:15|different:contact_person_phone',
-            'address' => 'nullable|string|max:500',
-            'contact_person_name' => 'nullable|string|max:255',
-            'contact_person_phone' => 'nullable|string|max:15|different:contact_no',
-            'poilicy_no' => 'nullable|string|max:255',
-            'e_card_no' => 'nullable|string|max:255',
-            'e_card_upload' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-        ]);
+        $request->validate(array_merge(
+            ['id' => 'required|exists:organisation,id'],
+            $this->organisationStoreUpdateRules((int) $id)
+        ));
 
         $organisation = Organisation::findOrFail($id);
 
-        $organisation->insurance_company_id = $request->insurance_company_id;
-        $organisation->organisation_name = $request->organisation_name;
-        $organisation->code = $request->input('code', '');
-        $organisation->contact_no = $request->input('contact_no', '');
-        $organisation->address = $request->input('address', '');
-        $organisation->contact_person_name = $request->input('contact_person_name', '');
-        $organisation->contact_person_phone = $request->input('contact_person_phone', '');
-        $organisation->poilicy_no = $request->input('poilicy_no', '');
-        $organisation->e_card_no = $request->input('e_card_no', '');
+        $this->fillOrganisationFromRequest($organisation, $request);
 
         if ($request->hasFile('e_card_upload')) {
             $file = $request->file('e_card_upload');
