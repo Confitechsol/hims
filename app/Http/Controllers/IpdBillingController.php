@@ -23,6 +23,7 @@ use App\Support\BedBillingPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Barryvdh\DomPDF\Facade\Pdf;
 // use App\Helpers\NumberToWords; // Commented out to force full namespace usage
 
@@ -922,8 +923,13 @@ class IpdBillingController extends Controller
     {
         $packages = IpdPackage::where('ipd_id', $ipdId)
             ->where('status', 'applied')
-            ->with('package')
-            ->orderByRaw('COALESCE(approval_percentage, 0) DESC')
+            ->with('package');
+
+        if (Schema::hasColumn('ipd_packages', 'approval_percentage')) {
+            $packages = $packages->orderByRaw('COALESCE(approval_percentage, 0) DESC');
+        }
+
+        $packages = $packages
             ->orderBy('applied_date', 'asc')
             ->orderBy('id', 'asc')
             ->get();
