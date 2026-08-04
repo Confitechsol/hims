@@ -68,8 +68,9 @@
           font-size: 17px;
           text-transform: uppercase;
           padding: 10px 5px;
-          color: #7d7c7c;
+          color: #000000;
           text-decoration: underline;
+          font-weight: 700;
       }
 
       .heading h4 {
@@ -288,7 +289,7 @@
 
                               <div class="body_area flex-grow-1">
                                   <div class="heading1">
-                                      <h4>DISCHARGE SUMMARY & CERTIFICATE</h4>
+                                      <h4>DISCHARGE SUMMARY &amp; CERTIFICATE</h4>
                                   </div>
 
                                   <div class="admission_info mb-3">
