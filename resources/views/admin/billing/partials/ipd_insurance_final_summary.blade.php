@@ -22,7 +22,7 @@
 
     @if(($s['special_discount'] ?? 0) > 0)
         <div class="summary-row">
-            <span class="summary-label">Special Discount:</span>
+            <span class="summary-label">Hospital Discount:</span>
             <span class="summary-value">Rs. {{ number_format($s['special_discount'] ?? 0, 2) }}</span>
         </div>
     @endif

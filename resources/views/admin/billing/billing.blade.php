@@ -414,8 +414,26 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.discharged) {
-                            // Patient is discharged, open final bill
-                            window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-final', '_blank');
+                            const openFinal = function() {
+                                window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-final', '_blank');
+                            };
+                            if (data.is_insurance && (!data.final_approval_amount || parseFloat(data.final_approval_amount) <= 0)) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Final Approval Amount not set',
+                                    html: '<p style="text-align:left;margin-bottom:10px;">For insurance patients, enter the <strong>Final Approval Amount</strong> from the insurer (and hospital discount if any), click <strong>Save billing amounts</strong>, then export the final bill.</p>',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#750096',
+                                    confirmButtonText: 'Export anyway',
+                                    cancelButtonText: 'Go back',
+                                }).then(function(result) {
+                                    if (result.isConfirmed) {
+                                        openFinal();
+                                    }
+                                });
+                            } else {
+                                openFinal();
+                            }
                         } else {
                             // Patient is not discharged, show professional alert
                             Swal.fire({
@@ -591,6 +609,10 @@
                             }
                             if (previewBal && data.balance_amount != null) {
                                 previewBal.textContent = '₹ ' + parseFloat(data.balance_amount || 0).toFixed(2);
+                            }
+                            const previewHospital = document.getElementById('previewHospitalDiscount');
+                            if (previewHospital && data.special_discount != null) {
+                                previewHospital.textContent = '₹ ' + parseFloat(data.special_discount || 0).toFixed(2);
                             }
                         } else {
                             msgEl.className = 'mt-2 small text-danger';

@@ -1213,6 +1213,81 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * OT procedure doctor fees (e.g. OT(Anesthesia Charge), OT(Surgeon Charge)) — shown outside Doctor Visit Charges on bills.
+     */
+    private function isOtAnesthesiaOrSurgeonDoctorChargeLabel(string $label): bool
+    {
+        $name = strtoupper(trim($label));
+        if ($name === '') {
+            return false;
+        }
+        if (! str_contains($name, 'OT')) {
+            return false;
+        }
+
+        return str_contains($name, 'ANESTHESIA') || str_contains($name, 'SURGEON');
+    }
+
+    private function isOtAnesthesiaOrSurgeonDoctorCharge($charge): bool
+    {
+        if (! $charge) {
+            return false;
+        }
+
+        return $this->isOtAnesthesiaOrSurgeonDoctorChargeLabel((string) ($charge->name ?? ''));
+    }
+
+    /**
+     * @return array{
+     *     doctorVisitGroupedForDisplay: \Illuminate\Support\Collection,
+     *     doctorVisitGroupedByVisitType: \Illuminate\Support\Collection,
+     *     otDoctorChargeRows: \Illuminate\Support\Collection,
+     *     doctorVisitChargesDisplaySubtotal: float,
+     *     otDoctorChargesDisplaySubtotal: float
+     * }
+     */
+    private function prepareDoctorVisitDisplayForBillPdf($doctorVisitDetails): array
+    {
+        $doctorVisitGroupedForDisplay = $this->groupDoctorVisitsForDisplay($doctorVisitDetails);
+        $groupedByVisitType = $this->groupDoctorVisitsByVisitTypeForDisplay($doctorVisitGroupedForDisplay);
+
+        $visitGroups = collect();
+        $otRows = collect();
+
+        foreach ($groupedByVisitType as $group) {
+            $label = (string) ($group->visit_type_label ?? '');
+            $isOtDoctorCharge = $this->isOtAnesthesiaOrSurgeonDoctorChargeLabel($label);
+            if (! $isOtDoctorCharge && ($group->rows ?? collect())->isNotEmpty()) {
+                $first = $group->rows->first();
+                $isOtDoctorCharge = $this->isOtAnesthesiaOrSurgeonDoctorCharge($first->charge ?? null);
+            }
+
+            if ($isOtDoctorCharge) {
+                foreach ($group->rows ?? [] as $row) {
+                    $otRows->push($row);
+                }
+            } else {
+                $visitGroups->push($group);
+            }
+        }
+
+        $otRows = $otRows->sortBy('from_date')->values();
+
+        $visitSubtotal = $visitGroups->sum(function ($group) {
+            return ($group->rows ?? collect())->sum(fn ($row) => (float) ($row->total_amount ?? 0));
+        });
+        $otSubtotal = $otRows->sum(fn ($row) => (float) ($row->total_amount ?? 0));
+
+        return [
+            'doctorVisitGroupedForDisplay' => $doctorVisitGroupedForDisplay,
+            'doctorVisitGroupedByVisitType' => $visitGroups->values(),
+            'otDoctorChargeRows' => $otRows,
+            'doctorVisitChargesDisplaySubtotal' => round((float) $visitSubtotal, 2),
+            'otDoctorChargesDisplaySubtotal' => round((float) $otSubtotal, 2),
+        ];
+    }
+
+    /**
      * Get formatted doctor name.
      */
     private function formatDoctorName($doctor)
@@ -1818,9 +1893,13 @@ class IpdBillingController extends Controller
                 ->orderByRaw('COALESCE(visit_date, DATE(reporting_date), DATE(created_at)) ASC')
                 ->orderBy('id')
                 ->get();
-            // Group doctor visits by doctor + visit type, then by visit type for PDF display
-            $doctorVisitGroupedForDisplay = $this->groupDoctorVisitsForDisplay($doctorVisitDetails);
-            $doctorVisitGroupedByVisitType = $this->groupDoctorVisitsByVisitTypeForDisplay($doctorVisitGroupedForDisplay);
+            // Group doctor visits for PDF (OT Anesthesia/Surgeon split to separate section)
+            $doctorVisitBillDisplay = $this->prepareDoctorVisitDisplayForBillPdf($doctorVisitDetails);
+            $doctorVisitGroupedForDisplay = $doctorVisitBillDisplay['doctorVisitGroupedForDisplay'];
+            $doctorVisitGroupedByVisitType = $doctorVisitBillDisplay['doctorVisitGroupedByVisitType'];
+            $otDoctorChargeRows = $doctorVisitBillDisplay['otDoctorChargeRows'];
+            $doctorVisitChargesDisplaySubtotal = $doctorVisitBillDisplay['doctorVisitChargesDisplaySubtotal'];
+            $otDoctorChargesDisplaySubtotal = $doctorVisitBillDisplay['otDoctorChargesDisplaySubtotal'];
 
             // Package details (applied packages) for estimate / approval PDF
             $packageDetails = $this->buildPackageDetailsForBillDisplay($ipdId);
@@ -1950,7 +2029,9 @@ class IpdBillingController extends Controller
             $tempPdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
                 'bedChargesDisplayTotal', 'bedChargesCoveredByPackage',
-                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'doctorVisitGroupedByVisitType', 'packageDetails', 'payments',
+                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'doctorVisitGroupedByVisitType',
+                'otDoctorChargeRows', 'doctorVisitChargesDisplaySubtotal', 'otDoctorChargesDisplaySubtotal',
+                'packageDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise', 'investigationBrief', 'viewMode',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
@@ -1994,7 +2075,9 @@ class IpdBillingController extends Controller
             $pdf = Pdf::loadView('admin.billing.ipd_estimate_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
                 'bedChargesDisplayTotal', 'bedChargesCoveredByPackage',
-                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'doctorVisitGroupedByVisitType', 'packageDetails', 'payments',
+                'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'doctorVisitGroupedForDisplay', 'doctorVisitGroupedByVisitType',
+                'otDoctorChargeRows', 'doctorVisitChargesDisplaySubtotal', 'otDoctorChargesDisplaySubtotal',
+                'packageDetails', 'payments',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise', 'investigationBrief', 'viewMode',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
@@ -2157,7 +2240,9 @@ class IpdBillingController extends Controller
                 'discharged' => $isDischarged && $hasDischargeDate,
                 'discharged_date' => $dischargeCard ? $dischargeCard->discharge_date : null,
                 'has_discharge_date' => $hasDischargeDate,
-                'message' => $message
+                'message' => $message,
+                'is_insurance' => $ipd->isInsuranceBilling(),
+                'final_approval_amount' => (float) ($ipd->final_approval_amount ?? 0),
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -2279,9 +2364,13 @@ class IpdBillingController extends Controller
                 ->orderByRaw('COALESCE(visit_date, DATE(reporting_date), DATE(created_at)) ASC')
                 ->orderBy('id')
                 ->get();
-            // Group doctor visits by doctor + visit type, then by visit type for PDF display
-            $doctorVisitGroupedForDisplay = $this->groupDoctorVisitsForDisplay($doctorVisitDetails);
-            $doctorVisitGroupedByVisitType = $this->groupDoctorVisitsByVisitTypeForDisplay($doctorVisitGroupedForDisplay);
+            // Group doctor visits for PDF (OT Anesthesia/Surgeon split to separate section)
+            $doctorVisitBillDisplay = $this->prepareDoctorVisitDisplayForBillPdf($doctorVisitDetails);
+            $doctorVisitGroupedForDisplay = $doctorVisitBillDisplay['doctorVisitGroupedForDisplay'];
+            $doctorVisitGroupedByVisitType = $doctorVisitBillDisplay['doctorVisitGroupedByVisitType'];
+            $otDoctorChargeRows = $doctorVisitBillDisplay['otDoctorChargeRows'];
+            $doctorVisitChargesDisplaySubtotal = $doctorVisitBillDisplay['doctorVisitChargesDisplaySubtotal'];
+            $otDoctorChargesDisplaySubtotal = $doctorVisitBillDisplay['otDoctorChargesDisplaySubtotal'];
 
             // Package details (applied packages) for final bill PDF
             $packageDetails = $this->buildPackageDetailsForBillDisplay($ipdId);
@@ -2527,6 +2616,7 @@ class IpdBillingController extends Controller
                 'surgeonCharges', 'anesthesiaCharges', 'investigationCharges', 'totalPages',
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise', 'doctorVisitGroupedForDisplay', 'doctorVisitGroupedByVisitType',
+                'otDoctorChargeRows', 'doctorVisitChargesDisplaySubtotal', 'otDoctorChargesDisplaySubtotal',
                 'gstChargesGrouped', 'logged_user', 'showOriginalAmount', 'showPackageProcedureColumn',
                 'isInsuranceFinalBill', 'useInsurancePackageLayout', 'excludedMedicineImplantCharges',
                 'ipdChargesForDisplay', 'ipdChargesDisplaySubtotal',
