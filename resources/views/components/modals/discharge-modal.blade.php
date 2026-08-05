@@ -840,7 +840,7 @@
                         <div class="col-md-12">
                             <label for="remarks" class="form-label">
                                 <i class="bi bi-chat-left-text"></i>
-                                Doctor Advice
+                                Discharge Advice
                             </label>
                             <textarea class="form-control" id="doctor_advice_text" name="doctor_advice" rows="3"></textarea>
                         </div>
