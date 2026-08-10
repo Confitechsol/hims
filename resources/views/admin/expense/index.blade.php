@@ -66,7 +66,6 @@
                                             <thead class="thead-light">
                                                 <tr>
                                                     <th>Name</th>
-                                                    <th>Invoice Number</th>
                                                     <th>Date</th>
                                                     <th>Description</th>
                                                     <th>Expense Head</th>
@@ -80,7 +79,6 @@
                                                  @foreach($expenses as $expense)
                                                     <tr>
                                                         <td>{{ $expense->name }}</td>
-                                                        <td>{{ $expense->invoice_no }}</td>
                                                         <td>{{ \Carbon\Carbon::parse($expense->date)->format('d-m-Y') }}</td>
                                                         <td>{{ $expense->note }}</td>
                                                         <td>{{ $expense->expenseHead->exp_category ?? '-' }}</td>
@@ -102,7 +100,6 @@
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill edit-btn"
                                                                     data-id="{{ $expense->id }}"
                                                                     data-name="{{ $expense->name }}"
-                                                                    data-invoice_number="{{ $expense->invoice_no }}"
                                                                     data-date="{{ optional($expense->date)?->format('Y-m-d') ?? $expense->date }}"
                                                                     data-description="{{ $expense->note }}"
                                                                     data-amount="{{ $expense->amount }}"
@@ -213,10 +210,9 @@
                 'type' => 'select',
                 'options' => $expenseOptions,
                 'required' => true,
-                'size' => '5',
+                'size' => '6',
             ],
-            ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'invoice_number', 'label' => 'Invoice Number', 'type' => 'text', 'required' => true, 'size' => '4'],
+            ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '6'],
             ['name' => 'date', 'label' => 'Date', 'type' => 'date', 'required' => true, 'size' => '12'],
             [
                 'name' => 'amount',
@@ -238,7 +234,7 @@
             ['name' => 'cheque_no', 'label' => 'Cheque / CARD No.', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'payment_reference', 'label' => 'Transaction / Reference No.', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6'],
-            ['name' => 'description', 'label' => 'Description', 'type' => 'text', 'required' => true, 'size' => '6'],
+            ['name' => 'description', 'label' => 'Description', 'type' => 'text', 'required' => false, 'size' => '6'],
         ]" :columns="3" />
     {{-- @endif --}}
     {{-- @if(canEdit(12)) --}}
@@ -251,10 +247,9 @@
                 'type' => 'select',
                 'options' => $expenseOptions,
                 'required' => true,
-                'size' => '5',
+                'size' => '6',
             ],
-            ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '3'],
-            ['name' => 'invoice_number', 'label' => 'Invoice Number', 'type' => 'text', 'required' => true, 'size' => '4'],
+            ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true, 'size' => '6'],
             ['name' => 'date', 'label' => 'Date', 'type' => 'date', 'required' => true, 'size' => '12'],
             [
                 'name' => 'amount',
@@ -276,7 +271,7 @@
             ['name' => 'cheque_no', 'label' => 'Cheque / CARD No.', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'payment_reference', 'label' => 'Transaction / Reference No.', 'type' => 'text', 'required' => false, 'size' => '4'],
             ['name' => 'attach_document', 'label' => 'Attach Document', 'type' => 'file', 'required' => false, 'size' => '6'],
-            ['name' => 'description', 'label' => 'Description', 'type' => 'text', 'size' => '6'],
+            ['name' => 'description', 'label' => 'Description', 'type' => 'text', 'required' => false, 'size' => '6'],
         ]" :columns="3" />
     {{-- @endif --}}
 

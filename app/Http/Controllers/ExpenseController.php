@@ -88,7 +88,6 @@ class ExpenseController extends Controller
         $validated = $request->validate([
             'expense_name' => 'required',
             'name' => 'required|string|max:255',
-            'invoice_number' => 'nullable|string|max:255',
             'date' => 'required|date',
             'amount' => 'required|numeric',
             'payment_mode' => 'required|string|in:Cash,Cheque,Card,UPI,Online,Transfer to Bank Account,Other',
@@ -129,7 +128,6 @@ class ExpenseController extends Controller
         Expense::create([
             'exp_head_id' => $expHeadId,
             'name' => $validated['name'],
-            'invoice_no' => $validated['invoice_number'] ?? null,
             'date' => $validated['date'],
             'amount' => $validated['amount'],
             'payment_mode' => $validated['payment_mode'],
@@ -157,7 +155,6 @@ class ExpenseController extends Controller
         $validated = $request->validate([
             'expense_name' => 'required',
             'name' => 'required|string|max:255',
-            'invoice_number' => 'nullable|string|max:255',
             'date' => 'required|date',
             'amount' => 'required|numeric',
             'payment_mode' => 'nullable|string|in:Cash,Cheque,Card,UPI,Online,Transfer to Bank Account,Other',
@@ -205,7 +202,6 @@ class ExpenseController extends Controller
 
         $expense->exp_head_id = $expHeadId;
         $expense->name = $validated['name'];
-        $expense->invoice_no = $validated['invoice_number'] ?? null;
         $expense->date = $validated['date'];
         $expense->amount = $validated['amount'];
         $expense->payment_mode = $validated['payment_mode'] ?? $expense->payment_mode;

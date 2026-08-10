@@ -19,7 +19,6 @@ class Expense extends Model
         'branch_id',
         'exp_head_id',
         'name',
-        'invoice_no',
         'date',
         'amount',
         'payment_mode',
