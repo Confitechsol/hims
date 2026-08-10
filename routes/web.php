@@ -15,6 +15,7 @@ use App\Http\Controllers\BloodBankController;
 use App\Http\Controllers\BloodDonorController;
 use App\Http\Controllers\CashRegisterController;
 use App\Http\Controllers\DailyCollectionReportController;
+use App\Http\Controllers\DailyCashBookController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\DeathController;
@@ -1147,6 +1148,9 @@ Route::prefix('reports')->group(function () {
     Route::get('/daily-collection-report', [DailyCollectionReportController::class, 'index'])->name('reports.daily-collection');
     Route::get('/daily-collection-report/excel', [DailyCollectionReportController::class, 'exportExcel'])->name('reports.daily-collection.excel');
     Route::get('/daily-collection-report/pdf', [DailyCollectionReportController::class, 'exportPdf'])->name('reports.daily-collection.pdf');
+    Route::get('/daily-cash-book', [DailyCashBookController::class, 'index'])->name('reports.daily-cash-book');
+    Route::get('/daily-cash-book/excel', [DailyCashBookController::class, 'exportExcel'])->name('reports.daily-cash-book.excel');
+    Route::get('/daily-cash-book/pdf', [DailyCashBookController::class, 'exportPdf'])->name('reports.daily-cash-book.pdf');
 
     Route::get('/opd-reports-index', [OpdController::class, 'reports'])->name('opd.reports');
     Route::get('/opd-reports', [OpdController::class, 'opdReport'])->name('opd.opd_reports');

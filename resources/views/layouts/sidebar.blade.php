@@ -566,7 +566,7 @@
                                 </li>
                                 <li class="submenu">
                                     <a href="javascript:void(0);"
-                                        class="{{ request()->routeIs('reports.money-receipt-register*') || request()->routeIs('reports.cash-register*') || request()->routeIs('reports.expense-register*') || request()->routeIs('reports.daily-collection*') ? 'subdrop' : '' }}">
+                                        class="{{ request()->routeIs('reports.money-receipt-register*') || request()->routeIs('reports.cash-register*') || request()->routeIs('reports.expense-register*') || request()->routeIs('reports.daily-collection*') || request()->routeIs('reports.daily-cash-book*') ? 'subdrop' : '' }}">
                                         <i class="ti ti-report-money"></i><span>Accounting Report</span>
                                         <span class="menu-arrow"></span>
                                     </a>
@@ -583,6 +583,9 @@
                                         <li><a href="{{ route('reports.daily-collection') }}"
                                                 class="{{ request()->routeIs('reports.daily-collection') ? 'active' : '' }}">Daily
                                                 Collection Report</a></li>
+                                        <li><a href="{{ route('reports.daily-cash-book') }}"
+                                                class="{{ request()->routeIs('reports.daily-cash-book*') ? 'active' : '' }}">Daily
+                                                Cash Book</a></li>
                                     </ul>
                                 </li>
                                 <li><a href="{{ route('opd.reports') }}"

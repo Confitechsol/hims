@@ -123,6 +123,14 @@
                                 </div>
                             </a>
                         </div>
+                        <div class="col-md-3">
+                            <a href="{{ route('reports.daily-cash-book') }}">
+                                <div class="module_billing">
+                                    <i class="fa-solid fa-book"></i>
+                                    <p>Daily Cash Book</p>
+                                </div>
+                            </a>
+                        </div>
 
                     </div>
                 </div>
