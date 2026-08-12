@@ -277,7 +277,8 @@ class DischargeController extends Controller
             }
 
             // -------------------------------
-            // 🔹 Final Discharge: close bed history, then apply discharge-time bed charge rule
+            // 🔹 Final Discharge: save card and mark discharged.
+            //    Bed stays occupied until Generate Final Bill in billing.
             //    Insurance: discharge-day bed charge only if final discharge time >= 3:00 PM
             //    Cash: normal boundary (11:00) using final discharge datetime
             // -------------------------------
@@ -286,7 +287,6 @@ class DischargeController extends Controller
                 $validated['discharge_time'] ?? null,
                 (int) $validated['ipd_details_id']
             );
-            $this->releaseBedsAndCloseHistory((int) $validated['ipd_details_id'], $dischargeAt);
 
             IpdDetail::where('id', $validated['ipd_details_id'])
                 ->update([
@@ -300,7 +300,7 @@ class DischargeController extends Controller
 
             return redirect()
                 ->back()
-                ->with('success', 'Patient discharged successfully.');
+                ->with('success', 'Patient discharged successfully. The bed stays occupied until Generate Final Bill is used in billing.');
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error($e);
@@ -547,11 +547,6 @@ class DischargeController extends Controller
             // dd($barcodeBinary);
             // dd($validated);
             $discharge      = DischargeCard::findOrFail($id);
-            $oldDischargeAt = $this->parseDischargeDateTimeForBedHistory(
-                $this->dischargeDateToString($discharge->discharge_date),
-                $discharge->discharge_time,
-                (int) ($validated['ipd_details_id'] ?? $discharge->ipd_details_id)
-            );
             // dd($discharge);
             $discharge->update([
                 'ipd_details_id'     => $validated['ipd_details_id'],
@@ -621,7 +616,8 @@ class DischargeController extends Controller
             ]);
 
             // -------------------------------
-            // 🔹 Final Discharge from Draft/Edit (same as cash): close bed + apply discharge-time bed charge
+            // 🔹 Final Discharge from Draft/Edit: apply discharge-time bed charge.
+            //    Bed is released only when Generate Final Bill is used in billing.
             // -------------------------------
             if ($validated['is_draft'] == "false") {
                 $newDischargeAt = $this->parseDischargeDateTimeForBedHistory(
@@ -629,20 +625,6 @@ class DischargeController extends Controller
                     $validated['discharge_time'] ?? null,
                     (int) $validated['ipd_details_id']
                 );
-
-                $ipd = IpdDetail::find((int) $validated['ipd_details_id']);
-                $wasAlreadyFinal = $ipd && ($ipd->discharged ?? 'no') === 'yes';
-
-                if ($wasAlreadyFinal) {
-                    $this->syncBedHistoryToDateOnDischargeEdit(
-                        (int) $validated['ipd_details_id'],
-                        $oldDischargeAt,
-                        $newDischargeAt
-                    );
-                } else {
-                    // Coming from draft → final: close active bed(s) at final discharge time
-                    $this->releaseBedsAndCloseHistory((int) $validated['ipd_details_id'], $newDischargeAt);
-                }
 
                 IpdDetail::where('id', $validated['ipd_details_id'])
                     ->update(['discharged' => 'yes', 'discharged_date' => $validated['discharge_date']]);
@@ -652,7 +634,7 @@ class DischargeController extends Controller
                 DB::commit();
                 return redirect()
                     ->route('ipd', ['tab' => 'discharge'])
-                    ->with('success', 'Patient discharged successfully. Bed charge applied based on final discharge time.');
+                    ->with('success', 'Discharge updated. The bed stays occupied until Generate Final Bill is used in billing.');
             }
 
             // Still draft — keep beds open; no final bed-charge decision yet

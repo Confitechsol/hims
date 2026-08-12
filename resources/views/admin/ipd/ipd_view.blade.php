@@ -667,6 +667,10 @@
                                         {{ $ipd->patient->patient_name }}
                                     </h5>
                                     @if ($ipd->discharged == 'yes' || $ipd->discharged == 'draft')
+                                        <div class="d-flex align-items-center">
+                                        @if ($ipd->discharged == 'yes' && empty($ipd->final_bill_generated_at))
+                                            <span class="badge bg-info me-2">Bed occupied until final bill</span>
+                                        @endif
                                         <button class="border-0 text-white"
                                             style="background-color: #750096;padding: 0.5rem;border-radius: 8px;"
                                             data-bs-toggle="modal" data-bs-target="#dischargePreviewModal"
@@ -674,6 +678,7 @@
                                             data-medicines='@json($ipd->discharge_medicines)'><i
                                                 class="bi bi-clipboard-pulse text-white"></i>
                                             Discharge</button>
+                                        </div>
                                     @else
                                         <button class="border-0 text-white" style="background-color: #750096;padding: 0.5rem;border-radius: 8px;" data-bs-toggle="modal"
                                             data-bs-target="#patientDischargeModal" data-ipd="{{ $ipd }}"

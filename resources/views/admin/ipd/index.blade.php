@@ -267,6 +267,11 @@
                                                                         class="badge bg-warning-subtle text-warning ms-2">
                                                                         Draft
                                                                     </span>
+                                                                @elseif (strtolower(trim($ipdDetails->discharged ?? '')) === 'yes' && empty($ipdDetails->final_bill_generated_at))
+                                                                    <span
+                                                                        class="badge bg-info-subtle text-info ms-2">
+                                                                        Bed occupied
+                                                                    </span>
                                                                 @endif
                                                             </td>
                                                             <td>{{ optional($ipdDetails->patient)->patient_name ?? '-' }}

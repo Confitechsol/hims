@@ -698,6 +698,8 @@ Route::prefix('ipd/billing')->group(function () {
     Route::post('/{ipdId}/discount', [IpdBillingController::class, 'updateDiscount'])->name('ipd.billing.discount.update');
     Route::post('/{ipdId}/due-patient-party', [IpdBillingController::class, 'updateDuePatientParty'])->name('ipd.billing.due.patient.party.update');
     Route::get('/{ipdId}/check-discharged', [IpdBillingController::class, 'checkDischarged'])->name('ipd.billing.check.discharged');
+    Route::get('/{ipdId}/final-bill-preview', [IpdBillingController::class, 'previewFinalBill'])->name('ipd.billing.final.preview');
+    Route::post('/{ipdId}/generate-final', [IpdBillingController::class, 'generateFinalBill'])->name('ipd.billing.final.generate');
     Route::get('/{ipdId}/check-approval', [IpdBillingController::class, 'checkApprovalBill'])->name('ipd.billing.check.approval');
     Route::get('/{ipdId}/export-estimate', [IpdBillingController::class, 'exportEstimate'])->name('ipd.billing.export.estimate');
     Route::get('/{ipdId}/export-approval', [IpdBillingController::class, 'exportApprovalBill'])->name('ipd.billing.export.approval');

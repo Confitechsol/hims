@@ -65,6 +65,10 @@ class IpdDetail extends Model
         'date',
         'discharged',
         'discharged_date',
+        'final_bill_generated_at',
+        'final_bill_generated_by',
+        'include_post_discharge_bed_charge',
+        'physical_release_at',
         'net_amount',
         'tax',
         'amount',
@@ -86,7 +90,15 @@ class IpdDetail extends Model
         'final_approval_amount' => 'decimal:2',
         'due_patient_party_amount' => 'decimal:2',
         'is_cashless' => 'boolean',
+        'final_bill_generated_at' => 'datetime',
+        'physical_release_at' => 'datetime',
+        'include_post_discharge_bed_charge' => 'boolean',
     ];
+
+    public function isFinalBillGenerated(): bool
+    {
+        return ! empty($this->final_bill_generated_at);
+    }
 
     /**
      * Relationships

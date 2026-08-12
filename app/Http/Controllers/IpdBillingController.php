@@ -19,6 +19,7 @@ use App\Services\InsuranceDischargeBedChargeService;
 use App\Services\DaywiseBedChargeService;
 use App\Services\IpdPackageService;
 use App\Services\InsuranceFinalBillSummaryService;
+use App\Services\IpdFinalBillService;
 use App\Support\BedBillingPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -56,7 +57,9 @@ class IpdBillingController extends Controller
             $data = $ipdPatients->map(function($ipd) {
                 $patient = $ipd->patient;
                 $isDischarged = $ipd->discharged == 'yes';
-                $dischargeStatus = $isDischarged ? ' (Discharged)' : '';
+                $dischargeStatus = $isDischarged
+                    ? ($ipd->isFinalBillGenerated() ? ' (Discharged)' : ' (Discharged – bed occupied)')
+                    : '';
 
                 $patientName = $patient ? ($patient->patient_name ?? 'N/A') : 'N/A';
                 $phone = $patient ? ($patient->mobileno ?? '') : '';
@@ -68,6 +71,7 @@ class IpdBillingController extends Controller
                     'phone' => $phone,
                     'discharged' => $isDischarged,
                     'discharged_date' => $ipd->discharged_date,
+                    'final_bill_generated' => $ipd->isFinalBillGenerated(),
                     'display_text' => ($ipd->ipd_no ?? 'N/A') . ' - ' . $patientName . $dischargeStatus,
                 ];
             });
@@ -242,7 +246,7 @@ class IpdBillingController extends Controller
      * @param string|null $endDate End date for calculation (Y-m-d format). If null, uses current date.
      * @return array ['total' => float, 'details' => array]
      */
-    private function calculateBedChargesFromHistory($ipdId, $endDate = null)
+    private function calculateBedChargesFromHistory($ipdId, $endDate = null, ?Carbon $insuranceDischargeAtOverride = null)
     {
         $ipd = IpdDetail::find($ipdId);
         if (!$ipd) {
@@ -272,7 +276,11 @@ class IpdBillingController extends Controller
         }
 
         $insuranceDischargeBedService = app(InsuranceDischargeBedChargeService::class);
-        $skipInsuranceDischargeChargeDate = $insuranceDischargeBedService->dischargeChargeDateToExclude($ipd, $endAt);
+        $skipInsuranceDischargeChargeDate = $insuranceDischargeBedService->dischargeChargeDateToExclude(
+            $ipd,
+            $endAt,
+            $insuranceDischargeAtOverride
+        );
 
         // Get all bed history records for this IPD (primary source)
         $bedHistories = PatientBedHistory::where('ipd_id', $ipdId)
@@ -665,13 +673,29 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * Public snapshot of bed charges up to an end datetime (used by final-bill extra-bed preview).
+     */
+    public function computeBedChargesSnapshot(int $ipdId, $endDate = null, ?Carbon $insuranceDischargeAtOverride = null): array
+    {
+        return $this->calculateBedChargesFromHistory($ipdId, $endDate, $insuranceDischargeAtOverride);
+    }
+
+    /**
      * Resolve billing end date for an IPD.
-     * For discharged IPD, billing stops at discharge date.
+     * After Generate Final Bill with extra bed, use physical release datetime.
+     * Otherwise discharged IPD stops at discharge date.
      */
     private function resolveBillingEndDateForIpd(IpdDetail $ipd): ?string
     {
         if (($ipd->discharged ?? 'no') !== 'yes') {
             return null;
+        }
+
+        if ($ipd->isFinalBillGenerated()
+            && $ipd->include_post_discharge_bed_charge
+            && ! empty($ipd->physical_release_at)
+        ) {
+            return Carbon::parse($ipd->physical_release_at)->format('Y-m-d H:i:s');
         }
 
         if (!empty($ipd->discharged_date)) {
@@ -2249,11 +2273,99 @@ class IpdBillingController extends Controller
                 'message' => $message,
                 'is_insurance' => $ipd->isInsuranceBilling(),
                 'final_approval_amount' => (float) ($ipd->final_approval_amount ?? 0),
+                'final_bill_generated' => $ipd->isFinalBillGenerated(),
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'discharged' => false,
                 'message' => 'Error checking discharge status: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Extra-bed preview before Generate Final Bill (does not release the bed).
+     */
+    public function previewFinalBill($ipdId, IpdFinalBillService $finalBillService)
+    {
+        try {
+            $ipd = IpdDetail::findOrFail($ipdId);
+            $preview = $finalBillService->preview($ipd);
+
+            return response()->json([
+                'success' => true,
+                'data' => $preview,
+            ]);
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        } catch (\Throwable $e) {
+            \Log::error('Final bill preview failed', ['ipd_id' => $ipdId, 'message' => $e->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to preview extra bed charges. Please try again.',
+            ], 500);
+        }
+    }
+
+    /**
+     * Generate (lock) the final bill, optionally include extra bed, then release the bed.
+     */
+    public function generateFinalBill(Request $request, $ipdId, IpdFinalBillService $finalBillService)
+    {
+        $request->validate([
+            'include_extra_bed' => 'nullable|boolean',
+        ]);
+
+        try {
+            $ipd = IpdDetail::findOrFail($ipdId);
+            $preview = $finalBillService->preview($ipd);
+
+            if (! empty($preview['already_generated'])) {
+                return response()->json([
+                    'success' => true,
+                    'already_generated' => true,
+                    'pdf_url' => url('ipd/billing/' . $ipdId . '/export-final'),
+                    'message' => 'Final bill already generated.',
+                ]);
+            }
+
+            $includeExtra = $request->boolean('include_extra_bed');
+            if (! empty($preview['prompt_needed']) && ! $request->exists('include_extra_bed')) {
+                return response()->json([
+                    'success' => false,
+                    'prompt_needed' => true,
+                    'data' => $preview,
+                    'message' => $preview['message'],
+                ], 422);
+            }
+
+            $finalBillService->generate($ipd, $includeExtra);
+
+            return response()->json([
+                'success' => true,
+                'already_generated' => false,
+                'pdf_url' => url('ipd/billing/' . $ipdId . '/export-final'),
+                'message' => 'Final bill generated and bed released.',
+            ]);
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        } catch (\Throwable $e) {
+            \Log::error('Generate final bill failed', [
+                'ipd_id' => $ipdId,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to generate the final bill. Please try again.',
             ], 500);
         }
     }
@@ -2300,9 +2412,7 @@ class IpdBillingController extends Controller
             
             $dischargeDate = $dischargeCard->discharge_date;
             $dischargeTime = $dischargeCard->discharge_time;
-            $dischargeAt = $this->resolveDischargeDateTimeForIpd($ipd)
-                ?? Carbon::parse($dischargeDate);
-            $billingEndAt = $dischargeAt->format('Y-m-d H:i:s');
+            $billingEndAt = app(IpdFinalBillService::class)->billingEndAt($ipd)->format('Y-m-d H:i:s');
             
             \Log::info('Discharge information retrieved', [
                 'discharge_date' => $dischargeDate,

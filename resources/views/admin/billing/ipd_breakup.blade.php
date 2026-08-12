@@ -329,7 +329,7 @@
             </div>
             <div class="card-body">
                 <p class="text-muted small mb-3">
-                    After insurer response: enter <strong>Final Approval Amount</strong> and <strong>Hospital Discount</strong> (if applicable), click <strong>Save billing amounts</strong>, then use <strong>Export Final Bill</strong>.
+                    After insurer response: enter <strong>Final Approval Amount</strong> and <strong>Hospital Discount</strong> (if applicable), click <strong>Save billing amounts</strong>, then use <strong>Preview Final Bill</strong> or <strong>Generate Final Bill</strong>.
                     Due on A/C insurer = Final Approval Amount. Hospital discount appears on the final bill when entered.
                 </p>
                 <div class="row g-3">

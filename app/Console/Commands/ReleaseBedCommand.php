@@ -291,6 +291,7 @@ class ReleaseBedCommand extends Command
             return false;
         }
 
-        return in_array(strtolower((string) $ipd->discharged), ['yes', 'draft'], true);
+        return in_array(strtolower((string) $ipd->discharged), ['yes', 'draft'], true)
+            && ! empty($ipd->final_bill_generated_at);
     }
 }

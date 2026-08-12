@@ -301,7 +301,8 @@ class DaywiseBedChargeService
         int $bedGroupId,
         int $bedId,
         Carbon $segmentFrom,
-        ?Carbon $segmentTo = null
+        ?Carbon $segmentTo = null,
+        ?Carbon $effectiveDischargeAt = null
     ): int {
         if ($bedChargeRate <= 0) {
             return 0;
@@ -317,7 +318,7 @@ class DaywiseBedChargeService
         }
 
         $insuranceBedService = app(InsuranceDischargeBedChargeService::class);
-        $skipDischargeChargeDate = $insuranceBedService->dischargeChargeDateToExclude($ipd, $endAt);
+        $skipDischargeChargeDate = $insuranceBedService->dischargeChargeDateToExclude($ipd, $endAt, $effectiveDischargeAt);
 
         $billableAnchor = BedBillingPeriod::billableAnchorAt($segmentFrom);
         $firstChargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($segmentFrom);

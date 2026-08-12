@@ -66,8 +66,11 @@ class InsuranceDischargeBedChargeService
     /**
      * Charge label day (Y-m-d) to skip for insurance discharge, or null if none.
      */
-    public function dischargeChargeDateToExclude(IpdDetail $ipd, ?Carbon $billingEndAt = null): ?string
-    {
+    public function dischargeChargeDateToExclude(
+        IpdDetail $ipd,
+        ?Carbon $billingEndAt = null,
+        ?Carbon $effectiveDischargeAt = null
+    ): ?string {
         if (! $ipd->isInsuranceBilling()) {
             return null;
         }
@@ -76,7 +79,7 @@ class InsuranceDischargeBedChargeService
             return null;
         }
 
-        $dischargeAt = $this->resolveDischargeAt($ipd);
+        $dischargeAt = $effectiveDischargeAt ?? $this->resolveDischargeAt($ipd);
         if (! $dischargeAt) {
             return null;
         }
