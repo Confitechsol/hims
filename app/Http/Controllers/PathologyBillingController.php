@@ -452,25 +452,29 @@ class PathologyBillingController extends Controller
             
             $prescriptions = collect();
             
-            // Get OPD Visits (exclude already billed)
-            $opdQuery = OpdDetail::where('patient_id', $patientId);
-            if (!empty($billedCaseRefIds)) {
-                $opdQuery->whereNotIn('id', $billedCaseRefIds);
+            // Get OPD Visits (exclude already billed). Older installations may not
+            // have the OPD table yet, but IPD prescriptions must remain available.
+            $opdVisits = collect();
+            if (\Illuminate\Support\Facades\Schema::hasTable('opd_details')) {
+                $opdQuery = OpdDetail::where('patient_id', $patientId);
+                if (!empty($billedCaseRefIds)) {
+                    $opdQuery->whereNotIn('id', $billedCaseRefIds);
+                }
+                $opdVisits = $opdQuery
+                    ->with('doctor')
+                    ->orderBy('appointment_date', 'desc')
+                    ->get()
+                    ->map(function($opd) {
+                        return [
+                            'id' => $opd->id,
+                            'case_id' => $opd->opd_no ?? 'OPD' . str_pad($opd->id, 4, '0', STR_PAD_LEFT),
+                            'date' => $opd->appointment_date ? date('Y-m-d', strtotime($opd->appointment_date)) : null,
+                            'symptoms' => $opd->symptoms_description ?? $opd->symptoms_title ?? '',
+                            'doctor' => $opd->doctor ? $opd->doctor->name : null,
+                            'type' => 'opd',
+                        ];
+                    });
             }
-            $opdVisits = $opdQuery
-                ->with('doctor')
-                ->orderBy('appointment_date', 'desc')
-                ->get()
-                ->map(function($opd) {
-                    return [
-                        'id' => $opd->id,
-                        'case_id' => $opd->opd_no ?? 'OPD' . str_pad($opd->id, 4, '0', STR_PAD_LEFT),
-                        'date' => $opd->appointment_date ? date('Y-m-d', strtotime($opd->appointment_date)) : null,
-                        'symptoms' => $opd->symptoms_description ?? $opd->symptoms_title ?? '',
-                        'doctor' => $opd->doctor ? $opd->doctor->name : null,
-                        'type' => 'opd',
-                    ];
-                });
             
             $prescriptions = $prescriptions->merge($opdVisits);
             \Log::info('OPD Visits found: ' . $opdVisits->count());

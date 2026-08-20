@@ -70,7 +70,7 @@
           padding: 10px 5px;
           color: #000000;
           text-decoration: underline;
-          font-weight: 700;
+          font-weight: bold;
       }
 
       .heading h4 {
@@ -432,7 +432,7 @@
 
 
                                       <h6 id="discharge_medicine_label">Discharge Advised Medicines:</h6>
-                                      <div class="general_list" id="discharge_medicine_list"></div>
+                                      {{-- <div class="general_list" id="discharge_medicine_list"></div> --}}
                                       <br />
                                       <div class="general_list ps-4" id="dis_doctor_advice_html"></div>
                                       <br />
@@ -569,6 +569,7 @@
                   setText('dis_ot_date_text', formatDate(new Date(data.ot_date)));
               } else {
                   hideLabel('ot-date');
+             
               }
 
               if (medicines.length > 0) {

@@ -45,6 +45,7 @@
         text-transform: uppercase;
         margin: 10px 0;
         text-decoration: underline;
+        font-weight: 700;
         color: #7d7c7c;
     }
 
@@ -369,8 +370,8 @@
             {!! $data->course_in_hospital !!}
         @endif
 
-        @if ($data->discharge_medicines_html != null || $data->discharge_medicines_html != '')
-            <h4>Discharge Advised Medicines</h4>
+        <h4>Discharge Advised Medicines</h4>
+        @if (!empty($data->discharge_medicines_html))
             {!! $data->discharge_medicines_html !!}
         @endif
 
