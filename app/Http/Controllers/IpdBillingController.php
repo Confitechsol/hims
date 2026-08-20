@@ -57,8 +57,9 @@ class IpdBillingController extends Controller
             $data = $ipdPatients->map(function($ipd) {
                 $patient = $ipd->patient;
                 $isDischarged = $ipd->discharged == 'yes';
+                $finalBillGenerated = !empty($ipd->final_bill_generated_at);
                 $dischargeStatus = $isDischarged
-                    ? ($ipd->isFinalBillGenerated() ? ' (Discharged)' : ' (Discharged – bed occupied)')
+                    ? ($finalBillGenerated ? ' (Discharged)' : ' (Discharged – bed occupied)')
                     : '';
 
                 $patientName = $patient ? ($patient->patient_name ?? 'N/A') : 'N/A';
@@ -71,7 +72,7 @@ class IpdBillingController extends Controller
                     'phone' => $phone,
                     'discharged' => $isDischarged,
                     'discharged_date' => $ipd->discharged_date,
-                    'final_bill_generated' => $ipd->isFinalBillGenerated(),
+                    'final_bill_generated' => $finalBillGenerated,
                     'display_text' => ($ipd->ipd_no ?? 'N/A') . ' - ' . $patientName . $dischargeStatus,
                 ];
             });
@@ -1802,11 +1803,25 @@ class IpdBillingController extends Controller
             
             \Log::info('IPD found', ['ipd_no' => $ipd->ipd_no]);
 
-            $breakup = $this->calculateBreakup($ipdId);
+            $billingEndAtForEstimate = null;
+            if ($isApprovalBill || ($ipd->discharged ?? 'no') === 'yes') {
+                $billingEndAtForEstimate = $this->resolveDischargeDateTimeForIpd($ipd);
+                if (!$billingEndAtForEstimate && !empty($ipd->discharged_date)) {
+                    $billingEndAtForEstimate = Carbon::parse($ipd->discharged_date)->endOfDay();
+                }
+            }
+
+            $breakup = $this->calculateBreakup(
+                $ipdId,
+                $billingEndAtForEstimate ? $billingEndAtForEstimate->format('Y-m-d H:i:s') : null
+            );
             \Log::info('Breakup calculated', ['total_charges' => $breakup['total_charges']]);
 
             // Get detailed breakdown - Calculate dynamically from PatientBedHistory (omit from display when package applied)
-            $bedChargesData = $this->calculateBedChargesFromHistory($ipdId);
+            $bedChargesData = $this->calculateBedChargesFromHistory(
+                $ipdId,
+                $billingEndAtForEstimate ? $billingEndAtForEstimate->format('Y-m-d H:i:s') : null
+            );
             $bedChargesDetails = collect($bedChargesData['details']);
             $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
             $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
