@@ -31,6 +31,7 @@ class DischargePdfController extends Controller
         $meds            = array_map(function ($med) {
             return trim($med) === '' ? '' : trim($med);
         }, explode(',', $ipd->medicines ?? ''));
+        $meds = array_values(array_filter($meds, fn($med) => $med !== ''));
 
         $medTypes = array_map(function ($types) {
             return trim($types) === '' ? '' : trim($types);

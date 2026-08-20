@@ -70,7 +70,7 @@
           padding: 10px 5px;
           color: #000000;
           text-decoration: underline;
-          font-weight: 700;
+          font-weight: bold;
       }
 
       .heading h4 {
