@@ -65,6 +65,11 @@ class InsuranceDischargeBedChargeService
 
     /**
      * Charge label day (Y-m-d) to skip for insurance discharge, or null if none.
+     *
+     * Early discharge (< 3 PM) normally excludes the discharge label day so multi-day
+     * stays do not bill that last day. If that label day is also the first billable day
+     * (typical overnight admit → morning discharge), do not exclude it — otherwise bed
+     * charge becomes ₹0 incorrectly.
      */
     public function dischargeChargeDateToExclude(
         IpdDetail $ipd,
@@ -91,6 +96,12 @@ class InsuranceDischargeBedChargeService
         $labelDay = BedBillingPeriod::chargeLabelDayForMoment(
             $billingEndAt ?? $dischargeAt
         );
+
+        $admissionAt = Carbon::parse($ipd->date ?? $ipd->created_at ?? $dischargeAt);
+        $firstChargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($admissionAt);
+        if ($firstChargeDay->isSameDay($labelDay)) {
+            return null;
+        }
 
         return $labelDay->format('Y-m-d');
     }

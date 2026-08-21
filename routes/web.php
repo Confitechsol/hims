@@ -703,6 +703,7 @@ Route::prefix('ipd/billing')->group(function () {
     Route::get('/{ipdId}/check-approval', [IpdBillingController::class, 'checkApprovalBill'])->name('ipd.billing.check.approval');
     Route::get('/{ipdId}/export-estimate', [IpdBillingController::class, 'exportEstimate'])->name('ipd.billing.export.estimate');
     Route::get('/{ipdId}/export-approval', [IpdBillingController::class, 'exportApprovalBill'])->name('ipd.billing.export.approval');
+    Route::get('/{ipdId}/export-approval-preview', [IpdBillingController::class, 'exportApprovalBillPreview'])->name('ipd.billing.export.approval.preview');
     Route::get('/{ipdId}/export-final', [IpdBillingController::class, 'exportFinal'])->name('ipd.billing.export.final');
 });
 Route::get('/patient_profile', function () {

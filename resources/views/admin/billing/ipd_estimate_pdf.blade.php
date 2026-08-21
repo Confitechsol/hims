@@ -419,10 +419,10 @@
                             <strong>ADM No.</strong> : <span class="red">{{ $ipd->ipd_no }}</span>
                         </td>
                         <td style="text-align: center; width: 33.33%; padding: 3px 4px;">
-                            <strong>Estimate Date</strong> : {{ \Carbon\Carbon::now()->format('d/m/Y') }}
+                            <strong>{{ $headerDateLabel ?? 'Estimate Date' }}</strong> : {{ $headerDateValue ?? \Carbon\Carbon::now()->format('d/m/Y') }}
                         </td>
                         <td style="text-align: right; width: 33.34%; padding: 3px 4px;">
-                            <strong>Estimate Time</strong> : {{ \Carbon\Carbon::now()->format('H:i:s') }}
+                            <strong>{{ $headerTimeLabel ?? 'Estimate Time' }}</strong> : {{ $headerTimeValue ?? \Carbon\Carbon::now()->format('H:i:s') }}
                         </td>
                     </tr>
                 </table>
@@ -531,6 +531,18 @@
                                 <td class="patient_colon">:</td>
                                 <td class="patient_value">{{ \Carbon\Carbon::parse($ipd->date)->format('h:i A') }}</td>
                             </tr>
+                            @if(!empty($showDischargeOnBill))
+                            <tr>
+                                <td class="patient_label">Discharge Date</td>
+                                <td class="patient_colon">:</td>
+                                <td class="patient_value">{{ $dischargeDateDisplay }}</td>
+                            </tr>
+                            <tr>
+                                <td class="patient_label">Discharge Time</td>
+                                <td class="patient_colon">:</td>
+                                <td class="patient_value">{{ $dischargeTimeDisplay }}</td>
+                            </tr>
+                            @endif
                             @if($ipd->bedDetail)
                             <tr>
                                 <td class="patient_label">Bed No.</td>
