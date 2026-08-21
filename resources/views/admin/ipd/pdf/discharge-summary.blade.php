@@ -46,7 +46,7 @@
         margin: 10px 0;
         text-decoration: underline;
         font-weight: 700;
-        color: #7d7c7c;
+        color: #000000;
     }
 
     .table-box-border,
@@ -466,10 +466,3 @@
 
 </div>
 
-<script>
-    window.onload = function() {
-        setTimeout(function() {
-            window.print();
-        }, 300);
-    };
-</script>
