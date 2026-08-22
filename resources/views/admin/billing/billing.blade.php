@@ -455,8 +455,9 @@
                 return null;
             }
 
-            function openFinalPdf(ipdId) {
-                window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-final', '_blank');
+            function openFinalPdf(ipdId, billStage) {
+                var qs = billStage ? ('?bill_stage=' + encodeURIComponent(billStage)) : '';
+                window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-final' + qs, '_blank');
             }
 
             function setButtonEnabled(btn, enabled) {
@@ -575,12 +576,12 @@
                             if (data.final_bill_generated) {
                                 return;
                             }
-                            openFinalPdf(ipdId);
+                            openFinalPdf(ipdId, 'final_preview');
                             return;
                         }
 
                         if (data.final_bill_generated) {
-                            openFinalPdf(ipdId);
+                            openFinalPdf(ipdId, 'final_bill');
                             return;
                         }
 
@@ -653,7 +654,7 @@
                                 return;
                             }
                             refreshBillingActionButtons(ipdId);
-                            const pdfUrl = body.pdf_url || ('{{ url("ipd/billing") }}/' + ipdId + '/export-final');
+                            const pdfUrl = body.pdf_url || ('{{ url("ipd/billing") }}/' + ipdId + '/export-final?bill_stage=final_bill');
                             window.open(pdfUrl, '_blank');
                         })
                         .catch(() => {

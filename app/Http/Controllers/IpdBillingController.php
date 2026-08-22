@@ -535,7 +535,7 @@ class IpdBillingController extends Controller
      * @param int $ipdId
      * @param string|null $endDate End date for calculation (Y-m-d format). If null, uses current date.
      */
-    private function calculateBreakup($ipdId, $endDate = null)
+    private function calculateBreakup($ipdId, $endDate = null, ?string $billStage = null)
     {
         // Get IPD record first
         $ipd = IpdDetail::find($ipdId);
@@ -563,7 +563,7 @@ class IpdBillingController extends Controller
         $sgstCharges = $bedChargesData['total_sgst'] ?? 0;
 
         // IPD Charges (from ipd_charges table)
-        $ipdCharges = IpdCharges::where('ipd_id', $ipdId)
+        $ipdCharges = $this->ipdChargesBaseQuery($ipdId, $billStage)
             ->sum('net_amount');
 
         // Get case_reference_id from IPD
@@ -685,6 +685,35 @@ class IpdBillingController extends Controller
      * Resolve billing end datetime for an IPD.
      * Discharged IPD always stops at clinical discharge date/time (no post-discharge bed).
      */
+    /**
+     * IPD charges query, optionally filtered for a billing export stage.
+     */
+    private function ipdChargesBaseQuery(int $ipdId, ?string $billStage = null)
+    {
+        return IpdCharges::where('ipd_id', $ipdId)->visibleForBillStage($billStage);
+    }
+
+    /**
+     * Map export context to ipd_charges visibility stage.
+     */
+    private function resolveIpdChargeBillStage(?string $billType = null, ?string $finalBillStage = null): ?string
+    {
+        if ($billType === 'approval') {
+            return IpdCharges::STAGE_APPROVAL;
+        }
+        if ($billType === 'approval_preview') {
+            return IpdCharges::STAGE_APPROVAL_PREVIEW;
+        }
+        if ($finalBillStage === 'final_preview') {
+            return IpdCharges::STAGE_FINAL_PREVIEW;
+        }
+        if ($finalBillStage === 'final_bill') {
+            return IpdCharges::STAGE_FINAL_BILL;
+        }
+
+        return null;
+    }
+
     private function resolveBillingEndDateForIpd(IpdDetail $ipd): ?string
     {
         if (($ipd->discharged ?? 'no') !== 'yes') {
@@ -1826,9 +1855,14 @@ class IpdBillingController extends Controller
                 $headerTimeValue = $dischargeAtForBill->format('H:i:s');
             }
 
+            $ipdChargeBillStage = $this->resolveIpdChargeBillStage(
+                $isApprovalPreview ? 'approval_preview' : ($isApprovalBill ? 'approval' : null)
+            );
+
             $breakup = $this->calculateBreakup(
                 $ipdId,
-                $billingEndAtForEstimate ? $billingEndAtForEstimate->format('Y-m-d H:i:s') : null
+                $billingEndAtForEstimate ? $billingEndAtForEstimate->format('Y-m-d H:i:s') : null,
+                $ipdChargeBillStage
             );
             \Log::info('Breakup calculated', ['total_charges' => $breakup['total_charges']]);
 
@@ -1851,7 +1885,7 @@ class IpdBillingController extends Controller
                 $bedChargesDisplayTotal = $bedChargesGroupedForDisplay->sum('bed_charge');
             }
 
-            $ipdChargesDetails = IpdCharges::where('ipd_id', $ipdId)
+            $ipdChargesDetails = $this->ipdChargesBaseQuery($ipdId, $ipdChargeBillStage)
                 ->with(['charge', 'chargeCategory'])
                 ->orderBy('date', 'asc')
                 ->get() ?? collect();
@@ -2417,7 +2451,7 @@ class IpdBillingController extends Controller
                 return response()->json([
                     'success' => true,
                     'already_generated' => true,
-                    'pdf_url' => url('ipd/billing/' . $ipdId . '/export-final'),
+                    'pdf_url' => url('ipd/billing/' . $ipdId . '/export-final?bill_stage=final_bill'),
                     'message' => 'Final bill already generated.',
                 ]);
             }
@@ -2427,7 +2461,7 @@ class IpdBillingController extends Controller
             return response()->json([
                 'success' => true,
                 'already_generated' => false,
-                'pdf_url' => url('ipd/billing/' . $ipdId . '/export-final'),
+                'pdf_url' => url('ipd/billing/' . $ipdId . '/export-final?bill_stage=final_bill'),
                 'message' => 'Final bill generated and bed released.',
             ]);
         } catch (\RuntimeException $e) {
@@ -2452,12 +2486,18 @@ class IpdBillingController extends Controller
     /**
      * Export Final Bill PDF
      */
-    public function exportFinal($ipdId)
+    public function exportFinal($ipdId, Request $request)
     {
         try {
                 $logged_user = auth()->user()->username ?? ''; 
 
             \Log::info('exportFinal started', ['ipd_id' => $ipdId]);
+            
+            $finalBillStage = $request->query('bill_stage', IpdCharges::STAGE_FINAL_BILL);
+            if (! in_array($finalBillStage, [IpdCharges::STAGE_FINAL_PREVIEW, IpdCharges::STAGE_FINAL_BILL], true)) {
+                $finalBillStage = IpdCharges::STAGE_FINAL_BILL;
+            }
+            $ipdChargeBillStage = $this->resolveIpdChargeBillStage(null, $finalBillStage);
             
             $ipd = IpdDetail::with([
                 'patient.organisation',
@@ -2500,7 +2540,7 @@ class IpdBillingController extends Controller
             ]);
 
             \Log::info('Calculating breakup');
-            $breakup = $this->calculateBreakup($ipdId, $billingEndAt);
+            $breakup = $this->calculateBreakup($ipdId, $billingEndAt, $ipdChargeBillStage);
             \Log::info('Breakup calculated', ['total_charges' => $breakup['total_charges']]);
 
             // Get payment details
@@ -2524,7 +2564,7 @@ class IpdBillingController extends Controller
             }
 
             \Log::info('Getting IPD charges details');
-            $ipdChargesDetails = IpdCharges::where('ipd_id', $ipdId)
+            $ipdChargesDetails = $this->ipdChargesBaseQuery($ipdId, $ipdChargeBillStage)
                 ->with(['charge', 'chargeCategory'])
                 ->orderBy('date', 'asc')
                 ->get() ?? collect();

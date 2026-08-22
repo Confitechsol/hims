@@ -1810,6 +1810,10 @@ class IpdController extends Controller
                 'net_amount'          => $request->net_amount[$i],
                 'charge_note'         => $request->charge_note[$i],
                 'date'                => $chargeDate,
+                'show_on_approval_bill' => $this->parseBillVisibilityFlag($request->show_on_approval_bill[$i] ?? true),
+                'show_on_approval_preview' => $this->parseBillVisibilityFlag($request->show_on_approval_preview[$i] ?? true),
+                'show_on_final_preview' => $this->parseBillVisibilityFlag($request->show_on_final_preview[$i] ?? true),
+                'show_on_final_bill' => $this->parseBillVisibilityFlag($request->show_on_final_bill[$i] ?? true),
             ]);
         }
 
@@ -1864,6 +1868,10 @@ class IpdController extends Controller
             'net_amount'          => $validated['amount'],
             'charge_note'         => $validated['note'] ?? null,
             'date'                => $validated['date'],
+            'show_on_approval_bill' => $this->parseBillVisibilityFlag($request->input('show_on_approval_bill', 1)),
+            'show_on_approval_preview' => $this->parseBillVisibilityFlag($request->input('show_on_approval_preview', 1)),
+            'show_on_final_preview' => $this->parseBillVisibilityFlag($request->input('show_on_final_preview', 1)),
+            'show_on_final_bill' => $this->parseBillVisibilityFlag($request->input('show_on_final_bill', 1)),
         ]);
 
         // Behaviour same as Add Charges: go back with flash message
@@ -1882,6 +1890,40 @@ class IpdController extends Controller
         return redirect()
             ->back()
             ->with('success', 'Charge deleted successfully!');
+    }
+
+    /**
+     * Quick toggle for a single bill-visibility flag (Charges tab listing).
+     */
+    public function updateIpdChargeBillVisibility(Request $request, IpdCharges $charge)
+    {
+        $validated = $request->validate([
+            'field' => 'required|in:show_on_approval_bill,show_on_approval_preview,show_on_final_preview,show_on_final_bill',
+            'value' => 'required|boolean',
+        ]);
+
+        $charge->update([
+            $validated['field'] => (bool) $validated['value'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Bill visibility updated.',
+            'data' => [
+                'id' => $charge->id,
+                'field' => $validated['field'],
+                'value' => (bool) $validated['value'],
+            ],
+        ]);
+    }
+
+    protected function parseBillVisibilityFlag($value): bool
+    {
+        if ($value === null || $value === '') {
+            return true;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? ((string) $value === '1');
     }
 
     public function getAvailableBeds(Request $request)

@@ -672,6 +672,7 @@ Route::delete('/ipd/prescription/{id}', [IpdController::class, 'deletePrescripti
 Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.addIpdCharge');
 Route::get('/ipd_charge/{charge}', [IpdController::class, 'getIpdCharge'])->name('ipd.charge.show');
 Route::put('/ipd_charge/{charge}', [IpdController::class, 'updateIpdCharge'])->name('ipd.charge.update');
+Route::patch('/ipd_charge/{charge}/bill-visibility', [IpdController::class, 'updateIpdChargeBillVisibility'])->name('ipd.charge.bill-visibility');
 Route::delete('/ipd_charge/{charge}', [IpdController::class, 'deleteIpdCharge'])->name('ipd.charge.delete');
 Route::post('/assignNewBed', [IpdController::class, 'assignNewBed'])->name('assignNewBed');
 Route::post('/ipd/bed-history/store', [IpdController::class, 'storeBedHistory'])->name('ipd.bedHistory.store');
