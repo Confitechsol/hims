@@ -719,6 +719,7 @@
             <thead>
                 <tr>
                     <th>Date</th>
+                    <th>Case No.</th>
                     <th>Test Name</th>
                     <th class="text-right">Amount (Rs.)</th>
                 </tr>
@@ -727,12 +728,13 @@
                 @foreach($investigationDatewise->where('type', 'pathology') as $row)
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($row['date'])->format('d-m-Y') }}</td>
+                    <td>{{ $row['case_no'] ?? '-' }}</td>
                     <td>{{ $row['test_name'] ?? '-' }}</td>
                     <td class="text-right">{{ number_format($row['amount'] ?? 0, 2) }}</td>
                 </tr>
                 @endforeach
                 <tr style="font-weight: bold;">
-                    <td colspan="2" class="text-right">Pathology Total:</td>
+                    <td colspan="3" class="text-right">Pathology Total:</td>
                     <td class="text-right">Rs. {{ number_format(isset($pathologyTotal) && $pathologyTotal > 0 ? $pathologyTotal : ($breakup['pathology_charges'] ?? 0), 2) }}</td>
                 </tr>
             </tbody>
@@ -757,6 +759,7 @@
             <thead>
                 <tr>
                     <th>Date</th>
+                    <th>Case No.</th>
                     <th>Test Name</th>
                     <th class="text-right">Amount (Rs.)</th>
                 </tr>
@@ -765,12 +768,13 @@
                 @foreach($investigationDatewise->where('type', 'radiology') as $row)
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($row['date'])->format('d-m-Y') }}</td>
+                    <td>{{ $row['case_no'] ?? '-' }}</td>
                     <td>{{ $row['test_name'] ?? '-' }}</td>
                     <td class="text-right">{{ number_format($row['amount'] ?? 0, 2) }}</td>
                 </tr>
                 @endforeach
                 <tr style="font-weight: bold;">
-                    <td colspan="2" class="text-right">Radiology Total:</td>
+                    <td colspan="3" class="text-right">Radiology Total:</td>
                     <td class="text-right">Rs. {{ number_format(isset($radiologyTotal) && $radiologyTotal > 0 ? $radiologyTotal : ($breakup['radiology_charges'] ?? 0), 2) }}</td>
                 </tr>
             </tbody>

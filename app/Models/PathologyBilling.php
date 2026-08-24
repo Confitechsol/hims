@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasIpdBillVisibility;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PathologyBilling extends Model
 {
     use HasFactory;
+    use HasIpdBillVisibility;
 
     protected $table = 'pathology_billing';
 
@@ -28,63 +30,53 @@ class PathologyBilling extends Model
         'net_amount',
         'transaction_id',
         'note',
+        'show_on_approval_bill',
+        'show_on_approval_preview',
+        'show_on_final_preview',
+        'show_on_final_bill',
         'organisation_id',
         'insurance_validity',
         'generated_by',
         'insurance_id',
     ];
 
-    /**
-     * Relationship with Patient
-     */
+    protected $casts = [
+        'show_on_approval_bill' => 'boolean',
+        'show_on_approval_preview' => 'boolean',
+        'show_on_final_preview' => 'boolean',
+        'show_on_final_bill' => 'boolean',
+    ];
+
     public function patient()
     {
         return $this->belongsTo(Patient::class, 'patient_id');
     }
 
-    /**
-     * Relationship with Organisation
-     */
     public function organisation()
     {
         return $this->belongsTo(Organisation::class, 'organisation_id');
     }
 
-    /**
-     * Relationship with Transaction
-     */
     public function transaction()
     {
         return $this->belongsTo(Transaction::class, 'transaction_id');
     }
 
-    /**
-     * Relationship with Doctor (optional - uncomment foreign key in migration if needed)
-     */
     public function doctor()
     {
         return $this->belongsTo(Doctor::class, 'doctor_id');
     }
 
-    /**
-     * Relationship with PathologyReport
-     */
     public function reports()
     {
         return $this->hasMany(PathologyReport::class, 'pathology_bill_id');
     }
 
-    /**
-     * Relationship with CaseReference
-     */
     public function caseReference()
     {
         return $this->belongsTo(CaseReference::class, 'case_reference_id');
     }
 
-    /**
-     * Relationship with IpdPrescription (case reference)
-     */
     public function prescription()
     {
         return $this->belongsTo(IpdPrescription::class, 'case_reference_id');

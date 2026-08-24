@@ -210,6 +210,8 @@
                         </div>
                     </div>
 
+                    @include('admin.billing.partials.ipd_bill_visibility_checkboxes', ['bill' => $bill, 'prefix' => 'rad_bill_vis'])
+
                     <div class="d-flex justify-content-end gap-2 mt-4">
                         <a href="{{ route('radiology.billing.index') }}" class="btn btn-secondary">Cancel</a>
                         <button type="submit" class="btn btn-primary">Update Bill</button>

@@ -6,7 +6,8 @@ use App\Models\IpdDetail;
 use App\Models\IpdDaywiseBedCharge;
 use App\Models\IpdCharges;
 use App\Models\IpdPackage;
-use App\Models\PathologyBilling;
+use App\Models\IpdPrescription;
+use App\Models\OpdDetail;
 use App\Models\RadiologyBilling;
 use App\Models\Transaction;
 use App\Models\DoctorVisit;
@@ -566,26 +567,11 @@ class IpdBillingController extends Controller
         $ipdCharges = $this->ipdChargesBaseQuery($ipdId, $billStage)
             ->sum('net_amount');
 
-        // Get case_reference_id from IPD
-        $caseReferenceId = $ipd->case_reference_id ?? null;
-
         // Pathology Charges (check by patient_id + date range OR case_reference_id)
-        $pathologyCharges = PathologyBilling::where(function($query) use ($ipd, $caseReferenceId) {
-            $query->where('patient_id', $ipd->patient_id)
-                  ->where('date', '>=', $ipd->date);
-            if ($caseReferenceId) {
-                $query->orWhere('case_reference_id', $caseReferenceId);
-            }
-        })->sum('net_amount');
+        $pathologyCharges = (float) $this->pathologyBillsForIpdQuery($ipd, $billStage)->sum('net_amount');
 
         // Radiology Charges (check by patient_id + date range OR case_reference_id)
-        $radiologyCharges = RadiologyBilling::where(function($query) use ($ipd, $caseReferenceId) {
-            $query->where('patient_id', $ipd->patient_id)
-                  ->where('date', '>=', $ipd->date);
-            if ($caseReferenceId) {
-                $query->orWhere('case_reference_id', $caseReferenceId);
-            }
-        })->sum('net_amount');
+        $radiologyCharges = (float) $this->radiologyBillsForIpdQuery($ipd, $billStage)->sum('net_amount');
 
         // Get IPD patient_id and admission date (use date-only so same-day visits are included)
         $patientId = $ipd->patient_id ?? null;
@@ -694,7 +680,43 @@ class IpdBillingController extends Controller
     }
 
     /**
-     * Map export context to ipd_charges visibility stage.
+     * Pathology bills for an IPD, optionally filtered by export stage visibility.
+     */
+    private function pathologyBillsForIpdQuery(IpdDetail $ipd, ?string $billStage = null)
+    {
+        $caseReferenceId = $ipd->case_reference_id ?? null;
+
+        return PathologyBilling::where(function ($query) use ($ipd, $caseReferenceId) {
+            $query->where(function ($q) use ($ipd) {
+                $q->where('patient_id', $ipd->patient_id)
+                    ->where('date', '>=', $ipd->date);
+            });
+            if ($caseReferenceId) {
+                $query->orWhere('case_reference_id', $caseReferenceId);
+            }
+        })->visibleForBillStage($billStage);
+    }
+
+    /**
+     * Radiology bills for an IPD, optionally filtered by export stage visibility.
+     */
+    private function radiologyBillsForIpdQuery(IpdDetail $ipd, ?string $billStage = null)
+    {
+        $caseReferenceId = $ipd->case_reference_id ?? null;
+
+        return RadiologyBilling::where(function ($query) use ($ipd, $caseReferenceId) {
+            $query->where(function ($q) use ($ipd) {
+                $q->where('patient_id', $ipd->patient_id)
+                    ->where('date', '>=', $ipd->date);
+            });
+            if ($caseReferenceId) {
+                $query->orWhere('case_reference_id', $caseReferenceId);
+            }
+        })->visibleForBillStage($billStage);
+    }
+
+    /**
+     * Map export context to ipd_charges / pathology / radiology visibility stage.
      */
     private function resolveIpdChargeBillStage(?string $billType = null, ?string $finalBillStage = null): ?string
     {
@@ -1715,21 +1737,67 @@ class IpdBillingController extends Controller
     }
 
     /**
-     * Build pathology and radiology line items date-wise for PDF (estimate/final).
-     * Returns collection of ['date' => ..., 'type' => 'pathology'|'radiology', 'test_name' => ..., 'amount' => ...] sorted by date.
+     * Case No. shown on IPD estimate / approval / final bills for a pathology or radiology bill.
+     * Prefers IPD prescription number (e.g. IPDP0248), then OPD visit no.
      */
-    private function getPathologyRadiologyDatewise($ipd)
+    private function resolveDiagnosticBillCaseNo($bill, $prescriptionIdFromReport = null): string
     {
-        $patientId = $ipd->patient_id;
-        $admissionDate = $ipd->date;
-        $caseReferenceId = $ipd->case_reference_id ?? null;
+        static $cache = [];
 
-        $pathologyBills = PathologyBilling::where(function ($query) use ($patientId, $admissionDate, $caseReferenceId) {
-            $query->where('patient_id', $patientId)->where('date', '>=', $admissionDate);
-            if ($caseReferenceId) {
-                $query->orWhere('case_reference_id', $caseReferenceId);
+        $lookupId = $prescriptionIdFromReport
+            ?: ($bill->case_reference_id ?? null)
+            ?: ($bill->ipd_prescription_basic_id ?? null);
+
+        $cacheKey = $lookupId !== null && $lookupId !== ''
+            ? 'id:' . $lookupId
+            : 'bill:' . ($bill->getTable() ?? 'diag') . ':' . ($bill->id ?? 0);
+
+        if (isset($cache[$cacheKey])) {
+            return $cache[$cacheKey];
+        }
+
+        $resolved = '-';
+
+        if ($lookupId) {
+            $prescription = IpdPrescription::find($lookupId);
+            if ($prescription) {
+                $number = trim((string) ($prescription->prescription_number ?? ''));
+                $resolved = $number !== ''
+                    ? $number
+                    : ('IPDP' . str_pad((string) $prescription->id, 4, '0', STR_PAD_LEFT));
+            } else {
+                $opd = OpdDetail::find($lookupId);
+                if ($opd && ! empty($opd->opd_no)) {
+                    $resolved = (string) $opd->opd_no;
+                }
             }
-        })->orderBy('date', 'asc')->get();
+        }
+
+        if ($resolved === '-') {
+            $linked = $bill->prescription ?? null;
+            if ($linked) {
+                $number = trim((string) ($linked->prescription_number ?? ''));
+                $resolved = $number !== ''
+                    ? $number
+                    : ('IPDP' . str_pad((string) $linked->id, 4, '0', STR_PAD_LEFT));
+            }
+        }
+
+        $cache[$cacheKey] = $resolved;
+
+        return $resolved;
+    }
+
+    /**
+     * Build pathology and radiology line items date-wise for PDF (estimate/final).
+     * Returns collection of ['date' => ..., 'case_no' => ..., 'type' => 'pathology'|'radiology', 'test_name' => ..., 'amount' => ...] sorted by date.
+     */
+    private function getPathologyRadiologyDatewise($ipd, ?string $billStage = null)
+    {
+        $pathologyBills = $this->pathologyBillsForIpdQuery($ipd, $billStage)
+            ->with('prescription')
+            ->orderBy('date', 'asc')
+            ->get();
 
         $pathologyRows = $pathologyBills->map(function ($bill) {
             $reports = DB::table('pathology_report')
@@ -1740,31 +1808,48 @@ class IpdBillingController extends Controller
                     'pathology.test_name',
                     'pathology_report.apply_charge',
                     'pathology_report.instance_number',
-                    'ipd_prescription_test.instance_number as prescription_instance_number'
+                    'ipd_prescription_test.instance_number as prescription_instance_number',
+                    'ipd_prescription_test.ipd_prescription_id as prescription_id'
                 )
                 ->get();
+            $fallbackCaseNo = $this->resolveDiagnosticBillCaseNo($bill);
             if ($reports->count() > 0) {
-                return $reports->map(function ($r) use ($bill) {
-                    // Format test name with instance number if available
+                return $reports->map(function ($r) use ($bill, $fallbackCaseNo) {
                     $instanceNumber = $r->prescription_instance_number ?? $r->instance_number ?? null;
                     $testName = $r->test_name ?? 'N/A';
                     if ($instanceNumber && $instanceNumber > 1 && $testName !== 'N/A') {
-                        $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                        $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' :
                                          ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
                         $testName = $r->test_name . $instanceSuffix;
                     }
-                    return ['date' => $bill->date, 'type' => 'pathology', 'test_name' => $testName, 'amount' => (float)($r->apply_charge ?? 0)];
+                    $caseNo = $this->resolveDiagnosticBillCaseNo($bill, $r->prescription_id ?? null);
+                    if ($caseNo === '-') {
+                        $caseNo = $fallbackCaseNo;
+                    }
+
+                    return [
+                        'date' => $bill->date,
+                        'case_no' => $caseNo,
+                        'type' => 'pathology',
+                        'test_name' => $testName,
+                        'amount' => (float) ($r->apply_charge ?? 0),
+                    ];
                 });
             }
-            return [['date' => $bill->date, 'type' => 'pathology', 'test_name' => 'Pathology Bill #' . $bill->id, 'amount' => (float)($bill->net_amount ?? 0)]];
+
+            return [[
+                'date' => $bill->date,
+                'case_no' => $fallbackCaseNo,
+                'type' => 'pathology',
+                'test_name' => 'Pathology Bill #' . $bill->id,
+                'amount' => (float) ($bill->net_amount ?? 0),
+            ]];
         })->flatten(1);
 
-        $radiologyBills = RadiologyBilling::where(function ($query) use ($patientId, $admissionDate, $caseReferenceId) {
-            $query->where('patient_id', $patientId)->where('date', '>=', $admissionDate);
-            if ($caseReferenceId) {
-                $query->orWhere('case_reference_id', $caseReferenceId);
-            }
-        })->orderBy('date', 'asc')->get();
+        $radiologyBills = $this->radiologyBillsForIpdQuery($ipd, $billStage)
+            ->with('prescription')
+            ->orderBy('date', 'asc')
+            ->get();
 
         $radiologyRows = $radiologyBills->map(function ($bill) {
             $reports = DB::table('radiology_report')
@@ -1775,23 +1860,42 @@ class IpdBillingController extends Controller
                     'radio.test_name',
                     'radiology_report.apply_charge',
                     'radiology_report.instance_number',
-                    'ipd_prescription_test.instance_number as prescription_instance_number'
+                    'ipd_prescription_test.instance_number as prescription_instance_number',
+                    'ipd_prescription_test.ipd_prescription_id as prescription_id'
                 )
                 ->get();
+            $fallbackCaseNo = $this->resolveDiagnosticBillCaseNo($bill);
             if ($reports->count() > 0) {
-                return $reports->map(function ($r) use ($bill) {
-                    // Format test name with instance number if available
+                return $reports->map(function ($r) use ($bill, $fallbackCaseNo) {
                     $instanceNumber = $r->prescription_instance_number ?? $r->instance_number ?? null;
                     $testName = $r->test_name ?? 'N/A';
                     if ($instanceNumber && $instanceNumber > 1 && $testName !== 'N/A') {
-                        $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' : 
+                        $instanceSuffix = $instanceNumber == 2 ? ' (2nd time)' :
                                          ($instanceNumber == 3 ? ' (3rd time)' : " ({$instanceNumber}th time)");
                         $testName = $r->test_name . $instanceSuffix;
                     }
-                    return ['date' => $bill->date, 'type' => 'radiology', 'test_name' => $testName, 'amount' => (float)($r->apply_charge ?? 0)];
+                    $caseNo = $this->resolveDiagnosticBillCaseNo($bill, $r->prescription_id ?? null);
+                    if ($caseNo === '-') {
+                        $caseNo = $fallbackCaseNo;
+                    }
+
+                    return [
+                        'date' => $bill->date,
+                        'case_no' => $caseNo,
+                        'type' => 'radiology',
+                        'test_name' => $testName,
+                        'amount' => (float) ($r->apply_charge ?? 0),
+                    ];
                 });
             }
-            return [['date' => $bill->date, 'type' => 'radiology', 'test_name' => 'Radiology Bill #' . $bill->id, 'amount' => (float)($bill->net_amount ?? 0)]];
+
+            return [[
+                'date' => $bill->date,
+                'case_no' => $fallbackCaseNo,
+                'type' => 'radiology',
+                'test_name' => 'Radiology Bill #' . $bill->id,
+                'amount' => (float) ($bill->net_amount ?? 0),
+            ]];
         })->flatten(1);
 
         return $pathologyRows->merge($radiologyRows)->sortBy('date')->values();
@@ -1895,15 +1999,9 @@ class IpdBillingController extends Controller
             $pathologyTestNames = [];
             $pathologyTotal = 0;
             
-            $pathologyDetails = PathologyBilling::where(function($query) use ($ipd) {
-                $query->where(function($q) use ($ipd) {
-                    $q->where('patient_id', $ipd->patient_id)
-                      ->whereDate('date', '>=', $ipd->date);
-                });
-                if ($ipd->case_reference_id) {
-                    $query->orWhere('case_reference_id', $ipd->case_reference_id);
-                }
-            })->orderBy('date', 'asc')->get();
+            $pathologyDetails = $this->pathologyBillsForIpdQuery($ipd, $ipdChargeBillStage)
+                ->orderBy('date', 'asc')
+                ->get();
             
             \Log::info('Pathology bills found', ['count' => $pathologyDetails->count()]);
             
@@ -1944,15 +2042,9 @@ class IpdBillingController extends Controller
             $radiologyTestNames = [];
             $radiologyTotal = 0;
             
-            $radiologyDetails = RadiologyBilling::where(function($query) use ($ipd) {
-                $query->where(function($q) use ($ipd) {
-                    $q->where('patient_id', $ipd->patient_id)
-                      ->whereDate('date', '>=', $ipd->date);
-                });
-                if ($ipd->case_reference_id) {
-                    $query->orWhere('case_reference_id', $ipd->case_reference_id);
-                }
-            })->orderBy('date', 'asc')->get();
+            $radiologyDetails = $this->radiologyBillsForIpdQuery($ipd, $ipdChargeBillStage)
+                ->orderBy('date', 'asc')
+                ->get();
             
             \Log::info('Radiology bills found', ['count' => $radiologyDetails->count()]);
             
@@ -2091,7 +2183,7 @@ class IpdBillingController extends Controller
             }
 
             // Date-wise pathology and radiology for detail table
-            $investigationDatewise = $this->getPathologyRadiologyDatewise($ipd);
+            $investigationDatewise = $this->getPathologyRadiologyDatewise($ipd, $ipdChargeBillStage);
             $investigationBrief = $this->buildInvestigationBriefSummary($pathologyDetails, $radiologyDetails, (float) $pathologyTotal, (float) $radiologyTotal);
 
             \Log::info('Loading PDF view', [
@@ -2571,27 +2663,15 @@ class IpdBillingController extends Controller
 
             // Pathology Details - Get all tests with names (same logic as estimate)
             \Log::info('Getting pathology details');
-            $pathologyDetails = PathologyBilling::where(function($query) use ($ipd) {
-                $query->where(function($q) use ($ipd) {
-                    $q->where('patient_id', $ipd->patient_id)
-                      ->whereDate('date', '>=', $ipd->date);
-                });
-                if ($ipd->case_reference_id) {
-                    $query->orWhere('case_reference_id', $ipd->case_reference_id);
-                }
-            })->orderBy('date', 'asc')->get() ?? collect();
+            $pathologyDetails = $this->pathologyBillsForIpdQuery($ipd, $ipdChargeBillStage)
+                ->orderBy('date', 'asc')
+                ->get() ?? collect();
 
             // Radiology Details - Get all tests with names (same logic as estimate)
             \Log::info('Getting radiology details');
-            $radiologyDetails = RadiologyBilling::where(function($query) use ($ipd) {
-                $query->where(function($q) use ($ipd) {
-                    $q->where('patient_id', $ipd->patient_id)
-                      ->whereDate('date', '>=', $ipd->date);
-                });
-                if ($ipd->case_reference_id) {
-                    $query->orWhere('case_reference_id', $ipd->case_reference_id);
-                }
-            })->orderBy('date', 'asc')->get() ?? collect();
+            $radiologyDetails = $this->radiologyBillsForIpdQuery($ipd, $ipdChargeBillStage)
+                ->orderBy('date', 'asc')
+                ->get() ?? collect();
 
             \Log::info('Getting doctor visit details');
             $doctorVisitDetails = $this->doctorVisitsBillableToIpdQuery((int) $ipd->patient_id, $ipd->date, $dischargeDate)
@@ -2829,7 +2909,7 @@ class IpdBillingController extends Controller
             }
 
             // Date-wise pathology and radiology for detail table
-            $investigationDatewise = $this->getPathologyRadiologyDatewise($ipd);
+            $investigationDatewise = $this->getPathologyRadiologyDatewise($ipd, $ipdChargeBillStage);
 
             \Log::info('Starting PDF generation', [
                 'pathology_tests' => count($pathologyTestNames),

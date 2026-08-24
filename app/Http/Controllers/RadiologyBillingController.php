@@ -140,7 +140,7 @@ class RadiologyBillingController extends Controller
                 'note' => $validated['note'] ?? null,
                 'organisation_id' => ($request->has('activate_tpa') && $request->activate_tpa) ? ($validated['organisation_id'] ?? null) : null,
                 'generated_by' => Auth::id(),
-            ]);
+            ] + RadiologyBilling::billVisibilityFromRequest($request));
 
             // Create radiology reports with instance tracking
             foreach ($validated['tests'] as $test) {
@@ -354,7 +354,7 @@ class RadiologyBillingController extends Controller
                 'net_amount' => round($netAmount, 2),
                 'note' => $validated['note'] ?? null,
                 'organisation_id' => ($request->has('activate_tpa') && $request->activate_tpa) ? ($validated['organisation_id'] ?? null) : null,
-            ]);
+            ] + RadiologyBilling::billVisibilityFromRequest($request));
 
             // Update existing rows in place so report results/parameters remain linked.
             $retainedReportIds = [];
@@ -445,6 +445,32 @@ class RadiologyBillingController extends Controller
             return redirect()->back()
                 ->with('error', 'Error deleting radiology bill: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Quick toggle for a single IPD bill-visibility flag (radiology bill list).
+     */
+    public function updateBillVisibility(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'field' => 'required|in:show_on_approval_bill,show_on_approval_preview,show_on_final_preview,show_on_final_bill',
+            'value' => 'required|boolean',
+        ]);
+
+        $bill = RadiologyBilling::findOrFail($id);
+        $bill->update([
+            $validated['field'] => (bool) $validated['value'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Bill visibility updated.',
+            'data' => [
+                'id' => $bill->id,
+                'field' => $validated['field'],
+                'value' => (bool) $validated['value'],
+            ],
+        ]);
     }
 
     /**

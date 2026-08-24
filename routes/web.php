@@ -989,6 +989,7 @@ Route::prefix('pathology/billing')->group(function () {
     Route::get('/{id}', [PathologyBillingController::class, 'show'])->name('pathology.billing.show');
     Route::get('/{id}/edit', [PathologyBillingController::class, 'edit'])->name('pathology.billing.edit');
     Route::put('/{id}', [PathologyBillingController::class, 'update'])->name('pathology.billing.update');
+    Route::patch('/{id}/bill-visibility', [PathologyBillingController::class, 'updateBillVisibility'])->name('pathology.billing.bill-visibility');
     Route::delete('/{id}', [PathologyBillingController::class, 'destroy'])->name('pathology.billing.destroy');
 });
 
@@ -1026,6 +1027,7 @@ Route::prefix('radiology/billing')->group(function () {
     Route::get('/{id}', [RadiologyBillingController::class, 'show'])->name('radiology.billing.show');
     Route::get('/{id}/edit', [RadiologyBillingController::class, 'edit'])->name('radiology.billing.edit');
     Route::put('/{id}', [RadiologyBillingController::class, 'update'])->name('radiology.billing.update');
+    Route::patch('/{id}/bill-visibility', [RadiologyBillingController::class, 'updateBillVisibility'])->name('radiology.billing.bill-visibility');
     Route::delete('/{id}', [RadiologyBillingController::class, 'destroy'])->name('radiology.billing.destroy');
 });
 

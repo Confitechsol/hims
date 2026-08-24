@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasIpdBillVisibility;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class RadiologyBilling extends Model
 {
     use HasFactory;
+    use HasIpdBillVisibility;
 
     protected $table = 'radiology_billing';
 
@@ -28,15 +30,23 @@ class RadiologyBilling extends Model
         'net_amount',
         'transaction_id',
         'note',
+        'show_on_approval_bill',
+        'show_on_approval_preview',
+        'show_on_final_preview',
+        'show_on_final_bill',
         'organisation_id',
         'insurance_validity',
         'insurance_id',
         'generated_by',
     ];
 
-    /**
-     * Relationships
-     */
+    protected $casts = [
+        'show_on_approval_bill' => 'boolean',
+        'show_on_approval_preview' => 'boolean',
+        'show_on_final_preview' => 'boolean',
+        'show_on_final_bill' => 'boolean',
+    ];
+
     public function patient()
     {
         return $this->belongsTo(Patient::class, 'patient_id');
@@ -52,17 +62,11 @@ class RadiologyBilling extends Model
         return $this->belongsTo(Doctor::class, 'doctor_id');
     }
 
-    /**
-     * Relationship with RadiologyReport
-     */
     public function reports()
     {
         return $this->hasMany(RadiologyReport::class, 'radiology_bill_id');
     }
 
-    /**
-     * Relationship with IpdPrescription (case reference)
-     */
     public function prescription()
     {
         return $this->belongsTo(IpdPrescription::class, 'case_reference_id');

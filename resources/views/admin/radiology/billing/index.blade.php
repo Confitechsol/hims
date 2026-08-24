@@ -45,6 +45,10 @@
                                     <th>Amount (INR)</th>
                                     <th>Paid Amount (INR)</th>
                                     <th>Balance Amount (INR)</th>
+                                    <th class="text-center" title="Export Approval Bill">Appr.</th>
+                                    <th class="text-center" title="Approval Bill Preview">Appr. Prev.</th>
+                                    <th class="text-center" title="Preview Final Bill">Fin. Prev.</th>
+                                    <th class="text-center" title="Generate Final Bill">Fin. Bill</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -70,6 +74,10 @@
                                         <td>₹{{ number_format($bill->total ?? 0, 2) }}</td>
                                         <td>₹0.00</td>
                                         <td>₹{{ number_format($bill->net_amount ?? 0, 2) }}</td>
+                                        @include('admin.billing.partials.diag_bill_visibility_toggles', [
+                                            'bill' => $bill,
+                                            'toggleUrl' => url('radiology/billing/__ID__/bill-visibility'),
+                                        ])
                                         <td>
                                             <div class="d-flex gap-2">
                                                 <a href="{{ route('radiology.billing.show', $bill->id) }}" class="btn btn-sm btn-info text-white" title="View">
@@ -90,7 +98,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="11" class="text-center py-4">
+                                        <td colspan="15" class="text-center py-4">
                                             <div class="text-muted">
                                                 <i class="ti ti-inbox fs-48 mb-2"></i>
                                                 <p>No radiology bills found. Generate your first bill!</p>
@@ -152,20 +160,6 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchBill');
-            const tableRows = document.querySelectorAll('tbody tr');
-            
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                
-                tableRows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    row.style.display = text.includes(searchTerm) ? '' : 'none';
-                });
-            });
-        });
-    </script>
+    @include('admin.billing.partials.diag_bill_visibility_script')
 @endsection
 
