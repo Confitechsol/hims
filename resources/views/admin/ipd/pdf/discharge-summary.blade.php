@@ -1,15 +1,33 @@
 <style>
-    /* @page {
-        size: A4;
-        margin: 0;
-    } */
+     @page {
+    size: A4;
+    margin: 130px 0 45px 0;
+    }
 
-    @page {
-        size: A4;
-        margin-top: 180px;
-        margin-bottom: 40px;
-        margin-left: 0px;
-        margin-right: 0px;
+    .header {
+        position: fixed;
+        top: -130px;
+        left: 0;
+        right: 0;
+        height: 130px;
+    }
+    
+    .header img {
+        width: 100%;
+        height: 130px;
+    }
+    
+    .footer {
+        position: fixed;
+        bottom: -45px;
+        left: 0;
+        right: 0;
+        height: 45px;
+    }
+    
+    .footer img {
+        width: 100%;
+        height: 45px;
     }
 
     body {
@@ -21,10 +39,13 @@
         background-repeat: no-repeat;
         background-position: center;
         background-size: 100% 100%;
+        
     }
 
     .main_box {
-        widows: 100%;
+       /* widows: 100%; */
+       
+         width: 100%;
         /* width: 210mm; */
         /* height: 297mm; */
         /* position: relative; */
@@ -37,9 +58,10 @@
     .header img,
     .footer img {
         width: 100%;
+        margin-top: 40px;
     }
 
-    .section-title {
+   /* .section-title {
         text-align: center;
         font-size: 16px;
         text-transform: uppercase;
@@ -48,7 +70,42 @@
         font-weight: 700;
         color: #000000;
     }
+    */
+    .section-title {
+    text-align: center;
+    font-size: 14px;
+    text-transform: uppercase;
+    margin: 4px 0;
+    text-decoration: underline;
+    font-weight: 700;
+    color: #000;
+    }
 
+    .text-box h4 {
+    font-size: 10px;
+    margin: 4px 0 2px 0;
+    line-height: 1.1;
+    }
+    
+    .text-box p {
+        margin: 2px 0;
+        line-height: 1.1;
+    }
+    
+    .text-box ul,
+    .text-box ol {
+        margin-top: 2px;
+        margin-bottom: 2px;
+        padding-left: 18px;
+    }
+    
+    .text-box li {
+        margin: 0;
+        padding: 0;
+        line-height: 1.1;
+    }
+    
+    
     .table-box-border,
     .table-box {
         /* width: 100%; */
@@ -99,7 +156,7 @@
 
     .footer {
         position: fixed;
-        bottom: -40px;
+        bottom: 0;
         left: 0;
         right: 0;
         height: 40px;
@@ -169,13 +226,24 @@
         width: 80%;
     }
 
-    .grid-box {
+   /* .grid-box {
         display: grid;
         grid-template-columns: 1fr auto;
         width: 100%;
         margin-top: 30px;
         align-items: stretch;
     }
+   */
+   .grid-box {
+    width: 100%;
+    margin-top: 10px;
+    align-items: stretch;
+    }
+    
+    .sig_box {
+        margin-top: 10px;
+    }
+    
 
     .left {
         justify-self: start;
@@ -212,10 +280,60 @@
     }
 
 
-    /* .header,
-    .footer {
-        height: 120px;
-    } */
+    .signature-area {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        width: calc(100% - 40px);
+        margin: 25px 20px 50px;
+        font-size: 9px;
+        page-break-inside: avoid;
+    }
+
+    .signature-area p {
+        display: block;
+        width: auto;
+        margin: 0;
+        font-size: 9px;
+    }
+
+    .contact-info {
+        width: 55%;
+        text-align: left;
+    }
+    
+    .contact-info p {
+        margin: 0 0 3px;
+    }
+    
+    .signature-info {
+            width: 40%;
+            margin-left: auto;
+            align-self: flex-end;
+            text-align: right;
+        }
+    
+    .signature-info img {
+        display: block;
+        margin-left: auto;
+    }
+
+    .signature-area .signature-line {
+        border-top: 1px solid #000;
+        width: 180px;
+        margin: 3px 0 3px auto;
+    }
+    
+    .signature-area img {
+        max-height: 40px;
+        max-width: 200px;
+    }
+    
+    
+        /* .header,
+        .footer {
+            height: 120px;
+        } */
 </style>
 
 
@@ -254,7 +372,7 @@
             <td class="value page-header">{{ $data->reason_discharge }}</td>
             <td class="value bar-code">
                 <img src="{{ $data->barcode }}" id="barcode" class="img-fluid rounded shadow-sm"
-                    style="max-height:50px; height:50px; min-width:120px; width:250px; object-fit:cover;">
+                    style="max-height:30px; height:30px; min-width:100px; width:150px; object-fit:cover;">
             </td>
         </tr>
     </table>
@@ -349,110 +467,77 @@
         </tr>
     </table>
     {{-- MEDICAL CONTENT --}}
-    <div class="text-box">
-        @if ($data->present_complaints != null || $data->present_complaints != '')
-            <h4>Present Complaints</h4>
-            {!! $data->present_complaints !!}
-        @endif
+   <div class="text-box">
+    @if ($data->present_complaints)
+        <h4>Present Complaints</h4>
+        {!! $data->present_complaints !!}
+    @endif
 
-        @if ($data->diagnosis != null || $data->diagnosis != '')
-            <h4>Diagnosis</h4>
-            {!! $data->diagnosis !!}
-        @endif
+    @if ($data->diagnosis)
+        <h4>Diagnosis</h4>
+        {!! $data->diagnosis !!}
+    @endif
 
-        @if ($data->ot_note != null || $data->ot_note != '')
-            <h4>Treatment / OT Note</h4>
-            {!! $data->ot_note !!}
-        @endif
+    @if ($data->ot_note)
+        <h4>Treatment / OT Note</h4>
+        {!! $data->ot_note !!}
+    @endif
 
-        @if ($data->course_in_hospital != null || $data->course_in_hospital != '')
-            <h4>Course in Hospital</h4>
-            {!! $data->course_in_hospital !!}
-        @endif
+    @if ($data->course_in_hospital)
+        <h4>Course in Hospital</h4>
+        {!! $data->course_in_hospital !!}
+    @endif
 
-        <h4>Discharge Advised Medicines</h4>
-        @if (!empty($data->discharge_medicines_html))
-            {!! $data->discharge_medicines_html !!}
-        @endif
+    <h4>Discharge Advised Medicines</h4>
 
-        @if ($data->doctor_advice != null || $data->doctor_advice != '')
-            {!! $data->doctor_advice !!}
-        @endif
+    @if (!empty($data->discharge_medicines_html))
+        {!! $data->discharge_medicines_html !!}
+    @endif
 
-        @if ($data->investigation != null || $data->investigation != '')
-            <h4>Investigations</h4>
-            {!! $data->investigation !!}
-        @endif
+    @if ($data->doctor_advice)
+        {!! $data->doctor_advice !!}
+    @endif
 
-        @if ($data->urgent_care != null || $data->urgent_care != '')
-            <h4>Urgent Care Instructions</h4>
-            {!! $data->urgent_care !!}
-        @endif
+    @if ($data->investigation)
+        <h4>Investigations</h4>
+        {!! $data->investigation !!}
+    @endif
 
-        @if ($data->diet_advice != null || $data->diet_advice != '')
-            <h4>Diet Advice</h4>
-            {!! $data->diet_advice !!}
-        @endif
+    @if ($data->urgent_care)
+        <h4>Urgent Care Instructions</h4>
+        {!! $data->urgent_care !!}
+    @endif
 
-        @if ($data->discharge_advice != null || $data->discharge_advice != '')
-            <h4>Condition at Discharge</h4>
-            {!! $data->discharge_advice !!}
-        @endif
+    @if ($data->diet_advice)
+        <h4>Diet Advice</h4>
+        {!! $data->diet_advice !!}
+    @endif
 
-        @if ($data->remarks != null || $data->remarks != '')
-            <h4>Follow Up</h4>
-            {!! $data->remarks !!}
-        @endif
-        <div class="end">
-        </div>
+    @if ($data->discharge_advice)
+        <h4>Condition at Discharge</h4>
+        {!! $data->discharge_advice !!}
+    @endif
 
-        <div class="grid-box">
-            {{-- <div class="left align-self-end">
+    @if ($data->remarks)
+        <h4>Follow Up</h4>
+        {!! $data->remarks !!}
+    @endif
+</div>
 
-            </div> --}}
-
-            <div class="right">
-
-
-                <div class="d-flex flex-column align-items-center">
-
-                    @php
-                        $signature = $data->signature_base64 ?? null;
-                        $signaturePath = public_path('uploads/Doctor/signatures/' . $signature);
-                    @endphp
-
-
-
-                    <div class="sig_box text-center">
-                        {{-- @php
-                            dd(!empty($data->signature_base64));
-                        @endphp --}}
-                        {!! $data->signature_base64 !!}
-                        {{-- @if (!empty($data->signature_base64))
-                            <img class="d-signature" src="{{ $data->signature_base64 }}">
-                        @else
-                            <p class="fw-bold mb-2">{{ $data->under_care_dr }}</p>
-                        @endif --}}
-                        <div style="text-align: right; padding-top: 5px;">
-                            <p style="border-top: 1px solid #000; margin: 0; width: 220px; display:inline-block;"></p>
-                        </div>
-                        <p>Signature of Doctor / R.M.O</p>
-                        @if (!empty($signature) && file_exists($signaturePath))
-                            <p class="mb-2 fw-bold">Doctor : {{ $data->under_care_dr }}</p>
-                        @endif
-                        <p>Regn No : {{ $data->registration_no }}</p>
-                        <p>DATE : {{ \Carbon\Carbon::now()->format('d-m-Y') }}</p>
-                    </div>
-
-                </div>
-
-                {{-- <div class="sig_box">
-                    <p>Signature of Doctor / R.M.O</p>
-                    <p>Regn No. : {{ $data->registration_no }}</p>
-                </div> --}}
-            </div>
-        </div>
-    </div>
+      <div class="signature-area">
+          <div class="contact-info">
+              <p><strong>Your health matters: Book your appointment by contacting us at the number below: ***+919836292167</strong></p>
+              <p>DATE : {{ \Carbon\Carbon::now()->format('d-m-Y') }}</p>
+          </div>
+      
+          <div class="signature-info">
+              {!! $data->signature_base64 !!}
+              <div class="signature-line"></div>
+              <p>Signature of Doctor / R.M.O</p>
+              <p>Doctor : {{ $data->under_care_dr }}</p>
+              <p>Regn No : {{ $data->registration_no }}</p>
+          </div>
+      </div>
 
 
 
