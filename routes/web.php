@@ -672,6 +672,7 @@ Route::delete('/ipd/prescription/{id}', [IpdController::class, 'deletePrescripti
 Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.addIpdCharge');
 Route::get('/ipd_charge/{charge}', [IpdController::class, 'getIpdCharge'])->name('ipd.charge.show');
 Route::put('/ipd_charge/{charge}', [IpdController::class, 'updateIpdCharge'])->name('ipd.charge.update');
+Route::patch('/ipd_charge/{charge}/bill-visibility', [IpdController::class, 'updateIpdChargeBillVisibility'])->name('ipd.charge.bill-visibility');
 Route::delete('/ipd_charge/{charge}', [IpdController::class, 'deleteIpdCharge'])->name('ipd.charge.delete');
 Route::post('/assignNewBed', [IpdController::class, 'assignNewBed'])->name('assignNewBed');
 Route::post('/ipd/bed-history/store', [IpdController::class, 'storeBedHistory'])->name('ipd.bedHistory.store');
@@ -703,6 +704,7 @@ Route::prefix('ipd/billing')->group(function () {
     Route::get('/{ipdId}/check-approval', [IpdBillingController::class, 'checkApprovalBill'])->name('ipd.billing.check.approval');
     Route::get('/{ipdId}/export-estimate', [IpdBillingController::class, 'exportEstimate'])->name('ipd.billing.export.estimate');
     Route::get('/{ipdId}/export-approval', [IpdBillingController::class, 'exportApprovalBill'])->name('ipd.billing.export.approval');
+    Route::get('/{ipdId}/export-approval-preview', [IpdBillingController::class, 'exportApprovalBillPreview'])->name('ipd.billing.export.approval.preview');
     Route::get('/{ipdId}/export-final', [IpdBillingController::class, 'exportFinal'])->name('ipd.billing.export.final');
 });
 Route::get('/patient_profile', function () {

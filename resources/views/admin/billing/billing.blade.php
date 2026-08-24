@@ -105,7 +105,10 @@
                             <button type="button" id="exportEstimateBtn" class="btn btn-sm btn-outline-primary me-2">
                                 <i class="fas fa-file-pdf me-1"></i> Export Estimate Bill
                             </button>
-                            <button type="button" id="exportApprovalBtn" class="btn btn-sm btn-outline-info me-2" style="display:none;">
+                            <button type="button" id="exportApprovalPreviewBtn" class="btn btn-sm btn-outline-secondary me-2" style="display:none;" disabled>
+                                <i class="fas fa-eye me-1"></i> Export Approval Bill Preview
+                            </button>
+                            <button type="button" id="exportApprovalBtn" class="btn btn-sm btn-outline-info me-2" style="display:none;" disabled>
                                 <i class="fas fa-file-pdf me-1"></i> Export Approval Bill
                             </button>
                             <button type="button" id="previewFinalBtn" class="btn btn-sm btn-outline-success me-2">
@@ -311,6 +314,9 @@
 
             // Handle export buttons
             document.getElementById('exportEstimateBtn').addEventListener('click', function() {
+                if (this.disabled) {
+                    return;
+                }
                 var ipdId = document.getElementById('ipd_id').value;
                 if (!ipdId) {
                     Swal.fire({
@@ -343,7 +349,22 @@
                 });
             });
 
+            document.getElementById('exportApprovalPreviewBtn').addEventListener('click', function() {
+                if (this.disabled) {
+                    return;
+                }
+                var ipdId = document.getElementById('ipd_id').value;
+                if (!ipdId) {
+                    alert('Please select an IPD patient first');
+                    return;
+                }
+                promptApprovalBillExport(ipdId, 'preview');
+            });
+
             document.getElementById('exportApprovalBtn').addEventListener('click', function() {
+                if (this.disabled) {
+                    return;
+                }
                 var ipdId = document.getElementById('ipd_id').value;
                 if (!ipdId) {
                     alert('Please select an IPD patient first');
@@ -353,14 +374,14 @@
                 fetch('{{ url("ipd/billing") }}/' + ipdId + '/check-approval')
                     .then(response => response.json())
                     .then(data => {
-                        if (data.allowed) {
-                            promptApprovalBillExport(ipdId);
+                        if (data.can_export_approval) {
+                            promptApprovalBillExport(ipdId, 'export');
                         } else {
                             Swal.fire({
                                 icon: 'info',
-                                title: 'Insurance Details Required',
+                                title: 'Approval Bill',
                                 html: '<div style="text-align:left;"><p style="margin-bottom:10px;">' +
-                                    (data.message || 'Save TPA & Insurance on this IPD before exporting the approval bill.') +
+                                    (data.message || 'Export Approval Bill is not available for this IPD right now.') +
                                     '</p></div>',
                                 confirmButtonColor: '#750096',
                                 confirmButtonText: 'OK',
@@ -379,7 +400,10 @@
                     });
             });
 
-            function promptApprovalBillExport(ipdId) {
+            function promptApprovalBillExport(ipdId, mode) {
+                var path = mode === 'preview'
+                    ? '/export-approval-preview'
+                    : '/export-approval';
                 Swal.fire({
                     icon: 'question',
                     title: 'Show Original Amount?',
@@ -392,9 +416,9 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-approval?show_original_amount=1', '_blank');
+                        window.open('{{ url("ipd/billing") }}/' + ipdId + path + '?show_original_amount=1', '_blank');
                     } else if (result.dismiss === Swal.DismissReason.cancel) {
-                        window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-approval', '_blank');
+                        window.open('{{ url("ipd/billing") }}/' + ipdId + path, '_blank');
                     }
                 });
             }
@@ -431,21 +455,94 @@
                 return null;
             }
 
-            function openFinalPdf(ipdId) {
-                window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-final', '_blank');
+            function openFinalPdf(ipdId, billStage) {
+                var qs = billStage ? ('?bill_stage=' + encodeURIComponent(billStage)) : '';
+                window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-final' + qs, '_blank');
+            }
+
+            function setButtonEnabled(btn, enabled) {
+                if (!btn) {
+                    return;
+                }
+                btn.disabled = !enabled;
+                if (enabled) {
+                    btn.classList.remove('disabled');
+                    btn.removeAttribute('aria-disabled');
+                } else {
+                    btn.classList.add('disabled');
+                    btn.setAttribute('aria-disabled', 'true');
+                }
+            }
+
+            function applyBillingActionButtons(status) {
+                const estimateBtn = document.getElementById('exportEstimateBtn');
+                const approvalPreviewBtn = document.getElementById('exportApprovalPreviewBtn');
+                const approvalBtn = document.getElementById('exportApprovalBtn');
+                const previewBtn = document.getElementById('previewFinalBtn');
+                const generateBtn = document.getElementById('generateFinalBtn');
+
+                const isInsurance = !!status.is_insurance;
+                const discharged = !!status.discharged;
+                const finalGenerated = !!status.final_bill_generated;
+                const canPreviewApproval = !!status.can_preview_approval;
+                const canExportApproval = !!status.can_export_approval;
+
+                if (approvalPreviewBtn) {
+                    approvalPreviewBtn.style.display = isInsurance ? 'inline-block' : 'none';
+                }
+                if (approvalBtn) {
+                    approvalBtn.style.display = isInsurance ? 'inline-block' : 'none';
+                }
+
+                if (finalGenerated) {
+                    setButtonEnabled(estimateBtn, false);
+                    setButtonEnabled(approvalPreviewBtn, false);
+                    setButtonEnabled(approvalBtn, false);
+                    setButtonEnabled(previewBtn, false);
+                    setButtonEnabled(generateBtn, true);
+                    if (generateBtn) {
+                        generateBtn.style.display = 'inline-block';
+                        generateBtn.innerHTML = '<i class="fas fa-file-pdf me-1"></i> Generate Final Bill';
+                    }
+                    if (previewBtn) {
+                        previewBtn.innerHTML = '<i class="fas fa-file-pdf me-1"></i> Preview Final Bill';
+                    }
+                    return;
+                }
+
+                setButtonEnabled(estimateBtn, true);
+                setButtonEnabled(approvalPreviewBtn, canPreviewApproval);
+                setButtonEnabled(approvalBtn, canExportApproval);
+                setButtonEnabled(previewBtn, true);
+                setButtonEnabled(generateBtn, true);
+                if (generateBtn) {
+                    generateBtn.style.display = 'inline-block';
+                }
+                if (previewBtn) {
+                    previewBtn.innerHTML = '<i class="fas fa-file-pdf me-1"></i> Preview Final Bill';
+                }
+            }
+
+            function refreshBillingActionButtons(ipdId) {
+                return Promise.all([
+                    fetch('{{ url("ipd/billing") }}/' + ipdId + '/check-discharged').then(r => r.json()).catch(() => ({})),
+                    fetch('{{ url("ipd/billing") }}/' + ipdId + '/check-approval').then(r => r.json()).catch(() => ({}))
+                ]).then(([dischargeStatus, approvalStatus]) => {
+                    applyBillingActionButtons({
+                        is_insurance: !!approvalStatus.is_insurance,
+                        discharged: !!dischargeStatus.discharged,
+                        final_bill_generated: !!dischargeStatus.final_bill_generated,
+                        can_preview_approval: !!approvalStatus.can_preview_approval,
+                        can_export_approval: !!approvalStatus.can_export_approval,
+                    });
+                    return dischargeStatus;
+                });
             }
 
             function applyFinalBillButtonState(generated) {
-                const previewBtn = document.getElementById('previewFinalBtn');
+                // Kept for compatibility; full state is applied via applyBillingActionButtons.
                 const generateBtn = document.getElementById('generateFinalBtn');
-                if (!previewBtn || !generateBtn) {
-                    return;
-                }
-                if (generated) {
-                    previewBtn.innerHTML = '<i class="fas fa-file-pdf me-1"></i> Download Final Bill';
-                    generateBtn.style.display = 'none';
-                } else {
-                    previewBtn.innerHTML = '<i class="fas fa-file-pdf me-1"></i> Preview Final Bill';
+                if (generateBtn) {
                     generateBtn.style.display = 'inline-block';
                 }
             }
@@ -473,10 +570,18 @@
                             return;
                         }
 
-                        applyFinalBillButtonState(!!data.final_bill_generated);
+                        refreshBillingActionButtons(ipdId);
 
-                        if (mode === 'preview' || data.final_bill_generated) {
-                            openFinalPdf(ipdId);
+                        if (mode === 'preview') {
+                            if (data.final_bill_generated) {
+                                return;
+                            }
+                            openFinalPdf(ipdId, 'final_preview');
+                            return;
+                        }
+
+                        if (data.final_bill_generated) {
+                            openFinalPdf(ipdId, 'final_bill');
                             return;
                         }
 
@@ -515,110 +620,52 @@
             }
 
             function runGenerateFinalBill(ipdId) {
-                fetch('{{ url("ipd/billing") }}/' + ipdId + '/final-bill-preview')
-                    .then(response => response.json())
-                    .then(payload => {
-                        if (!payload.success) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Generate Final Bill?',
+                    html: '<p style="text-align:left;margin-bottom:0;">Generating the final bill will <strong>release the bed</strong>. Bed charges stop at discharge date and time. Continue?</p>',
+                    showCancelButton: true,
+                    confirmButtonColor: '#750096',
+                    confirmButtonText: 'OK',
+                    cancelButtonText: 'Cancel'
+                }).then(function(result) {
+                    if (!result.isConfirmed) {
+                        return;
+                    }
+
+                    fetch('{{ url("ipd/billing") }}/' + ipdId + '/generate-final', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken()
+                        },
+                        body: JSON.stringify({})
+                    })
+                        .then(response => response.json().then(body => ({ ok: response.ok, body })))
+                        .then(({ ok, body }) => {
+                            if (!ok || !body.success) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Generate failed',
+                                    text: (body && body.message) ? body.message : 'Unable to generate the final bill.',
+                                    confirmButtonColor: '#750096'
+                                });
+                                return;
+                            }
+                            refreshBillingActionButtons(ipdId);
+                            const pdfUrl = body.pdf_url || ('{{ url("ipd/billing") }}/' + ipdId + '/export-final?bill_stage=final_bill');
+                            window.open(pdfUrl, '_blank');
+                        })
+                        .catch(() => {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Cannot generate',
-                                text: payload.message || 'Unable to prepare the final bill.',
+                                title: 'Error',
+                                text: 'Unable to generate the final bill. Please try again.',
                                 confirmButtonColor: '#750096'
                             });
-                            return;
-                        }
-
-                        const preview = payload.data || {};
-                        if (preview.already_generated) {
-                            applyFinalBillButtonState(true);
-                            openFinalPdf(ipdId);
-                            return;
-                        }
-
-                        const postGenerate = function(includeExtraBed) {
-                            fetch('{{ url("ipd/billing") }}/' + ipdId + '/generate-final', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Accept': 'application/json',
-                                    'X-CSRF-TOKEN': csrfToken()
-                                },
-                                body: JSON.stringify({ include_extra_bed: includeExtraBed ? 1 : 0 })
-                            })
-                                .then(response => response.json().then(body => ({ ok: response.ok, body })))
-                                .then(({ ok, body }) => {
-                                    if (!ok || !body.success) {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Generate failed',
-                                            text: (body && body.message) ? body.message : 'Unable to generate the final bill.',
-                                            confirmButtonColor: '#750096'
-                                        });
-                                        return;
-                                    }
-                                    applyFinalBillButtonState(true);
-                                    const pdfUrl = body.pdf_url || ('{{ url("ipd/billing") }}/' + ipdId + '/export-final');
-                                    window.open(pdfUrl, '_blank');
-                                })
-                                .catch(() => {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: 'Unable to generate the final bill. Please try again.',
-                                        confirmButtonColor: '#750096'
-                                    });
-                                });
-                        };
-
-                        if (preview.prompt_needed) {
-                            Swal.fire({
-                                icon: 'question',
-                                title: 'Add extra bed charge?',
-                                html: '<div style="text-align:left;">'
-                                    + '<p>Discharge: <strong>' + (preview.discharge_at_display || '-') + '</strong></p>'
-                                    + '<p>Release (now): <strong>' + (preview.release_at_display || '-') + '</strong></p>'
-                                    + '<p>Extra bed charge: <strong>₹ ' + Number(preview.extra_bed_amount || 0).toFixed(2) + '</strong></p>'
-                                    + '<p class="mb-0">If you choose Yes, this extra bed charge will be added to the final bill. The bed will be released either way.</p>'
-                                    + '</div>',
-                                showCancelButton: true,
-                                confirmButtonColor: '#750096',
-                                cancelButtonColor: '#6c757d',
-                                confirmButtonText: 'Yes, add extra bed',
-                                cancelButtonText: 'No, without extra bed',
-                                reverseButtons: true,
-                                width: '560px'
-                            }).then(function(result) {
-                                if (result.isConfirmed) {
-                                    postGenerate(true);
-                                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                    postGenerate(false);
-                                }
-                            });
-                            return;
-                        }
-
-                        Swal.fire({
-                            icon: 'question',
-                            title: 'Generate Final Bill?',
-                            html: '<p style="text-align:left;margin-bottom:0;">No extra bed charge applies. Generating the final bill will <strong>release the bed</strong>.</p>',
-                            showCancelButton: true,
-                            confirmButtonColor: '#750096',
-                            confirmButtonText: 'Generate & release bed',
-                            cancelButtonText: 'Cancel'
-                        }).then(function(result) {
-                            if (result.isConfirmed) {
-                                postGenerate(false);
-                            }
                         });
-                    })
-                    .catch(() => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Unable to check extra bed charges. Please try again.',
-                            confirmButtonColor: '#750096'
-                        });
-                    });
+                });
             }
 
             function loadBreakupBill(ipdId) {
@@ -627,37 +674,31 @@
                     .then(html => {
                         document.getElementById('breakupBillContent').innerHTML = html;
                         document.getElementById('breakupBillSection').style.display = 'block';
-                        fetch('{{ url("ipd/billing") }}/' + ipdId + '/check-discharged')
-                            .then(response => response.json())
-                            .then(status => applyFinalBillButtonState(!!status.final_bill_generated))
-                            .catch(() => {});
-                        const approvalBtn = document.getElementById('exportApprovalBtn');
+                        refreshBillingActionButtons(ipdId);
                         const inlineApprovalBtn = document.getElementById('exportApprovalBillBtn');
-                        const showApproval = html.indexOf('Insurance Approval Bill') !== -1;
-                        if (approvalBtn) {
-                            approvalBtn.style.display = showApproval ? 'inline-block' : 'none';
-                        }
                         if (inlineApprovalBtn) {
                             inlineApprovalBtn.addEventListener('click', function() {
                                 const targetIpdId = this.dataset.ipdId;
                                 fetch('{{ url("ipd/billing") }}/' + targetIpdId + '/check-approval')
                                     .then(response => response.json())
                                     .then(data => {
-                                        if (data.allowed) {
-                                            promptApprovalBillExport(targetIpdId);
+                                        if (data.can_export_approval) {
+                                            promptApprovalBillExport(targetIpdId, 'export');
+                                        } else if (data.can_preview_approval) {
+                                            promptApprovalBillExport(targetIpdId, 'preview');
                                         } else if (typeof Swal !== 'undefined') {
                                             Swal.fire({
                                                 icon: 'info',
-                                                title: 'Insurance Details Required',
-                                                text: data.message || 'Save TPA & Insurance on this IPD first.',
+                                                title: 'Approval Bill',
+                                                text: data.message || 'Approval bill is not available for this IPD right now.',
                                                 confirmButtonColor: '#750096'
                                             });
                                         } else {
-                                            alert(data.message || 'Save TPA & Insurance on this IPD first.');
+                                            alert(data.message || 'Approval bill is not available for this IPD right now.');
                                         }
                                     })
                                     .catch(() => {
-                                        promptApprovalBillExport(targetIpdId);
+                                        promptApprovalBillExport(targetIpdId, 'export');
                                     });
                             });
                         }

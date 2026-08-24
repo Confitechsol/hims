@@ -535,7 +535,7 @@ class IpdBillingController extends Controller
      * @param int $ipdId
      * @param string|null $endDate End date for calculation (Y-m-d format). If null, uses current date.
      */
-    private function calculateBreakup($ipdId, $endDate = null)
+    private function calculateBreakup($ipdId, $endDate = null, ?string $billStage = null)
     {
         // Get IPD record first
         $ipd = IpdDetail::find($ipdId);
@@ -563,7 +563,7 @@ class IpdBillingController extends Controller
         $sgstCharges = $bedChargesData['total_sgst'] ?? 0;
 
         // IPD Charges (from ipd_charges table)
-        $ipdCharges = IpdCharges::where('ipd_id', $ipdId)
+        $ipdCharges = $this->ipdChargesBaseQuery($ipdId, $billStage)
             ->sum('net_amount');
 
         // Get case_reference_id from IPD
@@ -682,30 +682,51 @@ class IpdBillingController extends Controller
     }
 
     /**
-     * Resolve billing end date for an IPD.
-     * After Generate Final Bill with extra bed, use physical release datetime.
-     * Otherwise discharged IPD stops at discharge date.
+     * Resolve billing end datetime for an IPD.
+     * Discharged IPD always stops at clinical discharge date/time (no post-discharge bed).
      */
+    /**
+     * IPD charges query, optionally filtered for a billing export stage.
+     */
+    private function ipdChargesBaseQuery(int $ipdId, ?string $billStage = null)
+    {
+        return IpdCharges::where('ipd_id', $ipdId)->visibleForBillStage($billStage);
+    }
+
+    /**
+     * Map export context to ipd_charges visibility stage.
+     */
+    private function resolveIpdChargeBillStage(?string $billType = null, ?string $finalBillStage = null): ?string
+    {
+        if ($billType === 'approval') {
+            return IpdCharges::STAGE_APPROVAL;
+        }
+        if ($billType === 'approval_preview') {
+            return IpdCharges::STAGE_APPROVAL_PREVIEW;
+        }
+        if ($finalBillStage === 'final_preview') {
+            return IpdCharges::STAGE_FINAL_PREVIEW;
+        }
+        if ($finalBillStage === 'final_bill') {
+            return IpdCharges::STAGE_FINAL_BILL;
+        }
+
+        return null;
+    }
+
     private function resolveBillingEndDateForIpd(IpdDetail $ipd): ?string
     {
         if (($ipd->discharged ?? 'no') !== 'yes') {
             return null;
         }
 
-        if ($ipd->isFinalBillGenerated()
-            && $ipd->include_post_discharge_bed_charge
-            && ! empty($ipd->physical_release_at)
-        ) {
-            return Carbon::parse($ipd->physical_release_at)->format('Y-m-d H:i:s');
+        $dischargeAt = $this->resolveDischargeDateTimeForIpd($ipd);
+        if ($dischargeAt) {
+            return $dischargeAt->format('Y-m-d H:i:s');
         }
 
-        if (!empty($ipd->discharged_date)) {
-            return Carbon::parse($ipd->discharged_date)->format('Y-m-d');
-        }
-
-        $dischargeCard = DischargeCard::where('ipd_details_id', $ipd->id)->orderByDesc('id')->first();
-        if ($dischargeCard && !empty($dischargeCard->discharge_date)) {
-            return Carbon::parse($dischargeCard->discharge_date)->format('Y-m-d');
+        if (! empty($ipd->discharged_date)) {
+            return Carbon::parse($ipd->discharged_date)->startOfDay()->format('Y-m-d H:i:s');
         }
 
         return null;
@@ -1783,7 +1804,9 @@ class IpdBillingController extends Controller
     {
         try {
              $logged_user = auth()->user()->username ?? '';
-            $isApprovalBill = $request->query('bill_type') === 'approval';
+            $isApprovalBill = in_array($request->query('bill_type'), ['approval', 'approval_preview'], true);
+            $isApprovalPreview = $request->query('bill_type') === 'approval_preview'
+                || $request->boolean('approval_preview');
             $viewMode = strtolower((string) $request->query('view_mode', 'detailed'));
             if ($isApprovalBill) {
                 $viewMode = 'detailed';
@@ -1792,7 +1815,10 @@ class IpdBillingController extends Controller
                 $viewMode = 'detailed';
             }
 
-            \Log::info('exportEstimate started', ['ipd_id' => $ipdId, 'bill_type' => $isApprovalBill ? 'approval' : 'estimate']);
+            \Log::info('exportEstimate started', [
+                'ipd_id' => $ipdId,
+                'bill_type' => $isApprovalPreview ? 'approval_preview' : ($isApprovalBill ? 'approval' : 'estimate'),
+            ]);
             
             $ipd = IpdDetail::with(['patient.organisation', 'doctor', 'bedGroup', 'bedDetail', 'organisation', 'insuranceCompany'])
                 ->findOrFail($ipdId);
@@ -1803,17 +1829,40 @@ class IpdBillingController extends Controller
             
             \Log::info('IPD found', ['ipd_no' => $ipd->ipd_no]);
 
-            $billingEndAtForEstimate = null;
-            if ($isApprovalBill || ($ipd->discharged ?? 'no') === 'yes') {
-                $billingEndAtForEstimate = $this->resolveDischargeDateTimeForIpd($ipd);
-                if (!$billingEndAtForEstimate && !empty($ipd->discharged_date)) {
-                    $billingEndAtForEstimate = Carbon::parse($ipd->discharged_date)->endOfDay();
-                }
+            $isDischarged = ($ipd->discharged ?? 'no') === 'yes';
+            $dischargeAtForBill = $this->resolveDischargeDateTimeForIpd($ipd);
+            if (! $dischargeAtForBill && ! empty($ipd->discharged_date)) {
+                $dischargeAtForBill = Carbon::parse($ipd->discharged_date)->startOfDay();
             }
+
+            // Approval preview (before discharge): bed charges till now.
+            // Approval / discharged estimate / final-aligned: stop at discharge datetime.
+            $billingEndAtForEstimate = null;
+            if ($isApprovalPreview) {
+                $billingEndAtForEstimate = null;
+            } elseif ($isApprovalBill || $isDischarged) {
+                $billingEndAtForEstimate = $dischargeAtForBill;
+            }
+
+            $headerDateLabel = 'Estimate Date';
+            $headerTimeLabel = 'Estimate Time';
+            $headerDateValue = Carbon::now()->format('d/m/Y');
+            $headerTimeValue = Carbon::now()->format('H:i:s');
+            if ($isApprovalBill && $isDischarged && $dischargeAtForBill) {
+                $headerDateLabel = 'Discharge Date';
+                $headerTimeLabel = 'Discharge Time';
+                $headerDateValue = $dischargeAtForBill->format('d/m/Y');
+                $headerTimeValue = $dischargeAtForBill->format('H:i:s');
+            }
+
+            $ipdChargeBillStage = $this->resolveIpdChargeBillStage(
+                $isApprovalPreview ? 'approval_preview' : ($isApprovalBill ? 'approval' : null)
+            );
 
             $breakup = $this->calculateBreakup(
                 $ipdId,
-                $billingEndAtForEstimate ? $billingEndAtForEstimate->format('Y-m-d H:i:s') : null
+                $billingEndAtForEstimate ? $billingEndAtForEstimate->format('Y-m-d H:i:s') : null,
+                $ipdChargeBillStage
             );
             \Log::info('Breakup calculated', ['total_charges' => $breakup['total_charges']]);
 
@@ -1836,7 +1885,7 @@ class IpdBillingController extends Controller
                 $bedChargesDisplayTotal = $bedChargesGroupedForDisplay->sum('bed_charge');
             }
 
-            $ipdChargesDetails = IpdCharges::where('ipd_id', $ipdId)
+            $ipdChargesDetails = $this->ipdChargesBaseQuery($ipdId, $ipdChargeBillStage)
                 ->with(['charge', 'chargeCategory'])
                 ->orderBy('date', 'asc')
                 ->get() ?? collect();
@@ -2053,8 +2102,13 @@ class IpdBillingController extends Controller
             // Get hospital information
             $hospital = Hospital::first();
 
-            $billHeading = $isApprovalBill ? 'FINAL BILL (FOR APPROVAL)' : 'ESTIMATE COPY';
+            $billHeading = $isApprovalBill
+                ? ($isApprovalPreview ? 'FINAL BILL (FOR APPROVAL) — PREVIEW' : 'FINAL BILL (FOR APPROVAL)')
+                : 'ESTIMATE COPY';
             $showInsuranceSection = $isApprovalBill;
+            $showDischargeOnBill = $isApprovalBill && $isDischarged && $dischargeAtForBill;
+            $dischargeDateDisplay = $showDischargeOnBill ? $dischargeAtForBill->format('d/m/Y') : null;
+            $dischargeTimeDisplay = $showDischargeOnBill ? $dischargeAtForBill->format('h:i A') : null;
             $grandTotal = (float) ($breakup['total_charges'] ?? 0);
             $totalAdvance = (float) ($breakup['total_payments'] ?? 0);
             $mouDiscountAmount = (float) ($ipd->mou_discount ?? 0);
@@ -2080,7 +2134,10 @@ class IpdBillingController extends Controller
                 'pathologyTestNames', 'radiologyTestNames', 'pathologyTotal', 'radiologyTotal',
                 'investigationDatewise', 'investigationBrief', 'viewMode',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
-                'hospital', 'logged_user', 'billHeading', 'isApprovalBill', 'showInsuranceSection', 'showOriginalAmount', 'showPackageProcedureColumn',
+                'hospital', 'logged_user', 'billHeading', 'isApprovalBill', 'isApprovalPreview', 'showInsuranceSection',
+                'showOriginalAmount', 'showPackageProcedureColumn',
+                'headerDateLabel', 'headerTimeLabel', 'headerDateValue', 'headerTimeValue',
+                'showDischargeOnBill', 'dischargeDateDisplay', 'dischargeTimeDisplay',
                 'grandTotal', 'totalAdvance', 'mouDiscountAmount', 'initialApprovalAmount',
                 'requestFurtherApproval', 'requestFurtherApprovalInWords'
             ));
@@ -2127,7 +2184,10 @@ class IpdBillingController extends Controller
                 'investigationDatewise', 'investigationBrief', 'viewMode',
                 'totalChargesInWords', 'totalPaymentsInWords', 'outstandingInWords', 'netBalanceInWords',
                 'hospital', 'totalPages', 'gstChargesGrouped', 'logged_user',
-                'billHeading', 'isApprovalBill', 'showInsuranceSection', 'showOriginalAmount', 'showPackageProcedureColumn',
+                'billHeading', 'isApprovalBill', 'isApprovalPreview', 'showInsuranceSection',
+                'showOriginalAmount', 'showPackageProcedureColumn',
+                'headerDateLabel', 'headerTimeLabel', 'headerDateValue', 'headerTimeValue',
+                'showDischargeOnBill', 'dischargeDateDisplay', 'dischargeTimeDisplay',
                 'grandTotal', 'totalAdvance', 'mouDiscountAmount', 'initialApprovalAmount',
                 'requestFurtherApproval', 'requestFurtherApprovalInWords'
             ));
@@ -2141,7 +2201,9 @@ class IpdBillingController extends Controller
             \Log::info('PDF generated, returning inline stream');
 
             $filename = $isApprovalBill
-                ? 'IPD_Approval_Bill_' . $ipd->ipd_no . '.pdf'
+                ? ($isApprovalPreview
+                    ? 'IPD_Approval_Bill_Preview_' . $ipd->ipd_no . '.pdf'
+                    : 'IPD_Approval_Bill_' . $ipd->ipd_no . '.pdf')
                 : 'IPD_Estimate_Bill_' . $ipd->ipd_no . '.pdf';
 
             return $pdf->stream($filename);
@@ -2161,7 +2223,7 @@ class IpdBillingController extends Controller
     }
 
     /**
-     * Export Insurance Approval Bill PDF (same layout as estimate + insurance section + approval summary).
+     * Export Insurance Approval Bill PDF after discharge (bed charges stop at discharge datetime).
      */
     public function exportApprovalBill($ipdId, Request $request)
     {
@@ -2171,6 +2233,14 @@ class IpdBillingController extends Controller
             abort(400, 'This IPD has no TPA / insurance details saved. Open Edit IPD, complete the TPA & Insurance section, save, then export the approval bill again.');
         }
 
+        if (($ipd->discharged ?? 'no') !== 'yes') {
+            abort(400, 'Export Approval Bill is available only after discharge. Use Export Approval Bill Preview before discharge.');
+        }
+
+        if ($ipd->isFinalBillGenerated()) {
+            abort(400, 'Final bill has already been generated. Approval bill export is locked.');
+        }
+
         $request->query->set('bill_type', 'approval');
         $request->query->set('view_mode', 'detailed');
 
@@ -2178,30 +2248,73 @@ class IpdBillingController extends Controller
     }
 
     /**
-     * Check if approval bill can be exported (insurance / TPA / cashless admission).
+     * Preview Insurance Approval Bill before discharge (bed charges till now; bed stays occupied).
+     */
+    public function exportApprovalBillPreview($ipdId, Request $request)
+    {
+        $ipd = IpdDetail::findOrFail($ipdId);
+
+        if (! $ipd->isInsuranceBilling()) {
+            abort(400, 'Insurance approval bill preview is only available for insurance / TPA / cashless IPD admissions.');
+        }
+
+        if (($ipd->discharged ?? 'no') === 'yes') {
+            abort(400, 'Patient is already discharged. Use Export Approval Bill instead of preview.');
+        }
+
+        if ($ipd->isFinalBillGenerated()) {
+            abort(400, 'Final bill has already been generated for this IPD.');
+        }
+
+        $request->query->set('bill_type', 'approval_preview');
+        $request->query->set('view_mode', 'detailed');
+
+        return $this->exportEstimate($ipdId, $request);
+    }
+
+    /**
+     * Button / eligibility state for approval preview vs approval export.
      */
     public function checkApprovalBill($ipdId)
     {
         try {
             $ipd = IpdDetail::with('patient.organisation')->findOrFail($ipdId);
-            $allowed = $ipd->isInsuranceBilling();
+            $isInsurance = $ipd->isInsuranceBilling();
+            $isDischarged = ($ipd->discharged ?? 'no') === 'yes';
+            $finalGenerated = $ipd->isFinalBillGenerated();
 
             $message = 'Approval bill can be exported.';
-            if (! $allowed) {
+            if (! $isInsurance) {
                 if ($ipd->patient && $ipd->patient->organisation_id) {
                     $message = 'TPA is set on the patient profile (' . ($ipd->patient->organisation->organisation_name ?? 'patient TPA') . ') but not saved on this IPD admission. Open Edit IPD → TPA & Insurance, confirm details, click Save, then export again.';
                 } else {
                     $message = 'Save TPA & Insurance on this IPD (Edit IPD → TPA & Insurance → Save) before exporting the approval bill.';
                 }
+            } elseif ($finalGenerated) {
+                $message = 'Final bill already generated. Approval bill buttons are locked.';
+            } elseif ($isDischarged) {
+                $message = 'Patient discharged. Export Approval Bill is available.';
+            } else {
+                $message = 'Before discharge, use Export Approval Bill Preview (charges till now).';
             }
 
             return response()->json([
-                'allowed' => $allowed,
+                'allowed' => $isInsurance,
+                'is_insurance' => $isInsurance,
+                'discharged' => $isDischarged,
+                'final_bill_generated' => $finalGenerated,
+                'can_preview_approval' => $isInsurance && ! $isDischarged && ! $finalGenerated,
+                'can_export_approval' => $isInsurance && $isDischarged && ! $finalGenerated,
                 'message' => $message,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'allowed' => false,
+                'is_insurance' => false,
+                'discharged' => false,
+                'final_bill_generated' => false,
+                'can_preview_approval' => false,
+                'can_export_approval' => false,
                 'message' => 'Error checking approval bill: ' . $e->getMessage(),
             ], 500);
         }
@@ -2299,7 +2412,7 @@ class IpdBillingController extends Controller
     }
 
     /**
-     * Extra-bed preview before Generate Final Bill (does not release the bed).
+     * Status payload before Generate Final Bill (no extra-bed prompt).
      */
     public function previewFinalBill($ipdId, IpdFinalBillService $finalBillService)
     {
@@ -2321,49 +2434,34 @@ class IpdBillingController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Unable to preview extra bed charges. Please try again.',
+                'message' => 'Unable to prepare final bill status. Please try again.',
             ], 500);
         }
     }
 
     /**
-     * Generate (lock) the final bill, optionally include extra bed, then release the bed.
+     * Generate (lock) the final bill and release the bed at discharge datetime.
      */
     public function generateFinalBill(Request $request, $ipdId, IpdFinalBillService $finalBillService)
     {
-        $request->validate([
-            'include_extra_bed' => 'nullable|boolean',
-        ]);
-
         try {
             $ipd = IpdDetail::findOrFail($ipdId);
-            $preview = $finalBillService->preview($ipd);
 
-            if (! empty($preview['already_generated'])) {
+            if ($finalBillService->isGenerated($ipd)) {
                 return response()->json([
                     'success' => true,
                     'already_generated' => true,
-                    'pdf_url' => url('ipd/billing/' . $ipdId . '/export-final'),
+                    'pdf_url' => url('ipd/billing/' . $ipdId . '/export-final?bill_stage=final_bill'),
                     'message' => 'Final bill already generated.',
                 ]);
             }
 
-            $includeExtra = $request->boolean('include_extra_bed');
-            if (! empty($preview['prompt_needed']) && ! $request->exists('include_extra_bed')) {
-                return response()->json([
-                    'success' => false,
-                    'prompt_needed' => true,
-                    'data' => $preview,
-                    'message' => $preview['message'],
-                ], 422);
-            }
-
-            $finalBillService->generate($ipd, $includeExtra);
+            $finalBillService->generate($ipd);
 
             return response()->json([
                 'success' => true,
                 'already_generated' => false,
-                'pdf_url' => url('ipd/billing/' . $ipdId . '/export-final'),
+                'pdf_url' => url('ipd/billing/' . $ipdId . '/export-final?bill_stage=final_bill'),
                 'message' => 'Final bill generated and bed released.',
             ]);
         } catch (\RuntimeException $e) {
@@ -2388,12 +2486,18 @@ class IpdBillingController extends Controller
     /**
      * Export Final Bill PDF
      */
-    public function exportFinal($ipdId)
+    public function exportFinal($ipdId, Request $request)
     {
         try {
                 $logged_user = auth()->user()->username ?? ''; 
 
             \Log::info('exportFinal started', ['ipd_id' => $ipdId]);
+            
+            $finalBillStage = $request->query('bill_stage', IpdCharges::STAGE_FINAL_BILL);
+            if (! in_array($finalBillStage, [IpdCharges::STAGE_FINAL_PREVIEW, IpdCharges::STAGE_FINAL_BILL], true)) {
+                $finalBillStage = IpdCharges::STAGE_FINAL_BILL;
+            }
+            $ipdChargeBillStage = $this->resolveIpdChargeBillStage(null, $finalBillStage);
             
             $ipd = IpdDetail::with([
                 'patient.organisation',
@@ -2436,7 +2540,7 @@ class IpdBillingController extends Controller
             ]);
 
             \Log::info('Calculating breakup');
-            $breakup = $this->calculateBreakup($ipdId, $billingEndAt);
+            $breakup = $this->calculateBreakup($ipdId, $billingEndAt, $ipdChargeBillStage);
             \Log::info('Breakup calculated', ['total_charges' => $breakup['total_charges']]);
 
             // Get payment details
@@ -2460,7 +2564,7 @@ class IpdBillingController extends Controller
             }
 
             \Log::info('Getting IPD charges details');
-            $ipdChargesDetails = IpdCharges::where('ipd_id', $ipdId)
+            $ipdChargesDetails = $this->ipdChargesBaseQuery($ipdId, $ipdChargeBillStage)
                 ->with(['charge', 'chargeCategory'])
                 ->orderBy('date', 'asc')
                 ->get() ?? collect();

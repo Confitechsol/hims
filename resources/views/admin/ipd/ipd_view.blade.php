@@ -3451,6 +3451,36 @@
                                                                                                 Add</button>
                                                                                         </div>
                                                                                     </div><!--./row-->
+                                                                                    <div class="row pt-2 mx-0" id="bill_visibility_section">
+                                                                                        <div class="col-12 border rounded p-2 bg-light">
+                                                                                            <label class="form-label fw-semibold mb-2">Show on bills</label>
+                                                                                            <div class="d-flex flex-wrap gap-3">
+                                                                                                <div class="form-check">
+                                                                                                    <input class="form-check-input bill-vis-default" type="checkbox" value="1" id="bill_vis_approval" checked>
+                                                                                                    <label class="form-check-label" for="bill_vis_approval">Export Approval Bill</label>
+                                                                                                </div>
+                                                                                                <div class="form-check">
+                                                                                                    <input class="form-check-input bill-vis-default" type="checkbox" value="1" id="bill_vis_approval_preview" checked>
+                                                                                                    <label class="form-check-label" for="bill_vis_approval_preview">Approval Bill Preview</label>
+                                                                                                </div>
+                                                                                                <div class="form-check">
+                                                                                                    <input class="form-check-input bill-vis-default" type="checkbox" value="1" id="bill_vis_final_preview" checked>
+                                                                                                    <label class="form-check-label" for="bill_vis_final_preview">Preview Final Bill</label>
+                                                                                                </div>
+                                                                                                <div class="form-check">
+                                                                                                    <input class="form-check-input bill-vis-default" type="checkbox" value="1" id="bill_vis_final_bill" checked>
+                                                                                                    <label class="form-check-label" for="bill_vis_final_bill">Generate Final Bill</label>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <small class="text-muted d-block mt-1">Uncheck to exclude this charge from the selected bill PDF.</small>
+                                                                                            <div id="bill_visibility_edit_fields" style="display:none;">
+                                                                                                <input type="hidden" name="show_on_approval_bill" value="0">
+                                                                                                <input type="hidden" name="show_on_approval_preview" value="0">
+                                                                                                <input type="hidden" name="show_on_final_preview" value="0">
+                                                                                                <input type="hidden" name="show_on_final_bill" value="0">
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
                                                                                     <hr>
                                                                                 </div>
                                                                                 <div class="col-lg-12 col-md-12 col-sm-12"
@@ -3525,6 +3555,10 @@
                                                                 <th>Discount</th>
                                                                 <!-- <th>Tax</th> -->
                                                                 <th>Amount (INR)</th>
+                                                                <th class="text-center" title="Export Approval Bill">Appr.</th>
+                                                                <th class="text-center" title="Approval Bill Preview">Appr. Prev.</th>
+                                                                <th class="text-center" title="Preview Final Bill">Fin. Prev.</th>
+                                                                <th class="text-center" title="Generate Final Bill">Fin. Bill</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
@@ -3568,6 +3602,24 @@
                                                                         </td> -->
                                                                     <td>&nbsp;</td>
                                                                     <td>{{ $amount }}</td>
+                                                                    @php
+                                                                        $visFields = [
+                                                                            'show_on_approval_bill' => 'Export Approval Bill',
+                                                                            'show_on_approval_preview' => 'Approval Bill Preview',
+                                                                            'show_on_final_preview' => 'Preview Final Bill',
+                                                                            'show_on_final_bill' => 'Generate Final Bill',
+                                                                        ];
+                                                                    @endphp
+                                                                    @foreach ($visFields as $visField => $visLabel)
+                                                                        <td class="text-center">
+                                                                            <input type="checkbox"
+                                                                                class="form-check-input ipd-charge-bill-vis-toggle mt-0"
+                                                                                data-charge-id="{{ $charge->id }}"
+                                                                                data-field="{{ $visField }}"
+                                                                                title="{{ $visLabel }}"
+                                                                                @checked($charge->{$visField} ?? true)>
+                                                                        </td>
+                                                                    @endforeach
                                                                     <td>
                                                                         <div class="d-flex gap-2">
                                                                             <a href="javascript:void(0);"
@@ -6036,12 +6088,105 @@
             const modalFooterBtn = document.querySelector("#add_charges .modal-footer button[type='submit']");
             const openAddChargesBtn = document.getElementById("open_add_charges_btn");
 
+            const billVisCheckboxIds = {
+                show_on_approval_bill: 'bill_vis_approval',
+                show_on_approval_preview: 'bill_vis_approval_preview',
+                show_on_final_preview: 'bill_vis_final_preview',
+                show_on_final_bill: 'bill_vis_final_bill',
+            };
+
+            function billVisibilityHiddenInputsHtml() {
+                let html = '';
+                Object.keys(billVisCheckboxIds).forEach(function(field) {
+                    const cb = document.getElementById(billVisCheckboxIds[field]);
+                    const val = cb && cb.checked ? '1' : '0';
+                    html += `<input type="hidden" name="${field}[]" value="${val}">`;
+                });
+                return html;
+            }
+
+            function resetBillVisibilityCheckboxes(allChecked) {
+                Object.values(billVisCheckboxIds).forEach(function(id) {
+                    const cb = document.getElementById(id);
+                    if (cb) {
+                        cb.checked = !!allChecked;
+                        cb.removeAttribute('name');
+                    }
+                });
+            }
+
+            function setBillVisibilityFromCharge(charge) {
+                Object.keys(billVisCheckboxIds).forEach(function(field) {
+                    const cb = document.getElementById(billVisCheckboxIds[field]);
+                    if (cb) {
+                        cb.checked = charge[field] !== false && charge[field] !== 0;
+                        cb.removeAttribute('name');
+                    }
+                });
+            }
+
+            function syncEditBillVisibilityHiddenFields() {
+                Object.keys(billVisCheckboxIds).forEach(function(field) {
+                    const cb = document.getElementById(billVisCheckboxIds[field]);
+                    const hidden = document.querySelector('#bill_visibility_edit_fields input[name="' + field + '"]');
+                    if (hidden && cb) {
+                        hidden.value = cb.checked ? '1' : '0';
+                    }
+                });
+            }
+
+            const addChargeFormEl = document.getElementById('addChargeForm');
+            if (addChargeFormEl) {
+                addChargeFormEl.addEventListener('submit', function() {
+                    if (window.editIpdChargeId) {
+                        syncEditBillVisibilityHiddenFields();
+                    }
+                });
+            }
+
+            document.addEventListener('change', function(e) {
+                const toggle = e.target.closest('.ipd-charge-bill-vis-toggle');
+                if (!toggle) {
+                    return;
+                }
+
+                const chargeId = toggle.getAttribute('data-charge-id');
+                const field = toggle.getAttribute('data-field');
+                const value = toggle.checked ? 1 : 0;
+                const csrfMeta = document.querySelector("meta[name='csrf-token']");
+                const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
+                fetch("{{ url('/ipd_charge') }}/" + chargeId + "/bill-visibility", {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ field: field, value: value })
+                })
+                    .then(function(res) { return res.json().then(function(body) { return { ok: res.ok, body: body }; }); })
+                    .then(function(result) {
+                        if (!result.ok || !result.body.success) {
+                            toggle.checked = !toggle.checked;
+                            alert((result.body && result.body.message) ? result.body.message : 'Unable to update bill visibility.');
+                        }
+                    })
+                    .catch(function() {
+                        toggle.checked = !toggle.checked;
+                        alert('Unable to update bill visibility.');
+                    });
+            });
+
             function enterAddMode() {
                 window.editIpdChargeId = null;
 
                 if (addBtnCol) addBtnCol.classList.remove('d-none');
                 if (previewWrapper) previewWrapper.classList.remove('d-none');
                 if (modalFooterBtn) modalFooterBtn.textContent = 'Save';
+
+                resetBillVisibilityCheckboxes(true);
 
                 // Auto-set admission date in charge_date field
                 const ipdContext = document.getElementById('ipdViewContext');
@@ -6215,6 +6360,7 @@
                             <input type="hidden" name="net_amount[]" value="${netAmount}">
                             <input type="hidden" name="charge_note[]" value="${note}">
                             <input type="hidden" name="charge_date[]" value="${date}">
+                            ${billVisibilityHiddenInputsHtml()}
                         </tr>
                     `;
 
@@ -6325,6 +6471,7 @@
             <input type="hidden" name="net_amount[]" value="${netAmountInp.value}">
             <input type="hidden" name="charge_note[]" value="${document.getElementById("edit_note").value}">
             <input type="hidden" name="charge_date[]" value="${chargeDate}">
+            ${billVisibilityHiddenInputsHtml()}
         </tr>
         `;
 
@@ -6345,6 +6492,7 @@
                 discountAmtInp.value = '0.00';
                 taxAmtInp.value = '0.00';
                 netAmountInp.value = '0.00';
+                resetBillVisibilityCheckboxes(true);
                 
                 console.log('✅ Charge added. Date captured:', chargeDate, 'Dropdowns repopulated');
             });
@@ -6561,6 +6709,7 @@
                         document.getElementById('charge_date').value = charge.date ?
                             String(charge.date).substring(0, 10) :
                             '';
+                        setBillVisibilityFromCharge(charge);
                     })
                     .catch(() => {
                         alert('Error loading charge details.');
