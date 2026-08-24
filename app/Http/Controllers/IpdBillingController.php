@@ -8,6 +8,7 @@ use App\Models\IpdCharges;
 use App\Models\IpdPackage;
 use App\Models\IpdPrescription;
 use App\Models\OpdDetail;
+use App\Models\PathologyBilling;
 use App\Models\RadiologyBilling;
 use App\Models\Transaction;
 use App\Models\DoctorVisit;
