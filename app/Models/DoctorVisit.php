@@ -14,6 +14,7 @@ class DoctorVisit extends Model
 
     protected $fillable = [
         'patient_id',
+        'ipd_id',
         'doctor_id',
         'charge_id',
         'reporting_date',
@@ -41,6 +42,11 @@ class DoctorVisit extends Model
         return $this->belongsTo(Patient::class, 'patient_id');
     }
 
+    public function ipd()
+    {
+        return $this->belongsTo(IpdDetail::class, 'ipd_id');
+    }
+
     public function doctor()
     {
         return $this->belongsTo(Doctor::class, 'doctor_id');
@@ -49,5 +55,23 @@ class DoctorVisit extends Model
     public function charge()
     {
         return $this->belongsTo(Charge::class, 'charge_id');
+    }
+
+    /**
+     * Current open (non-discharged) IPD for patient only.
+     * Returns null if the patient has no active admission.
+     */
+    public static function resolveIpdIdForPatient(int $patientId): ?int
+    {
+        $open = IpdDetail::where('patient_id', $patientId)
+            ->where(function ($q) {
+                $q->whereNull('discharged')
+                    ->orWhere('discharged', '!=', 'yes');
+            })
+            ->orderByDesc('date')
+            ->orderByDesc('id')
+            ->value('id');
+
+        return $open ? (int) $open : null;
     }
 }

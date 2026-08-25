@@ -47,7 +47,7 @@
                                 <input type="hidden" name="patient_id" id="patient_id" value="{{ old('patient_id') }}" required>
                                 <div id="patient_suggestions" class="autocomplete-suggestions"></div>
                             </div>
-                            <small class="text-muted">Start typing to see suggestions</small>
+                            <small class="text-muted">Active admitted patients only (discharged excluded)</small>
                             @error('patient_id')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror

@@ -578,10 +578,10 @@ class IpdBillingController extends Controller
         $patientId = $ipd->patient_id ?? null;
         $admissionDate = $ipd->date ? Carbon::parse($ipd->date)->format('Y-m-d') : null;
 
-        // Doctor Visit Charges (patient + admission; optional end date; include rows with null visit_date if reporting_date qualifies)
+        // Doctor Visit Charges (linked to this IPD; legacy null-ipd_id by admission window)
         $doctorVisitCharges = 0;
         if ($patientId && $admissionDate) {
-            $doctorVisitCharges = (float) $this->doctorVisitsBillableToIpdQuery($patientId, $ipd->date, $endDate)
+            $doctorVisitCharges = (float) $this->doctorVisitsBillableToIpdQuery($ipd, $endDate)
                 ->sum('amount');
         }
 
@@ -937,7 +937,7 @@ class IpdBillingController extends Controller
         // Doctor Visit Charges Details (include null visit_date when reporting_date is set)
         $doctorVisitDetails = collect();
         if ($admissionDateOnly) {
-            $doctorVisitDetails = $this->doctorVisitsBillableToIpdQuery($patientId, $admissionDateOnly, null)
+            $doctorVisitDetails = $this->doctorVisitsBillableToIpdQuery($ipd, null)
                 ->with(['doctor', 'charge'])
                 ->orderByRaw('COALESCE(visit_date, DATE(reporting_date), DATE(created_at)) ASC')
                 ->orderBy('id')
@@ -1115,33 +1115,43 @@ class IpdBillingController extends Controller
     }
 
     /**
-     * Doctor visits billable on an IPD estimate/final: same patient, on/after admission date,
-     * optionally on/before discharge. Rows with null visit_date are included when reporting_date qualifies.
+     * Doctor visits billable on an IPD estimate/final.
+     * Prefer rows linked to this IPD; include legacy null-ipd_id rows in the admission date window.
      */
-    private function doctorVisitsBillableToIpdQuery(int $patientId, $admissionDate, $endDateYmd = null): \Illuminate\Database\Eloquent\Builder
+    private function doctorVisitsBillableToIpdQuery(IpdDetail $ipd, $endDateYmd = null): \Illuminate\Database\Eloquent\Builder
     {
-        $admissionYmd = Carbon::parse($admissionDate)->format('Y-m-d');
+        $patientId = (int) $ipd->patient_id;
+        $admissionYmd = $ipd->date ? Carbon::parse($ipd->date)->format('Y-m-d') : null;
         $endYmd = ($endDateYmd !== null && $endDateYmd !== '')
             ? Carbon::parse($endDateYmd)->format('Y-m-d')
             : null;
 
         return DoctorVisit::query()
             ->where('patient_id', $patientId)
-            ->where(function ($q) use ($admissionYmd, $endYmd) {
-                $q->where(function ($w) use ($admissionYmd, $endYmd) {
-                    $w->whereNotNull('visit_date')
-                        ->whereDate('visit_date', '>=', $admissionYmd);
-                    if ($endYmd) {
-                        $w->whereDate('visit_date', '<=', $endYmd);
-                    }
-                })->orWhere(function ($w) use ($admissionYmd, $endYmd) {
-                    $w->whereNull('visit_date')
-                        ->whereNotNull('reporting_date')
-                        ->whereDate('reporting_date', '>=', $admissionYmd);
-                    if ($endYmd) {
-                        $w->whereDate('reporting_date', '<=', $endYmd);
-                    }
-                });
+            ->where(function ($q) use ($ipd, $admissionYmd, $endYmd) {
+                $q->where('ipd_id', $ipd->id);
+
+                if ($admissionYmd) {
+                    $q->orWhere(function ($legacy) use ($admissionYmd, $endYmd) {
+                        $legacy->whereNull('ipd_id')
+                            ->where(function ($dateQ) use ($admissionYmd, $endYmd) {
+                                $dateQ->where(function ($w) use ($admissionYmd, $endYmd) {
+                                    $w->whereNotNull('visit_date')
+                                        ->whereDate('visit_date', '>=', $admissionYmd);
+                                    if ($endYmd) {
+                                        $w->whereDate('visit_date', '<=', $endYmd);
+                                    }
+                                })->orWhere(function ($w) use ($admissionYmd, $endYmd) {
+                                    $w->whereNull('visit_date')
+                                        ->whereNotNull('reporting_date')
+                                        ->whereDate('reporting_date', '>=', $admissionYmd);
+                                    if ($endYmd) {
+                                        $w->whereDate('reporting_date', '<=', $endYmd);
+                                    }
+                                });
+                            });
+                    });
+                }
             });
     }
 
@@ -1584,7 +1594,7 @@ class IpdBillingController extends Controller
         // Doctor visits (include null visit_date when reporting_date is in range)
         $doctorVisits = collect();
         if ($admissionDate) {
-            $doctorVisits = $this->doctorVisitsBillableToIpdQuery($patientId, $admissionDate, $dischargeDate)
+            $doctorVisits = $this->doctorVisitsBillableToIpdQuery($ipd, $dischargeDate)
                 ->with(['doctor', 'charge'])
                 ->orderByRaw('COALESCE(visit_date, DATE(reporting_date), DATE(created_at)) ASC')
                 ->orderBy('id')
@@ -2075,7 +2085,7 @@ class IpdBillingController extends Controller
             
             \Log::info('Radiology tests collected', ['test_count' => count($radiologyTestNames), 'total' => $radiologyTotal]);
 
-            $doctorVisitDetails = $this->doctorVisitsBillableToIpdQuery((int) $ipd->patient_id, $ipd->date, null)
+            $doctorVisitDetails = $this->doctorVisitsBillableToIpdQuery($ipd, null)
                 ->with(['doctor', 'charge'])
                 ->orderByRaw('COALESCE(visit_date, DATE(reporting_date), DATE(created_at)) ASC')
                 ->orderBy('id')
@@ -2675,7 +2685,7 @@ class IpdBillingController extends Controller
                 ->get() ?? collect();
 
             \Log::info('Getting doctor visit details');
-            $doctorVisitDetails = $this->doctorVisitsBillableToIpdQuery((int) $ipd->patient_id, $ipd->date, $dischargeDate)
+            $doctorVisitDetails = $this->doctorVisitsBillableToIpdQuery($ipd, $dischargeDate)
                 ->with(['doctor', 'charge'])
                 ->orderByRaw('COALESCE(visit_date, DATE(reporting_date), DATE(created_at)) ASC')
                 ->orderBy('id')

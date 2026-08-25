@@ -7,16 +7,25 @@ use App\Models\Patient;
 use App\Models\Doctor;
 use App\Models\Charge;
 use App\Models\DoctorVisit;
+use App\Models\IpdDetail;
 use Illuminate\Support\Facades\DB;
 
 class DoctorVisitController extends Controller
 {
     /**
-     * Show create form
+     * Show create form — only currently admitted (non-discharged) IPD patients.
      */
     public function create()
     {
-        $patients = Patient::all();
+        $dischargedIds = IpdDetail::getDischargedPatientIds();
+        $ipdPatientIds = IpdDetail::query()->pluck('patient_id')->unique()->filter()->all();
+
+        $patients = Patient::select('id', 'patient_name', 'mobileno')
+            ->whereIn('id', $ipdPatientIds)
+            ->when(! empty($dischargedIds), fn ($q) => $q->whereNotIn('id', $dischargedIds))
+            ->orderBy('patient_name')
+            ->get();
+
         $doctors  = Doctor::all();
         $charges = Charge::where('charge_category_id', 1)->get();
 
@@ -44,6 +53,16 @@ class DoctorVisitController extends Controller
         try {
             DB::beginTransaction();
 
+            $ipdId = DoctorVisit::resolveIpdIdForPatient((int) $request->patient_id);
+            if (! $ipdId) {
+                throw new \Exception('Selected patient has no active IPD admission. Doctor visits can only be added for currently admitted patients.');
+            }
+
+            $ipd = IpdDetail::find($ipdId);
+            if ($ipd && ($ipd->discharged ?? '') === 'yes') {
+                throw new \Exception('Selected patient is already discharged. Doctor visits can only be added for active admissions.');
+            }
+
             // Check if editing
             if ($request->edit_id) {
                 // Use withTrashed() to include soft deleted records, or find normally
@@ -57,8 +76,8 @@ class DoctorVisitController extends Controller
                 if ($visit->trashed()) {
                     $visit->restore();
                 }
-                
-                $visit->update([
+
+                $payload = [
                     'patient_id' => $request->patient_id,
                     'doctor_id' => $request->doctor_id,
                     'charge_id' => $request->visit_type,
@@ -69,11 +88,21 @@ class DoctorVisitController extends Controller
                     'doctor_pay_amount' => $request->doctor_pay_amount ?? 0.00,
                     'visit_date' => $request->visit_date,
                     'visit_time' => $request->visit_time ?? null,
-                ]);
+                ];
+
+                // Keep existing admission link when set; otherwise attach current IPD.
+                if ($visit->ipd_id) {
+                    $payload['ipd_id'] = $visit->ipd_id;
+                } else {
+                    $payload['ipd_id'] = $ipdId;
+                }
+                
+                $visit->update($payload);
                 $message = 'Doctor visit record updated successfully!';
             } else {
                 DoctorVisit::create([
                     'patient_id' => $request->patient_id,
+                    'ipd_id' => $ipdId,
                     'doctor_id' => $request->doctor_id,
                     'charge_id' => $request->visit_type,
                     'reporting_date' => $request->date,
@@ -102,13 +131,25 @@ class DoctorVisitController extends Controller
     }
 
     /**
-     * Get patient visits for AJAX request
+     * Get patient visits for AJAX request (current open IPD admission only).
      */
     public function getPatientVisits($patientId)
     {
         try {
+            $ipdId = DoctorVisit::resolveIpdIdForPatient((int) $patientId);
+
+            if (! $ipdId) {
+                return response()->json([]);
+            }
+
+            $ipd = IpdDetail::find($ipdId);
+            if (! $ipd || ($ipd->discharged ?? '') === 'yes') {
+                return response()->json([]);
+            }
+
             $visits = DoctorVisit::with(['doctor', 'charge'])
                 ->where('patient_id', $patientId)
+                ->where('ipd_id', $ipdId)
                 ->orderBy('created_at', 'desc')
                 ->get();
 
@@ -171,8 +212,8 @@ class DoctorVisitController extends Controller
             if ($visit->trashed()) {
                 $visit->restore();
             }
-            
-            $visit->update([
+
+            $payload = [
                 'patient_id' => $request->patient_id,
                 'doctor_id' => $request->doctor_id,
                 'charge_id' => $request->visit_type,
@@ -183,7 +224,15 @@ class DoctorVisitController extends Controller
                 'doctor_pay_amount' => $request->doctor_pay_amount ?? 0.00,
                 'visit_date' => $request->visit_date,
                 'visit_time' => $request->visit_time ?? null,
-            ]);
+            ];
+
+            if ($visit->ipd_id) {
+                $payload['ipd_id'] = $visit->ipd_id;
+            } else {
+                $payload['ipd_id'] = DoctorVisit::resolveIpdIdForPatient((int) $request->patient_id);
+            }
+            
+            $visit->update($payload);
 
             DB::commit();
 

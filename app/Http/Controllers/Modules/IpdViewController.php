@@ -123,7 +123,39 @@ class IpdViewController extends Controller
         $PatientTimelines = PatientTimeline::with('patient')->where('patient_id', $patient_id)->get();
         $vitalDetails     = PatientVital::with('vital')->where('patient_id', $patient_id)->get();
         $radiologyReports = RadiologyReport::with('radiology')->where('patient_id', $ipd->patient->id)->get();
-        $doctorvisits     = DoctorVisit::with(['patient', 'doctor'])->where('patient_id', $ipd->patient->id)->get();
+        $doctorvisits     = DoctorVisit::with(['patient', 'doctor'])
+            ->where('patient_id', $ipd->patient->id)
+            ->where(function ($q) use ($ipd) {
+                $q->where('ipd_id', $ipd->id)
+                    ->orWhere(function ($legacy) use ($ipd) {
+                        $legacy->whereNull('ipd_id');
+                        $admitYmd = $ipd->date
+                            ? \Carbon\Carbon::parse($ipd->date)->format('Y-m-d')
+                            : null;
+                        if ($admitYmd) {
+                            $legacy->where(function ($dateQ) use ($admitYmd, $ipd) {
+                                $dateQ->where(function ($w) use ($admitYmd, $ipd) {
+                                    $w->whereNotNull('visit_date')
+                                        ->whereDate('visit_date', '>=', $admitYmd);
+                                    if (($ipd->discharged ?? '') === 'yes' && ! empty($ipd->discharged_date)) {
+                                        $endYmd = \Carbon\Carbon::parse($ipd->discharged_date)->format('Y-m-d');
+                                        $w->whereDate('visit_date', '<=', $endYmd);
+                                    }
+                                })->orWhere(function ($w) use ($admitYmd, $ipd) {
+                                    $w->whereNull('visit_date')
+                                        ->whereNotNull('reporting_date')
+                                        ->whereDate('reporting_date', '>=', $admitYmd);
+                                    if (($ipd->discharged ?? '') === 'yes' && ! empty($ipd->discharged_date)) {
+                                        $endYmd = \Carbon\Carbon::parse($ipd->discharged_date)->format('Y-m-d');
+                                        $w->whereDate('reporting_date', '<=', $endYmd);
+                                    }
+                                });
+                            });
+                        }
+                    });
+            })
+            ->orderByDesc('created_at')
+            ->get();
         if ($ipd->discharged == 'yes' || $ipd->discharged == 'draft') {
             $dischargeCard      = DischargeCard::where('ipd_details_id', $id)->firstOrFail();
             $ipd->dischargeCard = $dischargeCard;
