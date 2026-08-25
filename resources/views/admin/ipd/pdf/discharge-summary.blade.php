@@ -1,5 +1,32 @@
 <style>
-     @page {
+
+
+    @page {
+    size: A4;
+    margin: 160px 0 45px 0;
+}
+
+.header {
+    position: fixed;
+    top: -160px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 130px;
+}
+
+.header img {
+    width: 100%;
+    height: 130px;
+    display: block;
+}
+
+.main_box {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+  /*   @page {
     size: A4;
     margin: 130px 0 45px 0;
     }
@@ -16,7 +43,7 @@
         width: 100%;
         height: 130px;
     }
-    
+   */ 
     .footer {
         position: fixed;
         bottom: -45px;
@@ -45,7 +72,7 @@
     .main_box {
        /* widows: 100%; */
        
-         width: 100%;
+       /*  width: 100%; */
         /* width: 210mm; */
         /* height: 297mm; */
         /* position: relative; */
@@ -54,11 +81,11 @@
         background-repeat: no-repeat;
         background-size: 100% 100%; */
     }
-
+  
     .header img,
     .footer img {
         width: 100%;
-        margin-top: 40px;
+        margin-top: 0;
     }
 
    /* .section-title {
@@ -146,14 +173,6 @@
         bottom: 0;
         width: 100%;
     } */
-    .header {
-        position: fixed;
-        top: -180px;
-        left: 0;
-        right: 0;
-        height: 180px;
-    }
-
     .footer {
         position: fixed;
         bottom: 0;
