@@ -267,7 +267,7 @@
                                                     @endif
                                                     @foreach ($ipd as $ipdDetails)
                                                         <tr>
-                                                            <td>{{ $loop->iteration }}</td>
+                                                            <td>{{ $ipd->firstItem() + $loop->index }}</td>
                                                             <td><a href="{{ route('ipd.show', ['id' => $ipdDetails->id]) }}"
                                                                     class="text-primary">{{ $ipdDetails->ipd_no }}</a>
                                                                 @if (strtolower(trim($ipdDetails->discharged)) === 'draft')
@@ -300,17 +300,10 @@
                                                                     title="Edit">
                                                                     <i class="ti ti-pencil"></i>
                                                                 </a>
-                                                                <a href="{{ route('ipd.billing.export.final', ['ipdId' => $ipdDetails->id, 'bill_stage' => 'final_bill']) }}"
-                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
-                                                                    title="Export Final Bill PDF"
-                                                                    target="_blank">
-                                                                    <i class="ti ti-download"></i>
-                                                                </a>
                                                             </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
-
                                             </table>
                                         </div>
                                             {{-- Pagination Links --}}
