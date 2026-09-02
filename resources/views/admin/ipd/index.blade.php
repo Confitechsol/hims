@@ -31,6 +31,14 @@
                                 Discharged Patient
                             </a>
                         </li>
+                      <li class="nav-item">
+                          <a class="nav-link mb-0 text-white"
+                             href="{{ route('ipd.billing.discharged.zero.balance') }}">
+                              Final Bill
+                          </a>
+                      </li>
+
+
                     </ul>
 
                 </div>
@@ -291,6 +299,12 @@
                                                                     class="fs-18 p-1 btn btn-icon btn-sm btn-soft-success rounded-pill"
                                                                     title="Edit">
                                                                     <i class="ti ti-pencil"></i>
+                                                                </a>
+                                                                <a href="{{ route('ipd.billing.export.final', ['ipdId' => $ipdDetails->id, 'bill_stage' => 'final_bill']) }}"
+                                                                    class="fs-18 p-1 btn btn-icon btn-sm btn-soft-info rounded-pill"
+                                                                    title="Export Final Bill PDF"
+                                                                    target="_blank">
+                                                                    <i class="ti ti-download"></i>
                                                                 </a>
                                                             </td>
                                                         </tr>

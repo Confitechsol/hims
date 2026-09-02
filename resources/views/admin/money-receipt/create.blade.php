@@ -503,16 +503,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                     .then(r => {
                         console.log('Response status:', r.status); // Debug
-                        if (!r.ok) {
-                            throw new Error('Network response was not ok: ' + r.status);
-                        }
-                        return r.json();
+                        // Always parse JSON, even for error responses
+                        return r.json().then(data => {
+                            return { ok: r.ok, status: r.status, data: data };
+                        });
                     })
-                    .then(data => {
-                        console.log('Search results:', data); // Debug log
+                    .then(response => {
+                        console.log('Search results:', response); // Debug log
                         console.log('Patient suggestions element before update:', patientSuggestions); // Debug
                         console.log('Current display style:', patientSuggestions.style.display); // Debug
                         
+                        // Check if response was successful
+                        if (!response.ok) {
+                            throw new Error((response.data && response.data.error) ? response.data.error : 'Network response was not ok: ' + response.status);
+                        }
+                        
+                        const data = response.data;
                         if (data && data.data && Array.isArray(data.data) && data.data.length > 0) {
                             patientSuggestions.innerHTML = data.data.map(item => 
                                 `<div class="autocomplete-suggestion" 
@@ -551,9 +557,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     .catch(err => {
                         console.error('Error searching patients:', err);
                         console.error('Error details:', err.message, err.stack);
-                        patientSuggestions.innerHTML = '<div class="autocomplete-suggestion" style="color: #dc3545; padding: 10px;">Error searching patients: ' + err.message + '</div>';
+                        // Show error in dropdown
+                        patientSuggestions.innerHTML = '<div class="autocomplete-suggestion" style="color: #dc3545; padding: 10px;">Error: ' + (err.message || 'Unable to search patients') + '</div>';
                         patientSuggestions.style.setProperty('display', 'block', 'important');
                         patientSuggestions.style.setProperty('visibility', 'visible', 'important');
+                        // Also show alert
+                        if (err.message && err.message.includes('500')) {
+                            alert('Server error (500). Please try again later or contact support.');
+                        } else {
+                            console.warn('Patient search error (non-fatal)', err.message);
+                        }
                     });
             }, 300);
         });
@@ -601,8 +614,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Auto-populate Final Bill No and load patient details
                 if (patientId) {
                     fetch('{{ route("money-receipt.api.patient-final-bill") }}?patient_id=' + patientId)
-                        .then(r => r.json())
+                        .then(r => {
+                            if (!r.ok) {
+                                console.error('Patient final bill response status:', r.status);
+                            }
+                            return r.json().catch(() => ({}));
+                        })
                         .then(data => {
+                            if (data.error) {
+                                console.error('Patient final bill error:', data.error);
+                                return;
+                            }
+                            
                             if (data.final_bill_no) {
                                 finalBillNoInput.value = data.final_bill_no;
                                 
@@ -633,11 +656,16 @@ document.addEventListener('DOMContentLoaded', function() {
                                 document.getElementById('doctorChargesCard').style.display = 'none';
                                 updateCasePrescriptionNo();
                             }
+                        })
+                        .catch(err => {
+                            console.error('Error fetching patient final bill:', err);
+                            finalBillNoInput.value = '';
+                            document.getElementById('doctorChargesCard').style.display = 'none';
                         });
                     
                     // Load patient details (age, sex, etc.)
                     fetch('{{ url("api/patient") }}/' + patientId)
-                        .then(r => r.json())
+                        .then(r => r.ok ? r.json() : Promise.reject())
                         .catch(() => {
                             // If API doesn't exist, try to get from patient model via form
                             // We'll populate from the search result if available
