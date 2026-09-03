@@ -1535,17 +1535,42 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * Calendar end date for grouped bed charge "Date Range" (display only; billing unchanged).
+     * Uses period_end of the last billed day, capped to billing/discharge calendar date on the final bed row.
+     */
+    private function resolveBedChargeDisplayCalendarEnd(
+        string $periodEndYmd,
+        bool $isLastBedGroup,
+        ?string $billingEndCalendarYmd
+    ): string {
+        if (! $isLastBedGroup || $billingEndCalendarYmd === null || $billingEndCalendarYmd === '') {
+            return $periodEndYmd;
+        }
+
+        try {
+            $end = Carbon::parse($periodEndYmd)->startOfDay();
+            $cap = Carbon::parse($billingEndCalendarYmd)->startOfDay();
+
+            return $end->lte($cap) ? $end->format('Y-m-d') : $cap->format('Y-m-d');
+        } catch (\Throwable $e) {
+            return $periodEndYmd;
+        }
+    }
+
+    /**
      * Group day-wise bed charges by bed and contiguous date ranges for display.
-     * Returns one row per (bed + contiguous date range): e.g. "SINGLE - 5 SINGLE @5000 | 5 Days | 17/01/2026 To 21/01/2026".
+     * Returns one row per (bed + contiguous date range): e.g. "SINGLE - 5 SINGLE @5000 | 5 Days | 17/01/2026 To 20/01/2026".
      *
-     * Uses period_start_date / period_end_date (bed billing boundary from config, default 11:00–11:00) for the printed "Date Range".
-     * charge_date alone can repeat the same calendar day when the billing day label differs from the
-     * occupancy window (e.g. admit 27 10:31 → one line with charge_date 28 but period 27→28).
+     * Printed "Date Range" uses calendar dates only (display labels):
+     * - from = period_start_date of first billed day (admission-side calendar date)
+     * - to   = period_end_date of last billed day, capped to discharge/billing-end calendar date
+     *          on the chronologically last bed group (never increases day count or amounts).
      *
      * @param \Illuminate\Support\Collection $bedChargesDetails Day-wise details from calculateBedChargesFromHistory
+     * @param string|null $billingEndCalendarYmd Y-m-d discharge or estimate end (calendar); caps last row end date
      * @return \Illuminate\Support\Collection
      */
-    private function groupBedChargesByBedForDisplay($bedChargesDetails)
+    private function groupBedChargesByBedForDisplay($bedChargesDetails, ?string $billingEndCalendarYmd = null)
     {
         if ($bedChargesDetails->isEmpty()) {
             return collect();
@@ -1623,8 +1648,21 @@ class IpdBillingController extends Controller
             }
         }
 
-        // Sort by from_date so order is chronological
-        return $result->sortBy('from_date')->values();
+        if ($result->isEmpty()) {
+            return $result;
+        }
+
+        $sorted = $result->sortBy('from_date')->values();
+        $lastIndex = $sorted->count() - 1;
+        foreach ($sorted as $index => $row) {
+            $row->to_date = $this->resolveBedChargeDisplayCalendarEnd(
+                (string) $row->to_date,
+                $index === $lastIndex,
+                $billingEndCalendarYmd
+            );
+        }
+
+        return $sorted;
     }
 
     /**
@@ -2106,13 +2144,22 @@ class IpdBillingController extends Controller
                 $billingEndAtForEstimate ? $billingEndAtForEstimate->format('Y-m-d H:i:s') : null
             );
             $bedChargesDetails = collect($bedChargesData['details']);
-            $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
+            $bedChargeDisplayEndCalendar = $billingEndAtForEstimate
+                ? Carbon::parse($billingEndAtForEstimate)->format('Y-m-d')
+                : Carbon::now()->format('Y-m-d');
+            $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay(
+                $bedChargesDetails,
+                $bedChargeDisplayEndCalendar
+            );
             $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
             $bedChargesCoveredByPackage = ($breakup['package_charges'] ?? 0) > 0;
             // Estimate & approval: omit bed/GST lines when a package covers bed (same as final bill).
             if ($bedChargesCoveredByPackage) {
                 $bedChargesDetails = collect();
-                $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
+                $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay(
+                    $bedChargesDetails,
+                    $bedChargeDisplayEndCalendar
+                );
                 $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
                 $bedChargesDisplayTotal = 0;
             } else {
@@ -2777,11 +2824,18 @@ class IpdBillingController extends Controller
             \Log::info('Getting bed charges details');
             $bedChargesData = $this->calculateBedChargesFromHistory($ipdId, $billingEndAt);
             $bedChargesDetails = collect($bedChargesData['details']);
-            $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
+            $bedChargeDisplayEndCalendar = Carbon::parse($dischargeDate)->format('Y-m-d');
+            $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay(
+                $bedChargesDetails,
+                $bedChargeDisplayEndCalendar
+            );
             $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
             if (($breakup['package_charges'] ?? 0) > 0) {
                 $bedChargesDetails = collect();
-                $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay($bedChargesDetails);
+                $bedChargesGroupedForDisplay = $this->groupBedChargesByBedForDisplay(
+                    $bedChargesDetails,
+                    $bedChargeDisplayEndCalendar
+                );
                 $gstChargesGrouped = $this->prepareGstCharges($bedChargesDetails);
             }
 
