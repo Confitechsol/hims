@@ -3137,17 +3137,16 @@ class IpdBillingController extends Controller
                 try {
                     // Calculate breakup
                     $endDate = $this->resolveBillingEndDateForIpd($ipd);
-                    $breakup = $this->calculateBreakup($ipd->id, $endDate);
+                    $billStage = !empty($ipd->final_bill_generated_at) ? IpdCharges::STAGE_FINAL_BILL : null;
+                    $breakup = $this->calculateBreakup($ipd->id, $endDate, $billStage);
 
                     // Calculate net balance
                     $totalDiscount = (float) ($ipd->mou_discount ?? 0) + (float) ($ipd->special_discount ?? 0);
                     $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
                     $outstanding = (float) ($breakup['outstanding'] ?? 0);
-                    $netBalance = $outstanding - $totalDiscount - $duePatientPartyAmount;
+                    $netBalance = max(0, $outstanding - $totalDiscount - $duePatientPartyAmount);
 
-                    // Only include if truly paid in full: outstanding <= 0 (allows for rounding errors)
-                    if ($outstanding <= 0.01) {
-                        $patient = $ipd->patient;
+                    $patient = $ipd->patient;
                         
                         // Apply search filter if provided
                         if (!empty($searchTerm)) {
@@ -3160,7 +3159,7 @@ class IpdBillingController extends Controller
                             }
                         }
                         
-                        $patientsWithZeroBalance[] = [
+                    $patientsWithZeroBalance[] = [
                             'ipd_id' => $ipd->id,
                             'ipd_no' => $ipd->ipd_no ?? 'N/A',
                             'admission_date' => $ipd->date ?? null,
@@ -3186,7 +3185,8 @@ class IpdBillingController extends Controller
                             'billing' => [
                                 'total_charges' => round($breakup['total_charges'] ?? 0, 2),
                                 'total_payments' => round($breakup['total_payments'] ?? 0, 2),
-                                'outstanding' => round($outstanding, 2),
+                                'gross_outstanding' => round($outstanding, 2),
+                                'outstanding' => round($netBalance, 2),
                                 'total_discount' => round($totalDiscount, 2),
                                 'due_patient_party_amount' => round($duePatientPartyAmount, 2),
                                 'net_balance' => round($netBalance, 2),
@@ -3201,8 +3201,7 @@ class IpdBillingController extends Controller
                                 'cgst_charges' => round($breakup['cgst_charges'] ?? 0, 2),
                                 'sgst_charges' => round($breakup['sgst_charges'] ?? 0, 2),
                             ],
-                        ];
-                    }
+                    ];
                 } catch (\Exception $e) {
                     \Log::warning('Error calculating balance for IPD ' . $ipd->id . ': ' . $e->getMessage());
                     continue;
@@ -3243,13 +3242,13 @@ class IpdBillingController extends Controller
     public function showDischargedPatientsWithZeroBalance(Request $request)
     {
         try {
-            $perPage = (int) $request->get('per_page', 25);
+            $perPage = (int) $request->get('per_page', 10);
             $page = (int) $request->get('page', 1);
             $sortBy = $request->get('sort_by', 'discharged_date');
             $sortOrder = $request->get('sort_order', 'desc');
 
             // Validate pagination
-            if ($perPage <= 0) $perPage = 25;
+            if ($perPage <= 0) $perPage = 10;
             if ($page <= 0) $page = 1;
             if (!in_array($sortOrder, ['asc', 'desc'])) $sortOrder = 'desc';
 
@@ -3259,9 +3258,7 @@ class IpdBillingController extends Controller
                 ->orderBy($sortBy, $sortOrder);
 
             $totalCount = $query->count();
-            $ipdDetails = $query->offset(($page - 1) * $perPage)
-                ->limit($perPage)
-                ->get();
+            $ipdDetails = $query->get();
 
             $patientsWithZeroBalance = [];
 
@@ -3269,18 +3266,17 @@ class IpdBillingController extends Controller
                 try {
                     // Calculate breakup
                     $endDate = $this->resolveBillingEndDateForIpd($ipd);
-                    $breakup = $this->calculateBreakup($ipd->id, $endDate);
+                    $billStage = !empty($ipd->final_bill_generated_at) ? IpdCharges::STAGE_FINAL_BILL : null;
+                    $breakup = $this->calculateBreakup($ipd->id, $endDate, $billStage);
 
                     // Calculate net balance
                     $totalDiscount = (float) ($ipd->mou_discount ?? 0) + (float) ($ipd->special_discount ?? 0);
                     $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
                     $outstanding = (float) ($breakup['outstanding'] ?? 0);
-                    $netBalance = $outstanding - $totalDiscount - $duePatientPartyAmount;
+                    $netBalance = max(0, $outstanding - $totalDiscount - $duePatientPartyAmount);
 
-                    // Only include if truly paid in full: outstanding <= 0
-                    if ($outstanding <= 0.01) {
-                        $patient = $ipd->patient;
-                        $patientsWithZeroBalance[] = [
+                    $patient = $ipd->patient;
+                    $patientsWithZeroBalance[] = [
                             'ipd_id' => $ipd->id,
                             'ipd_no' => $ipd->ipd_no ?? 'N/A',
                             'admission_date' => $ipd->date ?? null,
@@ -3292,10 +3288,11 @@ class IpdBillingController extends Controller
                             'bed_info' => ($ipd->bedDetail?->name ?? '-') . ' - ' . ($ipd->bedGroup?->name ?? '-'),
                             'total_charges' => round($breakup['total_charges'] ?? 0, 2),
                             'total_payments' => round($breakup['total_payments'] ?? 0, 2),
-                            'outstanding' => round($outstanding, 2),
-                            'credit_limit' => $ipd->credit_limit ?? 0,
-                        ];
-                    }
+                            'due_patient_party_amount' => round($duePatientPartyAmount, 2),
+                            'gross_outstanding' => round($outstanding, 2),
+                            'outstanding' => round($netBalance, 2),
+                            'net_balance' => round($netBalance, 2),
+                    ];
                 } catch (\Exception $e) {
                     \Log::warning('Error calculating balance for IPD ' . $ipd->id . ': ' . $e->getMessage());
                     continue;
@@ -3303,6 +3300,11 @@ class IpdBillingController extends Controller
             }
 
             $totalFiltered = count($patientsWithZeroBalance);
+            $patientsWithZeroBalance = array_slice(
+                $patientsWithZeroBalance,
+                ($page - 1) * $perPage,
+                $perPage
+            );
 
             return view('admin.ipd.discharged-zero-balance', [
                 'patients' => $patientsWithZeroBalance,

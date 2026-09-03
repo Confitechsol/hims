@@ -6,7 +6,7 @@
             <div class="card-header d-flex justify-content-between align-items-center"
                 style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
                 <h5 class="mb-0" style="color: #750096">
-                    <i class="fas fa-check-circle me-2"></i> Discharged Patients - Full Payment
+                    <i class="fas fa-check-circle me-2"></i> Discharged Patients - Billing Summary
                 </h5>
                 <div>
                     <a href="{{ route('ipd') }}" class="btn btn-outline-light btn-sm">
@@ -43,7 +43,7 @@
                     <div class="col-md-6">
                         <div class="card bg-light">
                             <div class="card-body">
-                                <h6 class="text-muted mb-2">Fully Paid Patients</h6>
+                                <h6 class="text-muted mb-2">Discharged Patients Shown</h6>
                                 <h3 class="mb-0 text-success">{{ $pagination['total_zero_balance'] }}</h3>
                             </div>
                         </div>
@@ -89,8 +89,7 @@
                                 <th>Bed</th>
                                 <th class="text-end">Total Billing (INR)</th>
                                 <th class="text-end">Total Payment (INR)</th>
-                                <th class="text-end">Outstanding (INR)</th>
-                                <th class="text-end">Credit Limit (INR)</th>
+                                <th class="text-end">Outstanding (before discount) (INR)</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -118,18 +117,18 @@
                                         <span class="fw-bold text-success">{{ number_format($patient['total_payments'], 2) }}</span>
                                     </td>
                                     <td class="text-end">
-                                        @if ($patient['outstanding'] <= 0.01)
+                                        @php
+                                            $outstandingAmount = max(0, (float) ($patient['gross_outstanding'] ?? 0));
+                                        @endphp
+                                        @if ($outstandingAmount <= 0.01)
                                             <span class="badge bg-success-subtle text-success">
                                                 ₹ 0.00
                                             </span>
                                         @else
                                             <span class="badge bg-danger-subtle text-danger">
-                                                ₹ {{ number_format($patient['outstanding'], 2) }}
+                                                ₹ {{ number_format($outstandingAmount, 2) }}
                                             </span>
                                         @endif
-                                    </td>
-                                    <td class="text-end">
-                                        {{ number_format($patient['credit_limit'] ?? 0, 2) }}
                                     </td>
                                     <td>
                                         <a href="{{ route('ipd.billing.export.final', ['ipdId' => $patient['ipd_id'], 'bill_stage' => 'final_bill']) }}"
@@ -143,7 +142,7 @@
                             @empty
                                 <tr>
                                     <td colspan="11" class="text-center py-4">
-                                        <p class="text-muted mb-0">No fully paid discharged patients found.</p>
+                                        <p class="text-muted mb-0">No discharged patients found.</p>
                                     </td>
                                 </tr>
                             @endforelse
