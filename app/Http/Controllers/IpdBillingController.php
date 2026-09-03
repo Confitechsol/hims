@@ -97,6 +97,125 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * API: Get patient balance details (net_balance, payments, outstanding)
+     * Returns net_balance or total payments balance if net_balance is zero
+     */
+    public function getPatientBalance(Request $request)
+    {
+        try {
+            $ipdId = $request->get('ipd_id');
+            $patientId = $request->get('patient_id');
+
+            if (!$ipdId && !$patientId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Either ipd_id or patient_id is required',
+                ], 400);
+            }
+
+            // Get IPD details
+            $ipd = null;
+            if ($ipdId) {
+                $ipd = IpdDetail::with(['patient', 'duePatientPartyDoctor'])
+                    ->find($ipdId);
+            } elseif ($patientId) {
+                // Get latest IPD for patient
+                $ipd = IpdDetail::with(['patient', 'duePatientPartyDoctor'])
+                    ->where('patient_id', $patientId)
+                    ->orderBy('date', 'desc')
+                    ->first();
+            }
+
+            if (!$ipd) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'IPD record not found',
+                ], 404);
+            }
+
+            $patient = $ipd->patient;
+            if (!$patient) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Patient details not found',
+                ], 404);
+            }
+
+            // Calculate breakup
+            $endDate = $this->resolveBillingEndDateForIpd($ipd);
+            $breakup = $this->calculateBreakup($ipd->id, $endDate);
+
+            // Calculate net balance
+            $totalDiscount = (float) ($ipd->mou_discount ?? 0) + (float) ($ipd->special_discount ?? 0);
+            $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
+            $outstanding = (float) ($breakup['outstanding'] ?? 0);
+            $netBalance = max(0, $outstanding - $totalDiscount - $duePatientPartyAmount);
+            $totalPayments = (float) ($breakup['total_payments'] ?? 0);
+            $totalCharges = (float) ($breakup['total_charges'] ?? 0);
+
+            // If net_balance is 0, show outstanding or total_payments balance
+            $balanceToShow = $netBalance;
+            if ($netBalance == 0) {
+                $balanceToShow = max(0, $totalCharges - $totalPayments);
+            }
+
+            return response()->json([
+                'success' => true,
+                'patient' => [
+                    'id' => $patient->id,
+                    'patient_name' => $patient->patient_name ?? 'N/A',
+                    'patient_id_no' => $patient->patient_id_no ?? '',
+                    'phone' => $patient->mobileno ?? '',
+                    'email' => $patient->email ?? '',
+                    'address' => $patient->address ?? '',
+                    'age' => $patient->age ?? '',
+                    'gender' => $patient->gender ?? '',
+                ],
+                'ipd' => [
+                    'id' => $ipd->id,
+                    'ipd_no' => $ipd->ipd_no ?? 'N/A',
+                    'admission_date' => $ipd->date ?? null,
+                    'discharged' => $ipd->discharged ?? 'no',
+                    'discharged_date' => $ipd->discharged_date ?? null,
+                    'is_insurance' => $ipd->isInsuranceBilling() ? 'yes' : 'no',
+                ],
+                'billing' => [
+                    'total_charges' => round($totalCharges, 2),
+                    'total_payments' => round($totalPayments, 2),
+                    'outstanding' => round($outstanding, 2),
+                    'total_discount' => round($totalDiscount, 2),
+                    'due_patient_party_amount' => round($duePatientPartyAmount, 2),
+                    'net_balance' => round($netBalance, 2),
+                    'balance_to_show' => round($balanceToShow, 2),
+                ],
+                'breakup' => [
+                    'bed_charges' => round($breakup['bed_charges'] ?? 0, 2),
+                    'ipd_charges' => round($breakup['ipd_charges'] ?? 0, 2),
+                    'pathology_charges' => round($breakup['pathology_charges'] ?? 0, 2),
+                    'radiology_charges' => round($breakup['radiology_charges'] ?? 0, 2),
+                    'doctor_visit_charges' => round($breakup['doctor_visit_charges'] ?? 0, 2),
+                    'package_charges' => round($breakup['package_charges'] ?? 0, 2),
+                    'cgst_charges' => round($breakup['cgst_charges'] ?? 0, 2),
+                    'sgst_charges' => round($breakup['sgst_charges'] ?? 0, 2),
+                ],
+                'message' => $netBalance == 0 
+                    ? 'Net balance is zero. Balance to show is calculated from total charges minus payments.' 
+                    : 'Balance calculated successfully',
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Get patient balance failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error while fetching patient balance: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Get breakup bill for IPD patient
      */
     public function breakup($ipdId)
@@ -3034,6 +3153,228 @@ class IpdBillingController extends Controller
             }
             
             abort(500, $errorMessage);
+        }
+    }
+
+    /**
+     * API: Get all discharged patients with zero net balance
+     * Returns list of patients who have been discharged and have Net Balance (Due) = 0
+     */
+    public function getDischargedPatientsWithZeroBalance(Request $request)
+    {
+        try {
+            $perPage = intval($request->input('perPage', 50));
+            $page = intval($request->input('page', 1));
+            $sortBy = $request->get('sort_by', 'discharged_date');
+            $sortOrder = $request->get('sort_order', 'desc');
+            $searchTerm = $request->get('search', '');
+
+            if ($perPage <= 0) {
+                $perPage = 50;
+            }
+            if ($page <= 0) {
+                $page = 1;
+            }
+            if (!in_array($sortOrder, ['asc', 'desc'])) {
+                $sortOrder = 'desc';
+            }
+
+            // Get all discharged IPDs with related data
+            $ipdDetails = IpdDetail::with(['patient', 'doctor', 'organisation'])
+                ->where('discharged', 'yes')
+                ->orderBy($sortBy, $sortOrder)
+                ->get();
+
+            $patientsWithZeroBalance = [];
+
+            foreach ($ipdDetails as $ipd) {
+                try {
+                    // Calculate breakup
+                    $endDate = $this->resolveBillingEndDateForIpd($ipd);
+                    $breakup = $this->calculateBreakup($ipd->id, $endDate);
+
+                    // Calculate net balance
+                    $totalDiscount = (float) ($ipd->mou_discount ?? 0) + (float) ($ipd->special_discount ?? 0);
+                    $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
+                    $outstanding = (float) ($breakup['outstanding'] ?? 0);
+                    $netBalance = $outstanding - $totalDiscount - $duePatientPartyAmount;
+
+                    // Only include if truly paid in full: outstanding <= 0 (allows for rounding errors)
+                    if ($outstanding <= 0.01) {
+                        $patient = $ipd->patient;
+                        
+                        // Apply search filter if provided
+                        if (!empty($searchTerm)) {
+                            $ipdNo = $ipd->ipd_no ?? '';
+                            $patientName = $patient ? ($patient->patient_name ?? '') : '';
+                            
+                            // Check if search term matches IPD No or Patient Name
+                            if (stripos($ipdNo, $searchTerm) === false && stripos($patientName, $searchTerm) === false) {
+                                continue;
+                            }
+                        }
+                        
+                        $patientsWithZeroBalance[] = [
+                            'ipd_id' => $ipd->id,
+                            'ipd_no' => $ipd->ipd_no ?? 'N/A',
+                            'admission_date' => $ipd->date ?? null,
+                            'discharge_date' => $ipd->discharged_date ?? null,
+                            'patient' => [
+                                'id' => $patient ? $patient->id : null,
+                                'patient_name' => $patient ? ($patient->patient_name ?? 'N/A') : 'N/A',
+                                'patient_id_no' => $patient ? ($patient->patient_id_no ?? '') : '',
+                                'phone' => $patient ? ($patient->mobileno ?? '') : '',
+                                'email' => $patient ? ($patient->email ?? '') : '',
+                                'age' => $patient ? ($patient->age ?? '') : '',
+                                'gender' => $patient ? ($patient->gender ?? '') : '',
+                            ],
+                            'doctor' => [
+                                'id' => $ipd->doctor ? $ipd->doctor->id : null,
+                                'name' => $ipd->doctor ? ($ipd->doctor->name ?? '') : '',
+                                'surname' => $ipd->doctor ? ($ipd->doctor->surname ?? '') : '',
+                            ],
+                            'organisation' => [
+                                'id' => $ipd->organisation ? $ipd->organisation->id : null,
+                                'name' => $ipd->organisation ? ($ipd->organisation->organisation_name ?? '') : '',
+                            ],
+                            'billing' => [
+                                'total_charges' => round($breakup['total_charges'] ?? 0, 2),
+                                'total_payments' => round($breakup['total_payments'] ?? 0, 2),
+                                'outstanding' => round($outstanding, 2),
+                                'total_discount' => round($totalDiscount, 2),
+                                'due_patient_party_amount' => round($duePatientPartyAmount, 2),
+                                'net_balance' => round($netBalance, 2),
+                            ],
+                            'breakup' => [
+                                'bed_charges' => round($breakup['bed_charges'] ?? 0, 2),
+                                'ipd_charges' => round($breakup['ipd_charges'] ?? 0, 2),
+                                'pathology_charges' => round($breakup['pathology_charges'] ?? 0, 2),
+                                'radiology_charges' => round($breakup['radiology_charges'] ?? 0, 2),
+                                'doctor_visit_charges' => round($breakup['doctor_visit_charges'] ?? 0, 2),
+                                'package_charges' => round($breakup['package_charges'] ?? 0, 2),
+                                'cgst_charges' => round($breakup['cgst_charges'] ?? 0, 2),
+                                'sgst_charges' => round($breakup['sgst_charges'] ?? 0, 2),
+                            ],
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Error calculating balance for IPD ' . $ipd->id . ': ' . $e->getMessage());
+                    continue;
+                }
+            }
+
+            // Apply pagination to filtered results
+            $totalCount = count($patientsWithZeroBalance);
+            $paginatedData = array_slice($patientsWithZeroBalance, ($page - 1) * $perPage, $perPage);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Discharged patients with zero balance retrieved successfully',
+                'pagination' => [
+                    'total_zero_balance' => $totalCount,
+                    'current_page' => $page,
+                    'per_page' => $perPage,
+                    'pages' => ceil($totalCount / $perPage),
+                ],
+                'data' => $paginatedData,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Get discharged patients with zero balance failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error while fetching discharged patients with zero balance: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Display view for discharged patients with zero balance
+     */
+    public function showDischargedPatientsWithZeroBalance(Request $request)
+    {
+        try {
+            $perPage = (int) $request->get('per_page', 25);
+            $page = (int) $request->get('page', 1);
+            $sortBy = $request->get('sort_by', 'discharged_date');
+            $sortOrder = $request->get('sort_order', 'desc');
+
+            // Validate pagination
+            if ($perPage <= 0) $perPage = 25;
+            if ($page <= 0) $page = 1;
+            if (!in_array($sortOrder, ['asc', 'desc'])) $sortOrder = 'desc';
+
+            // Get all discharged IPDs with related data
+            $query = IpdDetail::with(['patient', 'doctor', 'organisation', 'bedDetail', 'bedGroup'])
+                ->where('discharged', 'yes')
+                ->orderBy($sortBy, $sortOrder);
+
+            $totalCount = $query->count();
+            $ipdDetails = $query->offset(($page - 1) * $perPage)
+                ->limit($perPage)
+                ->get();
+
+            $patientsWithZeroBalance = [];
+
+            foreach ($ipdDetails as $ipd) {
+                try {
+                    // Calculate breakup
+                    $endDate = $this->resolveBillingEndDateForIpd($ipd);
+                    $breakup = $this->calculateBreakup($ipd->id, $endDate);
+
+                    // Calculate net balance
+                    $totalDiscount = (float) ($ipd->mou_discount ?? 0) + (float) ($ipd->special_discount ?? 0);
+                    $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
+                    $outstanding = (float) ($breakup['outstanding'] ?? 0);
+                    $netBalance = $outstanding - $totalDiscount - $duePatientPartyAmount;
+
+                    // Only include if truly paid in full: outstanding <= 0
+                    if ($outstanding <= 0.01) {
+                        $patient = $ipd->patient;
+                        $patientsWithZeroBalance[] = [
+                            'ipd_id' => $ipd->id,
+                            'ipd_no' => $ipd->ipd_no ?? 'N/A',
+                            'admission_date' => $ipd->date ?? null,
+                            'discharge_date' => $ipd->discharged_date ?? null,
+                            'patient_name' => $patient ? ($patient->patient_name ?? 'N/A') : 'N/A',
+                            'guardian_phone' => $patient ? ($patient->guardian_phone ?? '-') : '-',
+                            'phone' => $patient ? ($patient->mobileno ?? '-') : '-',
+                            'consultant_name' => $ipd->doctor ? ($ipd->doctor->name ?? '') : '-',
+                            'bed_info' => ($ipd->bedDetail?->name ?? '-') . ' - ' . ($ipd->bedGroup?->name ?? '-'),
+                            'total_charges' => round($breakup['total_charges'] ?? 0, 2),
+                            'total_payments' => round($breakup['total_payments'] ?? 0, 2),
+                            'outstanding' => round($outstanding, 2),
+                            'credit_limit' => $ipd->credit_limit ?? 0,
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Error calculating balance for IPD ' . $ipd->id . ': ' . $e->getMessage());
+                    continue;
+                }
+            }
+
+            $totalFiltered = count($patientsWithZeroBalance);
+
+            return view('admin.ipd.discharged-zero-balance', [
+                'patients' => $patientsWithZeroBalance,
+                'pagination' => [
+                    'total_all_discharged' => $totalCount,
+                    'total_zero_balance' => $totalFiltered,
+                    'current_page' => $page,
+                    'per_page' => $perPage,
+                    'total_pages' => ceil($totalFiltered / $perPage),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Show discharged patients view failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->back()->with('error', 'Error while loading discharged patients with zero balance: ' . $e->getMessage());
         }
     }
 }

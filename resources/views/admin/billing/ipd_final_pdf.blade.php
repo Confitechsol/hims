@@ -609,11 +609,11 @@
                                     </td>
                                 </tr>
                             @endif
-                            <tr>
+                            {{-- <tr>
                                 <td class="patient_label">URN</td>
                                 <td class="patient_colon">:</td>
                                 <td class="patient_value">{{ $ipd->urn ?? '' }}</td>
-                            </tr>
+                            </tr> --}}
                         </table>
                     </td>
                 </tr>

@@ -59,7 +59,7 @@ class IpdController extends Controller
         $fromDate    = $request->get('from_date');
         $toDate      = $request->get('to_date');
         $draftFilter = $request->get('draft_filter');
-        $perPage     = intval($request->input('per_page', 50));
+        $perPage     = intval($request->input('per_page', 10));
         if ($perPage <= 0) {
             $perPage = 10;
         }

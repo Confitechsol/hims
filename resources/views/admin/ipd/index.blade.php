@@ -31,6 +31,14 @@
                                 Discharged Patient
                             </a>
                         </li>
+                      <li class="nav-item">
+                          <a class="nav-link mb-0 text-white"
+                             href="{{ route('ipd.billing.discharged.zero.balance') }}">
+                              Final Bill
+                          </a>
+                      </li>
+
+
                     </ul>
 
                 </div>
@@ -240,8 +248,8 @@
                                                         <th>IPD No.</th>
                                                         <th>Name</th>
                                                         <th>Phone</th>
-                                                        <th>Email</th>
-                                                        <th>Address</th>
+                                                        {{-- <th>Email</th> --}}
+                                                        {{-- <th>Address</th> --}}
                                                         <th>Gender</th>
                                                         <th>Consultant</th>
                                                         <th>Discharged Date</th>
@@ -259,7 +267,7 @@
                                                     @endif
                                                     @foreach ($ipd as $ipdDetails)
                                                         <tr>
-                                                            <td>{{ $loop->iteration }}</td>
+                                                            <td>{{ $ipd->firstItem() + $loop->index }}</td>
                                                             <td><a href="{{ route('ipd.show', ['id' => $ipdDetails->id]) }}"
                                                                     class="text-primary">{{ $ipdDetails->ipd_no }}</a>
                                                                 @if (strtolower(trim($ipdDetails->discharged)) === 'draft')
@@ -277,8 +285,8 @@
                                                             <td>{{ optional($ipdDetails->patient)->patient_name ?? '-' }}
                                                             </td>
                                                             <td>{{ optional($ipdDetails->patient)->mobileno ?? '-' }}</td>
-                                                            <td>{{ optional($ipdDetails->patient)->email ?? '-' }}</td>
-                                                            <td>{{ optional($ipdDetails->patient)->address ?? '-' }}</td>
+                                                            {{-- <td>{{ optional($ipdDetails->patient)->email ?? '-' }}</td>
+                                                            <td>{{ optional($ipdDetails->patient)->address ?? '-' }}</td> --}}
                                                             <td>{{ optional($ipdDetails->patient)->gender ?? '-' }}</td>
                                                             <td>{{ $ipdDetails->doctor->name ?? '-' }}</td>
                                                             <td>{{ \Carbon\Carbon::parse($ipdDetails->discharged_date)->format('d-M-Y') ?? '-' }}
@@ -296,7 +304,6 @@
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
-
                                             </table>
                                         </div>
                                             {{-- Pagination Links --}}

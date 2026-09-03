@@ -695,6 +695,9 @@ Route::get('/billing', function () {
 // IPD Billing Routes
 Route::prefix('ipd/billing')->group(function () {
     Route::get('/search', [IpdBillingController::class, 'search'])->name('ipd.billing.search');
+    Route::get('/patient-balance', [IpdBillingController::class, 'getPatientBalance'])->name('ipd.billing.patient.balance');
+    Route::get('/discharged-zero-balance', [IpdBillingController::class, 'showDischargedPatientsWithZeroBalance'])->name('ipd.billing.discharged.zero.balance');
+    Route::get('/discharged-zero-balance/api', [IpdBillingController::class, 'getDischargedPatientsWithZeroBalance'])->name('ipd.billing.discharged.zero.balance.api');
     Route::get('/{ipdId}/breakup', [IpdBillingController::class, 'breakup'])->name('ipd.billing.breakup');
     Route::post('/{ipdId}/discount', [IpdBillingController::class, 'updateDiscount'])->name('ipd.billing.discount.update');
     Route::post('/{ipdId}/due-patient-party', [IpdBillingController::class, 'updateDuePatientParty'])->name('ipd.billing.due.patient.party.update');

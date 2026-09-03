@@ -424,34 +424,43 @@ class MoneyReceiptController extends Controller
      */
     public function searchIpd(Request $request)
     {
-        $search = $request->get('search', '');
-        
-        $query = IpdDetail::with(['patient', 'doctor']);
-        
-        if (!empty($search)) {
-            $query->where(function($q) use ($search) {
-                $q->where('ipd_no', 'LIKE', "%{$search}%")
-                  ->orWhereHas('patient', function($subQ) use ($search) {
-                      $subQ->where('patient_name', 'LIKE', "%{$search}%")
-                           ->orWhere('mobileno', 'LIKE', "%{$search}%");
-                  });
+        try {
+            $search = $request->get('search', '');
+            
+            $query = IpdDetail::with(['patient', 'doctor']);
+            
+            if (!empty($search)) {
+                $query->where(function($q) use ($search) {
+                    $q->where('ipd_no', 'LIKE', "%{$search}%")
+                      ->orWhereHas('patient', function($subQ) use ($search) {
+                          $subQ->where('patient_name', 'LIKE', "%{$search}%")
+                               ->orWhere('mobileno', 'LIKE', "%{$search}%");
+                      });
+                });
+            }
+
+            $ipds = $query->orderBy('date', 'desc')->limit(50)->get();
+
+            $data = $ipds->map(function($ipd) {
+                return [
+                    'id' => $ipd->id,
+                    'ipd_no' => $ipd->ipd_no ?? 'N/A',
+                    'patient_name' => $ipd->patient->patient_name ?? 'N/A',
+                    'patient_id' => $ipd->patient_id,
+                    'phone' => $ipd->patient->mobileno ?? '',
+                    'display_text' => ($ipd->ipd_no ?? 'N/A') . ' - ' . ($ipd->patient->patient_name ?? 'N/A'),
+                ];
             });
+
+            return response()->json(['data' => $data]);
+        } catch (\Exception $e) {
+            \Log::error('Search IPD failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json([
+                'data' => [],
+                'error' => 'An error occurred while searching for IPD records',
+                'message' => $e->getMessage()
+            ], 500);
         }
-
-        $ipds = $query->orderBy('date', 'desc')->limit(50)->get();
-
-        $data = $ipds->map(function($ipd) {
-            return [
-                'id' => $ipd->id,
-                'ipd_no' => $ipd->ipd_no ?? 'N/A',
-                'patient_name' => $ipd->patient->patient_name ?? 'N/A',
-                'patient_id' => $ipd->patient_id,
-                'phone' => $ipd->patient->mobileno ?? '',
-                'display_text' => ($ipd->ipd_no ?? 'N/A') . ' - ' . ($ipd->patient->patient_name ?? 'N/A'),
-            ];
-        });
-
-        return response()->json(['data' => $data]);
     }
 
     /**
@@ -459,128 +468,149 @@ class MoneyReceiptController extends Controller
      */
     public function searchPatient(Request $request)
     {
-        $search = $request->get('search', '');
-        
-        // Log for debugging
-        \Log::info('Patient search called', ['search' => $search]);
-        
-        $results = [];
-        
-        if (!empty($search) && strlen($search) >= 2) {
-            // Escape special characters for LIKE query
-            $searchEscaped = str_replace(['%', '_'], ['\%', '\_'], $search);
+        try {
+            $search = $request->get('search', '');
             
-            // Search IPD patients
-            $ipds = IpdDetail::with('patient')
-                ->where(function($q) use ($searchEscaped) {
-                    $q->where('ipd_no', 'LIKE', "%{$searchEscaped}%")
-                      ->orWhereHas('patient', function($subQ) use ($searchEscaped) {
-                          $subQ->where('patient_name', 'LIKE', "%{$searchEscaped}%")
-                               ->orWhere('mobileno', 'LIKE', "%{$searchEscaped}%");
-                      });
-                })
-                ->orderBy('date', 'desc')
-                ->limit(50)
-                ->get();
+            // Log for debugging
+            \Log::info('Patient search called', ['search' => $search]);
             
-            foreach ($ipds as $ipd) {
-                if ($ipd->patient) {
-                    $patient = $ipd->patient;
-                    $results[] = [
-                        'id' => $ipd->patient_id,
-                        'patient_name' => $patient->patient_name ?? 'N/A',
-                        'phone' => $patient->mobileno ?? '',
-                        'address' => $patient->address ?? '',
-                        'age' => $patient->age ?? '',
-                        'gender' => $patient->gender ?? '',
-                        'marital_status' => $patient->marital_status ?? '',
-                        'guardian_name' => $patient->guardian_name ?? '',
-                        'area' => $patient->area ?? '',
-                        'bill_type' => 'IPD',
-                        'bill_no' => $ipd->ipd_no,
-                        'bill_id' => $ipd->id,
-                        'display_text' => ($ipd->ipd_no ?? 'N/A') . ' - ' . ($patient->patient_name ?? 'N/A') . ' (IPD)',
-                    ];
-                }
-            }
-
-            // Search OPD patients
-            $opds = OpdDetail::with('patient')
-                ->where(function($q) use ($searchEscaped) {
-                    $q->where('opd_no', 'LIKE', "%{$searchEscaped}%")
-                      ->orWhereHas('patient', function($subQ) use ($searchEscaped) {
-                          $subQ->where('patient_name', 'LIKE', "%{$searchEscaped}%")
-                               ->orWhere('mobileno', 'LIKE', "%{$searchEscaped}%");
-                      });
-                })
-                ->orderBy('appointment_date', 'desc')
-                ->limit(50)
-                ->get();
+            $results = [];
             
-            foreach ($opds as $opd) {
-                if ($opd->patient) {
-                    $patient = $opd->patient;
-                    $results[] = [
-                        'id' => $opd->patient_id,
-                        'patient_name' => $patient->patient_name ?? 'N/A',
-                        'phone' => $patient->mobileno ?? '',
-                        'address' => $patient->address ?? '',
-                        'age' => $patient->age ?? '',
-                        'gender' => $patient->gender ?? '',
-                        'marital_status' => $patient->marital_status ?? '',
-                        'guardian_name' => $patient->guardian_name ?? '',
-                        'area' => $patient->area ?? '',
-                        'bill_type' => 'OPD',
-                        'bill_no' => $opd->opd_no,
-                        'bill_id' => $opd->id,
-                        'display_text' => ($opd->opd_no ?? 'N/A') . ' - ' . ($patient->patient_name ?? 'N/A') . ' (OPD)',
-                    ];
-                }
-            }
-
-            // Also search patients directly (in case they don't have IPD/OPD records yet)
-            $directPatients = Patient::where(function($q) use ($searchEscaped) {
-                    $q->where('patient_name', 'LIKE', "%{$searchEscaped}%")
-                      ->orWhere('mobileno', 'LIKE', "%{$searchEscaped}%");
-                })
-                ->orderBy('id', 'desc')
-                ->limit(20)
-                ->get();
-            
-            foreach ($directPatients as $patient) {
-                // Check if this patient is already in results
-                $exists = false;
-                foreach ($results as $result) {
-                    if ($result['id'] == $patient->id) {
-                        $exists = true;
-                        break;
-                    }
-                }
+            if (!empty($search) && strlen($search) >= 2) {
+                // Escape special characters for LIKE query
+                $searchEscaped = str_replace(['%', '_'], ['\%', '\_'], $search);
                 
-                if (!$exists) {
-                    $results[] = [
-                        'id' => $patient->id,
-                        'patient_name' => $patient->patient_name ?? 'N/A',
-                        'phone' => $patient->mobileno ?? '',
-                        'address' => $patient->address ?? '',
-                        'age' => $patient->age ?? '',
-                        'gender' => $patient->gender ?? '',
-                        'marital_status' => $patient->marital_status ?? '',
-                        'guardian_name' => $patient->guardian_name ?? '',
-                        'area' => $patient->area ?? '',
-                        'bill_type' => '',
-                        'bill_no' => '',
-                        'bill_id' => '',
-                        'display_text' => ($patient->patient_name ?? 'N/A') . ' (No IPD/OPD)',
-                    ];
+                // Search IPD patients
+                try {
+                    $ipds = IpdDetail::with('patient')
+                        ->where(function($q) use ($searchEscaped) {
+                            $q->where('ipd_no', 'LIKE', "%{$searchEscaped}%")
+                              ->orWhereHas('patient', function($subQ) use ($searchEscaped) {
+                                  $subQ->where('patient_name', 'LIKE', "%{$searchEscaped}%")
+                                       ->orWhere('mobileno', 'LIKE', "%{$searchEscaped}%");
+                              });
+                        })
+                        ->orderBy('date', 'desc')
+                        ->limit(50)
+                        ->get();
+                    
+                    foreach ($ipds as $ipd) {
+                        if ($ipd->patient) {
+                            $patient = $ipd->patient;
+                            $results[] = [
+                                'id' => $ipd->patient_id,
+                                'patient_name' => $patient->patient_name ?? 'N/A',
+                                'phone' => $patient->mobileno ?? '',
+                                'address' => $patient->address ?? '',
+                                'age' => $patient->age ?? '',
+                                'gender' => $patient->gender ?? '',
+                                'marital_status' => $patient->marital_status ?? '',
+                                'guardian_name' => $patient->guardian_name ?? '',
+                                'area' => $patient->area ?? '',
+                                'bill_type' => 'IPD',
+                                'bill_no' => $ipd->ipd_no,
+                                'bill_id' => $ipd->id,
+                                'display_text' => ($ipd->ipd_no ?? 'N/A') . ' - ' . ($patient->patient_name ?? 'N/A') . ' (IPD)',
+                            ];
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Error searching IPD patients', ['error' => $e->getMessage(), 'search' => $search]);
+                }
+
+                // Search OPD patients
+                try {
+                    $opds = OpdDetail::with('patient')
+                        ->where(function($q) use ($searchEscaped) {
+                            $q->where('opd_no', 'LIKE', "%{$searchEscaped}%")
+                              ->orWhereHas('patient', function($subQ) use ($searchEscaped) {
+                                  $subQ->where('patient_name', 'LIKE', "%{$searchEscaped}%")
+                                       ->orWhere('mobileno', 'LIKE', "%{$searchEscaped}%");
+                              });
+                        })
+                        ->orderBy('appointment_date', 'desc')
+                        ->limit(50)
+                        ->get();
+                    
+                    foreach ($opds as $opd) {
+                        if ($opd->patient) {
+                            $patient = $opd->patient;
+                            $results[] = [
+                                'id' => $opd->patient_id,
+                                'patient_name' => $patient->patient_name ?? 'N/A',
+                                'phone' => $patient->mobileno ?? '',
+                                'address' => $patient->address ?? '',
+                                'age' => $patient->age ?? '',
+                                'gender' => $patient->gender ?? '',
+                                'marital_status' => $patient->marital_status ?? '',
+                                'guardian_name' => $patient->guardian_name ?? '',
+                                'area' => $patient->area ?? '',
+                                'bill_type' => 'OPD',
+                                'bill_no' => $opd->opd_no,
+                                'bill_id' => $opd->id,
+                                'display_text' => ($opd->opd_no ?? 'N/A') . ' - ' . ($patient->patient_name ?? 'N/A') . ' (OPD)',
+                            ];
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Error searching OPD patients', ['error' => $e->getMessage(), 'search' => $search]);
+                }
+
+                // Also search patients directly (in case they don't have IPD/OPD records yet)
+                try {
+                    $directPatients = Patient::where(function($q) use ($searchEscaped) {
+                            $q->where('patient_name', 'LIKE', "%{$searchEscaped}%")
+                              ->orWhere('mobileno', 'LIKE', "%{$searchEscaped}%");
+                        })
+                        ->orderBy('id', 'desc')
+                        ->limit(20)
+                        ->get();
+                    
+                    foreach ($directPatients as $patient) {
+                        // Check if this patient is already in results
+                        $exists = false;
+                        foreach ($results as $result) {
+                            if ($result['id'] == $patient->id) {
+                                $exists = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!$exists) {
+                            $results[] = [
+                                'id' => $patient->id,
+                                'patient_name' => $patient->patient_name ?? 'N/A',
+                                'phone' => $patient->mobileno ?? '',
+                                'address' => $patient->address ?? '',
+                                'age' => $patient->age ?? '',
+                                'gender' => $patient->gender ?? '',
+                                'marital_status' => $patient->marital_status ?? '',
+                                'guardian_name' => $patient->guardian_name ?? '',
+                                'area' => $patient->area ?? '',
+                                'bill_type' => '',
+                                'bill_no' => '',
+                                'bill_id' => '',
+                                'display_text' => ($patient->patient_name ?? 'N/A') . ' (No IPD/OPD)',
+                            ];
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Error searching direct patients', ['error' => $e->getMessage(), 'search' => $search]);
                 }
             }
-        }
 
-        // Log results for debugging
-        \Log::info('Patient search results', ['count' => count($results), 'search' => $search]);
-        
-        return response()->json(['data' => $results]);
+            // Log results for debugging
+            \Log::info('Patient search results', ['count' => count($results), 'search' => $search]);
+            
+            return response()->json(['data' => $results]);
+        } catch (\Exception $e) {
+            \Log::error('Patient search failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json([
+                'data' => [],
+                'error' => 'An error occurred while searching for patients',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -588,50 +618,60 @@ class MoneyReceiptController extends Controller
      */
     public function getPatientFinalBill(Request $request)
     {
-        $patientId = $request->get('patient_id');
-        
-        if (!$patientId) {
-            return response()->json(['final_bill_no' => null, 'bill_type' => null, 'bill_id' => null]);
-        }
-        
-        // Check for IPD final bill (discharged IPD)
-        $ipd = IpdDetail::with('duePatientPartyDoctor')
-            ->where('patient_id', $patientId)
-            ->where('discharged', 'yes')
-            ->orderBy('discharged_date', 'desc')
-            ->orderBy('date', 'desc')
-            ->first();
-        
-        if ($ipd) {
-            return response()->json([
-                'final_bill_no' => $ipd->ipd_no,
-                'bill_type' => 'IPD',
-                'bill_id' => $ipd->id,
-                'doctor_charges' => $ipd->due_patient_party_amount ?? 0,
-                'doctor_name' => $ipd->duePatientPartyDoctor ? 
-                    ($ipd->duePatientPartyDoctor->name ?? '') . ' ' . ($ipd->duePatientPartyDoctor->surname ?? '') : '',
-            ]);
-        }
+        try {
+            $patientId = $request->get('patient_id');
+            
+            if (!$patientId) {
+                return response()->json(['final_bill_no' => null, 'bill_type' => null, 'bill_id' => null]);
+            }
+            
+            // Check for IPD final bill (discharged IPD)
+            $ipd = IpdDetail::with('duePatientPartyDoctor')
+                ->where('patient_id', $patientId)
+                ->where('discharged', 'yes')
+                ->orderBy('discharged_date', 'desc')
+                ->orderBy('date', 'desc')
+                ->first();
+            
+            if ($ipd) {
+                return response()->json([
+                    'final_bill_no' => $ipd->ipd_no,
+                    'bill_type' => 'IPD',
+                    'bill_id' => $ipd->id,
+                    'doctor_charges' => $ipd->due_patient_party_amount ?? 0,
+                    'doctor_name' => $ipd->duePatientPartyDoctor ? 
+                        ($ipd->duePatientPartyDoctor->name ?? '') . ' ' . ($ipd->duePatientPartyDoctor->surname ?? '') : '',
+                ]);
+            }
 
-        // Check for OPD (latest OPD record)
-        $opd = OpdDetail::with('doctor')
-            ->where('patient_id', $patientId)
-            ->orderBy('appointment_date', 'desc')
-            ->orderBy('id', 'desc')
-            ->first();
-        
-        if ($opd) {
+            // Check for OPD (latest OPD record)
+            $opd = OpdDetail::with('doctor')
+                ->where('patient_id', $patientId)
+                ->orderBy('appointment_date', 'desc')
+                ->orderBy('id', 'desc')
+                ->first();
+            
+            if ($opd) {
+                return response()->json([
+                    'final_bill_no' => $opd->opd_no,
+                    'bill_type' => 'OPD',
+                    'bill_id' => $opd->id,
+                    'doctor_charges' => 0,
+                    'doctor_name' => $opd->doctor ? 
+                        ($opd->doctor->name ?? '') . ' ' . ($opd->doctor->surname ?? '') : '',
+                ]);
+            }
+            
+            return response()->json(['final_bill_no' => null, 'bill_type' => null, 'bill_id' => null]);
+        } catch (\Exception $e) {
+            \Log::error('Get patient final bill failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json([
-                'final_bill_no' => $opd->opd_no,
-                'bill_type' => 'OPD',
-                'bill_id' => $opd->id,
-                'doctor_charges' => 0,
-                'doctor_name' => $opd->doctor ? 
-                    ($opd->doctor->name ?? '') . ' ' . ($opd->doctor->surname ?? '') : '',
-            ]);
+                'final_bill_no' => null,
+                'bill_type' => null,
+                'bill_id' => null,
+                'error' => 'An error occurred while fetching patient bill information'
+            ], 500);
         }
-        
-        return response()->json(['final_bill_no' => null, 'bill_type' => null, 'bill_id' => null]);
     }
 
     /**
@@ -639,24 +679,32 @@ class MoneyReceiptController extends Controller
      */
     public function getIpdDetails($ipdId)
     {
-        $ipd = IpdDetail::with(['patient', 'duePatientPartyDoctor'])
-            ->findOrFail($ipdId);
+        try {
+            $ipd = IpdDetail::with(['patient', 'duePatientPartyDoctor'])
+                ->findOrFail($ipdId);
 
-        $doctorCharges = 0;
-        $doctorName = '';
-        if ($ipd->due_patient_party_amount > 0 && $ipd->duePatientPartyDoctor) {
-            $doctorCharges = $ipd->due_patient_party_amount;
-            $doctorName = ($ipd->duePatientPartyDoctor->name ?? '') . ' ' . ($ipd->duePatientPartyDoctor->surname ?? '');
+            $doctorCharges = 0;
+            $doctorName = '';
+            if ($ipd->due_patient_party_amount > 0 && $ipd->duePatientPartyDoctor) {
+                $doctorCharges = $ipd->due_patient_party_amount;
+                $doctorName = ($ipd->duePatientPartyDoctor->name ?? '') . ' ' . ($ipd->duePatientPartyDoctor->surname ?? '');
+            }
+
+            return response()->json([
+                'ipd_no' => $ipd->ipd_no,
+                'patient_id' => $ipd->patient_id,
+                'patient_name' => $ipd->patient->patient_name ?? '',
+                'phone' => $ipd->patient->mobileno ?? '',
+                'doctor_charges' => $doctorCharges,
+                'doctor_name' => $doctorName,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Get IPD details failed', ['error' => $e->getMessage(), 'ipdId' => $ipdId, 'trace' => $e->getTraceAsString()]);
+            return response()->json([
+                'error' => 'IPD record not found or an error occurred',
+                'message' => $e->getMessage()
+            ], 404);
         }
-
-        return response()->json([
-            'ipd_no' => $ipd->ipd_no,
-            'patient_id' => $ipd->patient_id,
-            'patient_name' => $ipd->patient->patient_name ?? '',
-            'phone' => $ipd->patient->mobileno ?? '',
-            'doctor_charges' => $doctorCharges,
-            'doctor_name' => $doctorName,
-        ]);
     }
 
     /**
@@ -664,10 +712,19 @@ class MoneyReceiptController extends Controller
      */
     public function getNextReceiptNo(Request $request)
     {
-        $paymentDate = $request->get('payment_date', now());
-        $nextReceiptNo = Transaction::generateReceiptNo($paymentDate);
-        
-        return response()->json(['receipt_no' => $nextReceiptNo]);
+        try {
+            $paymentDate = $request->get('payment_date', now());
+            $nextReceiptNo = Transaction::generateReceiptNo($paymentDate);
+            
+            return response()->json(['receipt_no' => $nextReceiptNo]);
+        } catch (\Exception $e) {
+            \Log::error('Get next receipt number failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json([
+                'receipt_no' => 'ERROR',
+                'error' => 'An error occurred while generating receipt number',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -675,78 +732,87 @@ class MoneyReceiptController extends Controller
      */
     public function getCasePrescriptionNo(Request $request)
     {
-        $receiptType = $request->get('receipt_type');
-        $opdId = $request->get('opd_id');
-        $ipdId = $request->get('ipd_id');
-        
-        $casePrescriptionNo = null;
-        
-        // Receipt types that need case/prescription number
-        $opdReceiptTypes = ['OPD Doctor Consultation', 'OPD Pathology', 'OPD Radiology'];
-        $ipdReceiptTypes = ['IPD Pathology', 'IPD Radiology', 'IPD Pharmacy'];
-        
-        if (in_array($receiptType, $opdReceiptTypes) && $opdId) {
-            // For OPD Doctor Consultation, get latest prescription
-            if ($receiptType === 'OPD Doctor Consultation') {
-                $prescription = OpdPrescription::where('opd_id', $opdId)
-                    ->orderBy('date', 'desc')
-                    ->orderBy('id', 'desc')
-                    ->first();
+        try {
+            $receiptType = $request->get('receipt_type');
+            $opdId = $request->get('opd_id');
+            $ipdId = $request->get('ipd_id');
+            
+            $casePrescriptionNo = null;
+            
+            // Receipt types that need case/prescription number
+            $opdReceiptTypes = ['OPD Doctor Consultation', 'OPD Pathology', 'OPD Radiology'];
+            $ipdReceiptTypes = ['IPD Pathology', 'IPD Radiology', 'IPD Pharmacy'];
+            
+            if (in_array($receiptType, $opdReceiptTypes) && $opdId) {
+                // For OPD Doctor Consultation, get latest prescription
+                if ($receiptType === 'OPD Doctor Consultation') {
+                    $prescription = OpdPrescription::where('opd_id', $opdId)
+                        ->orderBy('date', 'desc')
+                        ->orderBy('id', 'desc')
+                        ->first();
+                }
+                // For OPD Pathology, get prescription with pathology_id
+                elseif ($receiptType === 'OPD Pathology') {
+                    $prescription = OpdPrescription::where('opd_id', $opdId)
+                        ->whereNotNull('pathology_id')
+                        ->orderBy('date', 'desc')
+                        ->orderBy('id', 'desc')
+                        ->first();
+                }
+                // For OPD Radiology, get prescription with radiology_id
+                elseif ($receiptType === 'OPD Radiology') {
+                    $prescription = OpdPrescription::where('opd_id', $opdId)
+                        ->whereNotNull('radiology_id')
+                        ->orderBy('date', 'desc')
+                        ->orderBy('id', 'desc')
+                        ->first();
+                }
+                
+                if ($prescription && $prescription->prescription_number) {
+                    $casePrescriptionNo = $prescription->prescription_number;
+                }
             }
-            // For OPD Pathology, get prescription with pathology_id
-            elseif ($receiptType === 'OPD Pathology') {
-                $prescription = OpdPrescription::where('opd_id', $opdId)
-                    ->whereNotNull('pathology_id')
-                    ->orderBy('date', 'desc')
-                    ->orderBy('id', 'desc')
-                    ->first();
-            }
-            // For OPD Radiology, get prescription with radiology_id
-            elseif ($receiptType === 'OPD Radiology') {
-                $prescription = OpdPrescription::where('opd_id', $opdId)
-                    ->whereNotNull('radiology_id')
-                    ->orderBy('date', 'desc')
-                    ->orderBy('id', 'desc')
-                    ->first();
+            elseif (in_array($receiptType, $ipdReceiptTypes) && $ipdId) {
+                // For IPD Pathology, get prescription with pathology tests
+                if ($receiptType === 'IPD Pathology') {
+                    $prescription = IpdPrescription::where('ipd_id', $ipdId)
+                        ->where(function($q) {
+                            $q->whereNotNull('pathology_id')
+                              ->orWhereHas('pathologyTests');
+                        })
+                        ->orderBy('date', 'desc')
+                        ->orderBy('id', 'desc')
+                        ->first();
+                }
+                // For IPD Radiology, get prescription with radiology tests
+                elseif ($receiptType === 'IPD Radiology') {
+                    $prescription = IpdPrescription::where('ipd_id', $ipdId)
+                        ->where(function($q) {
+                            $q->whereNotNull('radiology_id')
+                              ->orWhereHas('radiologyTests');
+                        })
+                        ->orderBy('date', 'desc')
+                        ->orderBy('id', 'desc')
+                        ->first();
+                }
+                // For IPD Pharmacy, optional: could link to pharmacy prescription if available
+                elseif ($receiptType === 'IPD Pharmacy') {
+                    $casePrescriptionNo = null;
+                }
+                
+                if (isset($prescription) && $prescription && $prescription->prescription_number) {
+                    $casePrescriptionNo = $prescription->prescription_number;
+                }
             }
             
-            if ($prescription && $prescription->prescription_number) {
-                $casePrescriptionNo = $prescription->prescription_number;
-            }
+            return response()->json(['case_prescription_no' => $casePrescriptionNo]);
+        } catch (\Exception $e) {
+            \Log::error('Get case/prescription number failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json([
+                'case_prescription_no' => null,
+                'error' => 'An error occurred while fetching case/prescription number',
+                'message' => $e->getMessage()
+            ], 500);
         }
-        elseif (in_array($receiptType, $ipdReceiptTypes) && $ipdId) {
-            // For IPD Pathology, get prescription with pathology tests
-            if ($receiptType === 'IPD Pathology') {
-                $prescription = IpdPrescription::where('ipd_id', $ipdId)
-                    ->where(function($q) {
-                        $q->whereNotNull('pathology_id')
-                          ->orWhereHas('pathologyTests');
-                    })
-                    ->orderBy('date', 'desc')
-                    ->orderBy('id', 'desc')
-                    ->first();
-            }
-            // For IPD Radiology, get prescription with radiology tests
-            elseif ($receiptType === 'IPD Radiology') {
-                $prescription = IpdPrescription::where('ipd_id', $ipdId)
-                    ->where(function($q) {
-                        $q->whereNotNull('radiology_id')
-                          ->orWhereHas('radiologyTests');
-                    })
-                    ->orderBy('date', 'desc')
-                    ->orderBy('id', 'desc')
-                    ->first();
-            }
-            // For IPD Pharmacy, optional: could link to pharmacy prescription if available
-            elseif ($receiptType === 'IPD Pharmacy') {
-                $casePrescriptionNo = null;
-            }
-            
-            if (isset($prescription) && $prescription && $prescription->prescription_number) {
-                $casePrescriptionNo = $prescription->prescription_number;
-            }
-        }
-        
-        return response()->json(['case_prescription_no' => $casePrescriptionNo]);
     }
 }
