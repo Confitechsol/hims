@@ -878,7 +878,7 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Amount (INR) <span class="required">*</span></label>
+                                <label class="form-label">Amount (INR)</label>
                                 <input type="number" class="form-control" name="amount" id="amount"
                                     placeholder="0.00" readonly>
                             </div>
@@ -892,13 +892,13 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Paid Amount (INR) <span class="required">*</span></label>
+                                <label class="form-label">Paid Amount (INR) </label>
                                 <input type="number" class="form-control" name="paid_amount" id="paid_amount"
                                     placeholder="0.00">
                             </div>
                             <div class="col-md-6">
                                 <label for="payment_date" class="form-label">
-                                    Payment Date <span class="required">*</span>
+                                    Payment Date 
                                 </label>
                                 <input type="date" name="payment_date" id="payment_date" class="form-control"
                                     required>

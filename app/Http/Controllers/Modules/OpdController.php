@@ -117,17 +117,17 @@ class OpdController extends Controller
             'standard_charge'      => 'required|numeric|min:0',
             'applied_charge'       => 'required|numeric|min:0',
             'discount'             => 'required|numeric|min:0',
-            'tax'                  => 'required|numeric|min:0',
+            'tax'                  => 'nullable|numeric|min:0',
             'amount'               => 'required|numeric|min:0',
             'payment_mode'         => 'nullable|string|max:50',
             'payment_date'         => 'nullable|date',
             'paid_amount'          => 'required|numeric|min:0',
             'live_consultation'    => 'nullable|string|max:100',
-            'symptoms_type'        => 'required|array',
-            'symptoms_type.*'      => 'string',
-            'symptoms_title'       => 'required|array',
-            'symptoms_title.*'     => 'string',
-            'symptoms_description' => 'required|string',
+            'symptoms_type'        => 'nullable|array',
+            'symptoms_type.*'      => 'nullable|string',
+            'symptoms_title'       => 'nullable|array',
+            'symptoms_title.*'     => 'nullable|string',
+            'symptoms_description' => 'nullable|string',
             'allergies'            => 'nullable|string',
             'note'                 => 'nullable|string',
             'status'               => 'nullable|string|max:50',
@@ -140,9 +140,15 @@ class OpdController extends Controller
         if (!$user || !$user->hospital_id) {
             return redirect()->back()->with('error', 'User not authenticated or hospital ID missing.');
         }
-        try {
-            $symptomType          = array_filter($request->symptoms_type, fn ($type) => $type !== null && $type !== '');
-            $symptomTitle         = array_filter($request->symptoms_title, fn ($title) => $title !== null && $title !== '');
+                    try {
+                       $symptomType = array_filter(
+                (array) $request->symptoms_type,
+                fn ($type) => $type !== null && $type !== ''
+            );
+                        $symptomTitle         = array_filter(
+                (array) $request->symptoms_title,
+                fn ($title) => $title !== null && $title !== ''
+            );
             $implodedSymptomType  = implode(", ", $symptomType);
             $implodedSymptomTitle = implode(", ", $symptomTitle);
 
