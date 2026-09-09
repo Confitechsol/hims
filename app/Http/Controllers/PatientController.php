@@ -716,5 +716,71 @@ class PatientController extends Controller
 
        //  return view('patient.form', compact('states'));
     }
+    
+
+     public function opdPatientStore(Request $request)
+    {
+        // dd($request->all());
+        
+        $validated1 = Validator::make($request->all(), [
+            'name'                  => 'required|string|max:255',
+            'gender'                => 'required',
+            'birth_date'            => 'nullable|date',
+            'age.year'              => 'nullable|integer|min:0',
+            'age.month'             => 'nullable|integer|min:0|max:11',
+            'age.day'               => 'nullable|integer|min:0|max:31',
+            'marital_status'        => 'required',
+            'phone'                 => 'nullable|string|max:20',
+            'email'                 => 'nullable|email|max:255',
+            'nationality'           => 'required|string|max:255',
+            'address'               => 'required|string|max:500',
+            'area'                  => 'nullable|string|max:255',
+            'state_id'              => 'required|exists:states,id',
+            'district_id'           => 'required|exists:district,id',
+            'religion'              => 'nullable|string|max:500',
+            'pin_code'              => 'required|string|max:20',
+            'department_name'       =>  'nullable|string|max:255',
+        ]);
+
+        // Convert validator result to array
+       $data = $validated1->validated();
+        //dd($data);
+        
+        // Convert selected department IDs to names and save as comma-separated string
+        $departmentNames = [];
+        if ($request->has('department_ids')) {
+            $departmentNames = \App\Models\Department::whereIn('id', $request->input('department_ids'))->pluck('department_name')->toArray();
+        }
+        $departmentNameString = implode(',', $departmentNames);
+
+        Patient::create([
+            'patient_name'          => $data['name'],
+            'gender'                => $data['gender'],
+            
+             'dob'                   => $data['birth_date'] ?? null,
+
+            'age'                   => $data['age']['year'] ?? null,
+            'month'                 => $data['age']['month'] ?? null,
+            'day'                   => $data['age']['day'] ?? null,
+
+           
+            'marital_status'        => $data['marital_status'] ?? null,
+
+            'mobileno'              => $data['phone'] ?? null,
+            'email'                 => $data['email'] ?? null,
+            
+            'nationality'           => $data['nationality'] ?? null,
+            'address'               => $data['address'] ?? null,
+            'area'                  => $data['area'] ?? null,
+            'state'                 => $data['state_id'] ?? null,
+            'district'              => $data['district_id'] ?? null,
+            'religion'               => $data['religion'] ?? null,
+            'pin_code'              => $data['pin_code'] ?? null,
+            'department_name'       => $departmentNameString,
+        ]);
+
+        return redirect()->back()->with('success', 'Patient saved successfully!');
+    }
+
 
 }

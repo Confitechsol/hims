@@ -193,6 +193,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/report/patient', [PatientReportController::class, 'patientReport'])->name('patient-report');
     Route::get('/patient-report', [PatientReportController::class, 'patientReportApi']);
     Route::get('/departments', [PatientController::class, 'departments']); 
+    Route::post('opd/patient', [PatientController::class, 'opdPatientStore'])->name('opd-patient-store');
     
     
     Route::get('/get-doctors/patients/count', [DoctorExportPatientCountController::class, 'getDoctorsPatientCount'])->name('get.doctors.patient.count'  );
