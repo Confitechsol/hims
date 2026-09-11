@@ -826,12 +826,17 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
+                                        @php
+                                            $opdPaymentPercentage = $opd->amount > 0
+                                                ? round(($opd->paid_amount / $opd->amount) * 100, 2)
+                                                : 0;
+                                        @endphp
                                         <h6 class="text-primary">OPD Payment/Billing</h6>
-                                        <span>{{ round(($opd->paid_amount / $opd->amount) * 100, 2) }}%</span>
-                                        <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="68.18"
+                                        <span>{{ $opdPaymentPercentage }}%</span>
+                                        <div class="progress mb-3 mt-1" role="progressbar" aria-valuenow="{{ $opdPaymentPercentage }}"
                                             aria-valuemin="0" aria-valuemax="100">
                                             <div class="progress-bar bg-gradient"
-                                                style="width: {{ ($opd->paid_amount / $opd->amount) * 100 }}%;"></div>
+                                                style="width: {{ $opdPaymentPercentage }}%;"></div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
