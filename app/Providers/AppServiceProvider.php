@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use App\Models\Hospital;
 use App\Models\Area;
 use App\Models\BloodBankProduct;
@@ -35,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
 {
     $this->registerOrganisationInsuranceRelations();
+    $this->registerQueueAutoDrain();
 
     URL::forceRootUrl(config('app.url'));
 
@@ -93,6 +97,46 @@ class AppServiceProvider extends ServiceProvider
         $view->with('hospitalData', $hospital);
     });
 }
+
+    /**
+     * Drain queued jobs after each web response so audit/bed-charge jobs
+     * process on Hostinger without a long-lived `queue:work` daemon.
+     */
+    protected function registerQueueAutoDrain(): void
+    {
+        if (! config('queue.auto_drain')) {
+            return;
+        }
+
+        // CLI already has artisan/schedule; avoid nesting workers.
+        if ($this->app->runningInConsole()) {
+            return;
+        }
+
+        $this->app->terminating(function () {
+            try {
+                $lock = Cache::lock('hims-queue-auto-drain', 30);
+                if (! $lock->get()) {
+                    return;
+                }
+
+                try {
+                    Artisan::call('queue:work', [
+                        '--queue' => (string) config('queue.auto_drain_queues', 'audit,bed-charges,default'),
+                        '--stop-when-empty' => true,
+                        '--max-time' => (int) config('queue.auto_drain_max_time', 10),
+                        '--tries' => 3,
+                    ]);
+                } finally {
+                    optional($lock)->release();
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Queue auto-drain failed', [
+                    'message' => $e->getMessage(),
+                ]);
+            }
+        });
+    }
 
     /**
      * Ensure insurance relations exist on Organisation even if an older model

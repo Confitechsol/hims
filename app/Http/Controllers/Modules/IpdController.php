@@ -462,6 +462,11 @@ class IpdController extends Controller
             $implodedSymptomTitle = implode(", ", $symptomTitle);
             // 🔹 Update OPD record
             $ipd        = IpdDetail::findOrFail($id);
+
+            $stayValidator = app(\App\Services\IpdStayWindowValidator::class);
+            $stayValidator->assertMutable($ipd, 'update IPD admission');
+            $stayValidator->assertAdmissionImmutable($ipd, $request->admission_date);
+
             $allotedBed = $ipd->bed;
             //dd($id, IpdPatient::where('ipd_id', $id)->first());
             $ipdPatient = IpdPatient::where('ipd_id', $id)->firstOrFail();
@@ -1782,6 +1787,14 @@ class IpdController extends Controller
             ->orderBy('id', 'asc')
             ->first();
 
+        $ipd = IpdDetail::findOrFail($request->ipd_id);
+        $stayValidator = app(\App\Services\IpdStayWindowValidator::class);
+        try {
+            $stayValidator->assertMutable($ipd, 'add IPD charges');
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+
         $admissionDate = null;
         if ($ipdPatient && $ipdPatient->created_at) {
             $admissionDate = Carbon::parse($ipdPatient->created_at)->format('Y-m-d');
@@ -1794,6 +1807,12 @@ class IpdController extends Controller
             // Ensure date is never null
             if (!$chargeDate) {
                 return redirect()->back()->with('error', 'Date is required for all charges and admission date is not set.');
+            }
+
+            try {
+                $stayValidator->assertChargeDateInStayWindow($ipd, $chargeDate, 'IPD charge date');
+            } catch (\App\Exceptions\IpdConstraintException $e) {
+                return redirect()->back()->with('error', $e->getMessage());
             }
 
             IpdCharges::create([
@@ -1816,6 +1835,19 @@ class IpdController extends Controller
                 'show_on_final_bill' => $this->parseBillVisibilityFlag($request->show_on_final_bill[$i] ?? true),
             ]);
         }
+
+        app(\App\Services\Audit\AuditLogger::class)->log([
+            'module' => 'ipd',
+            'entity_type' => 'ipd_charges',
+            'entity_id' => null,
+            'parent_type' => 'ipd_details',
+            'parent_id' => $ipd->id,
+            'patient_id' => $ipd->patient_id,
+            'case_no' => $ipd->ipd_no,
+            'action' => 'created',
+            'reason' => $request->input('audit_reason'),
+            'meta' => ['rows' => $count],
+        ]);
 
         return redirect()->back()->with('success', 'Charges saved successfully!');
     }
@@ -1854,6 +1886,22 @@ class IpdController extends Controller
             'date'                       => 'required|date',
         ]);
 
+        $ipd = IpdDetail::find($charge->ipd_id);
+        $stayValidator = app(\App\Services\IpdStayWindowValidator::class);
+        if ($ipd) {
+            try {
+                $stayValidator->assertMutable($ipd, 'update IPD charge');
+                $stayValidator->assertChargeDateInStayWindow($ipd, $validated['date'], 'IPD charge date');
+            } catch (\App\Exceptions\IpdConstraintException $e) {
+                return redirect()->back()->with('error', $e->getMessage());
+            }
+        }
+
+        $before = $charge->only([
+            'charge_id', 'standard_charge', 'qty', 'net_amount', 'date',
+            'show_on_approval_bill', 'show_on_approval_preview', 'show_on_final_preview', 'show_on_final_bill',
+        ]);
+
         $charge->update([
             'charge_type_id'      => $validated['charge_type'],
             'charge_category_id'  => $validated['charge_category2'],
@@ -1874,6 +1922,23 @@ class IpdController extends Controller
             'show_on_final_bill' => $this->parseBillVisibilityFlag($request->input('show_on_final_bill', 1)),
         ]);
 
+        if ($ipd) {
+            [$old, $new] = app(\App\Services\Audit\AuditLogger::class)->diff($before, $charge->only(array_keys($before)));
+            app(\App\Services\Audit\AuditLogger::class)->log([
+                'module' => 'ipd',
+                'entity_type' => 'ipd_charges',
+                'entity_id' => $charge->id,
+                'parent_type' => 'ipd_details',
+                'parent_id' => $ipd->id,
+                'patient_id' => $ipd->patient_id,
+                'case_no' => $ipd->ipd_no,
+                'action' => 'updated',
+                'reason' => $request->input('audit_reason'),
+                'old_values' => $old,
+                'new_values' => $new,
+            ]);
+        }
+
         // Behaviour same as Add Charges: go back with flash message
         return redirect()
             ->back()
@@ -1885,7 +1950,32 @@ class IpdController extends Controller
      */
     public function deleteIpdCharge(IpdCharges $charge)
     {
+        $ipd = IpdDetail::find($charge->ipd_id);
+        if ($ipd) {
+            try {
+                app(\App\Services\IpdStayWindowValidator::class)->assertMutable($ipd, 'delete IPD charge');
+            } catch (\App\Exceptions\IpdConstraintException $e) {
+                return redirect()->back()->with('error', $e->getMessage());
+            }
+        }
+
+        $snapshot = $charge->only(['id', 'charge_id', 'net_amount', 'date', 'qty']);
         $charge->delete();
+
+        if ($ipd) {
+            app(\App\Services\Audit\AuditLogger::class)->log([
+                'module' => 'ipd',
+                'entity_type' => 'ipd_charges',
+                'entity_id' => $snapshot['id'] ?? null,
+                'parent_type' => 'ipd_details',
+                'parent_id' => $ipd->id,
+                'patient_id' => $ipd->patient_id,
+                'case_no' => $ipd->ipd_no,
+                'action' => 'deleted',
+                'reason' => request()->input('audit_reason'),
+                'old_values' => $snapshot,
+            ]);
+        }
 
         return redirect()
             ->back()
@@ -1900,10 +1990,33 @@ class IpdController extends Controller
         $validated = $request->validate([
             'field' => 'required|in:show_on_approval_bill,show_on_approval_preview,show_on_final_preview,show_on_final_bill',
             'value' => 'required|boolean',
+            'audit_reason' => 'nullable|string|max:2000',
         ]);
 
+        $ipd = IpdDetail::findOrFail($charge->ipd_id);
+        try {
+            app(\App\Services\IpdStayWindowValidator::class)->assertMutable($ipd, 'update charge bill visibility');
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return response()->json($e->toArray() + ['success' => false], 422);
+        }
+
+        $before = (bool) ($charge->{$validated['field']} ?? false);
         $charge->update([
             $validated['field'] => (bool) $validated['value'],
+        ]);
+
+        app(\App\Services\Audit\AuditLogger::class)->log([
+            'module' => 'ipd',
+            'entity_type' => 'ipd_charges',
+            'entity_id' => $charge->id,
+            'parent_type' => 'ipd_details',
+            'parent_id' => $ipd->id,
+            'patient_id' => $ipd->patient_id,
+            'case_no' => $ipd->ipd_no,
+            'action' => 'visibility_changed',
+            'reason' => $validated['audit_reason'] ?? $request->input('audit_reason'),
+            'old_values' => [$validated['field'] => $before],
+            'new_values' => [$validated['field'] => (bool) $validated['value']],
         ]);
 
         return response()->json([
@@ -1963,6 +2076,23 @@ class IpdController extends Controller
         ]);
 
         $ipd = IpdDetail::findOrFail($request->ipd_id);
+        $stayValidator = app(\App\Services\IpdStayWindowValidator::class);
+        try {
+            $stayValidator->assertMutable($ipd, 'assign new bed');
+            $transferAt = Carbon::parse($request->released_date);
+            $stayValidator->assertBedIntervalInStayWindow($ipd, $transferAt, null);
+            $stayValidator->assertBedAvailable(
+                (int) $request->new_bed,
+                $transferAt,
+                $stayValidator->isDischarged($ipd) || $stayValidator->isReopened($ipd)
+                    ? $stayValidator->resolveDischargeAt($ipd)
+                    : null,
+                null,
+                (int) $ipd->id
+            );
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
 
         // --- Release old bed ---
         if ($ipd->bed) {
@@ -2044,6 +2174,13 @@ class IpdController extends Controller
         $newBedId = (int) $request->bed;
         $isActive = $history->is_active === 'yes';
 
+        $stayValidator = app(\App\Services\IpdStayWindowValidator::class);
+        try {
+            $stayValidator->assertMutable($ipd, 'update bed history');
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+
         // Check bed belongs to selected bed group
         $bed = Bed::findOrFail($newBedId);
         if ((int) $bed->bed_group_id !== (int) $request->bed_group) {
@@ -2053,6 +2190,21 @@ class IpdController extends Controller
         // Check for date overlaps with adjacent history records
         $fromDate = Carbon::parse($request->from_date);
         $toDate   = $request->to_date ? Carbon::parse($request->to_date) : null;
+
+        // Reopen mode: bed from/to are frozen — rate/bed change only if dates unchanged.
+        if ($stayValidator->isReopened($ipd) || $stayValidator->isDischarged($ipd)) {
+            try {
+                $stayValidator->assertBedDatetimesUnchanged($history, $fromDate, $toDate);
+            } catch (\App\Exceptions\IpdConstraintException $e) {
+                return redirect()->back()->with('error', $e->getMessage());
+            }
+        } else {
+            try {
+                $stayValidator->assertBedIntervalInStayWindow($ipd, $fromDate, $toDate);
+            } catch (\App\Exceptions\IpdConstraintException $e) {
+                return redirect()->back()->with('error', $e->getMessage());
+            }
+        }
 
         // Use shared service to prevent overlaps / double-occupancy for this bed
         // Allow overlap with the same IPD's other history records; only block if some OTHER patient is on this bed
@@ -2136,6 +2288,21 @@ class IpdController extends Controller
 
         $fromDate = Carbon::parse($request->from_date);
         $toDate   = $request->to_date ? Carbon::parse($request->to_date) : null;
+
+        $stayValidator = app(\App\Services\IpdStayWindowValidator::class);
+        try {
+            $stayValidator->assertMutable($ipd, 'add bed history');
+            $stayValidator->assertBedIntervalInStayWindow($ipd, $fromDate, $toDate);
+            $stayValidator->assertBedAvailable(
+                (int) $newBedId,
+                $fromDate,
+                $toDate,
+                null,
+                (int) $ipd->id
+            );
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
 
         // Prevent double-occupancy / overlaps for this bed via shared service
         // For add, also allow same-IPD history on this bed; only conflict with other patients
@@ -2452,9 +2619,17 @@ class IpdController extends Controller
             'notes'        => 'nullable|string|max:500',
             'package_rate' => 'nullable|numeric|min:0',
             'approval_percentage' => 'nullable|numeric|min:0|max:100',
+            'audit_reason' => 'nullable|string|max:2000',
         ]);
 
         try {
+            $ipd = IpdDetail::findOrFail($id);
+            $stayValidator = app(\App\Services\IpdStayWindowValidator::class);
+            $stayValidator->assertMutable($ipd, 'apply package');
+            if ($request->filled('applied_date')) {
+                $stayValidator->assertChargeDateInStayWindow($ipd, $request->applied_date, 'Package applied date');
+            }
+
             $packageService      = new IpdPackageService();
             $packageRateOverride = $request->filled('package_rate') ? (float) $request->package_rate : null;
             $approvalPercentage  = $request->filled('approval_percentage') ? (float) $request->approval_percentage : null;
@@ -2469,6 +2644,22 @@ class IpdController extends Controller
             );
 
             if ($result['success']) {
+                app(\App\Services\Audit\AuditLogger::class)->log([
+                    'module' => 'ipd',
+                    'entity_type' => 'ipd_packages',
+                    'entity_id' => data_get($result, 'data.id'),
+                    'parent_type' => 'ipd_details',
+                    'parent_id' => $ipd->id,
+                    'patient_id' => $ipd->patient_id,
+                    'case_no' => $ipd->ipd_no,
+                    'action' => 'created',
+                    'reason' => $request->input('audit_reason'),
+                    'new_values' => [
+                        'package_id' => (int) $request->package_id,
+                        'applied_date' => $request->applied_date,
+                    ],
+                ]);
+
                 return response()->json([
                     'success' => true,
                     'message' => $result['message'],
@@ -2480,6 +2671,8 @@ class IpdController extends Controller
                     'message' => $result['message'],
                 ], 422);
             }
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return response()->json($e->toArray() + ['success' => false], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -2496,14 +2689,30 @@ class IpdController extends Controller
     {
         $request->validate([
             'ipd_package_id' => 'required|exists:ipd_packages,id',
+            'audit_reason' => 'nullable|string|max:2000',
         ]);
 
         try {
+            $ipd = IpdDetail::findOrFail($id);
+            app(\App\Services\IpdStayWindowValidator::class)->assertMutable($ipd, 'remove package');
+
             $packageService = new IpdPackageService();
 
             $result = $packageService->removePackage($id, $request->ipd_package_id);
 
             if ($result['success']) {
+                app(\App\Services\Audit\AuditLogger::class)->log([
+                    'module' => 'ipd',
+                    'entity_type' => 'ipd_packages',
+                    'entity_id' => (int) $request->ipd_package_id,
+                    'parent_type' => 'ipd_details',
+                    'parent_id' => $ipd->id,
+                    'patient_id' => $ipd->patient_id,
+                    'case_no' => $ipd->ipd_no,
+                    'action' => 'deleted',
+                    'reason' => $request->input('audit_reason'),
+                ]);
+
                 return response()->json([
                     'success' => true,
                     'message' => $result['message'],
@@ -2514,6 +2723,8 @@ class IpdController extends Controller
                     'message' => $result['message'],
                 ], 422);
             }
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return response()->json($e->toArray() + ['success' => false], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -2546,6 +2757,13 @@ class IpdController extends Controller
         }
 
         try {
+            $ipd = IpdDetail::findOrFail($id);
+            $stayValidator = app(\App\Services\IpdStayWindowValidator::class);
+            $stayValidator->assertMutable($ipd, 'update package');
+            if ($request->filled('applied_date')) {
+                $stayValidator->assertChargeDateInStayWindow($ipd, $request->applied_date, 'Package applied date');
+            }
+
             $packageService = new IpdPackageService();
             $newRate        = $request->has('package_rate') ? (float) $request->package_rate : null;
             $approval       = $request->exists('approval_percentage')
@@ -2566,6 +2784,23 @@ class IpdController extends Controller
             );
 
             if ($result['success']) {
+                app(\App\Services\Audit\AuditLogger::class)->log([
+                    'module' => 'ipd',
+                    'entity_type' => 'ipd_packages',
+                    'entity_id' => (int) $ipdPackageId,
+                    'parent_type' => 'ipd_details',
+                    'parent_id' => $ipd->id,
+                    'patient_id' => $ipd->patient_id,
+                    'case_no' => $ipd->ipd_no,
+                    'action' => 'updated',
+                    'reason' => $request->input('audit_reason'),
+                    'new_values' => [
+                        'package_rate' => $request->input('package_rate'),
+                        'approval_percentage' => $request->input('approval_percentage'),
+                        'applied_date' => $request->input('applied_date'),
+                    ],
+                ]);
+
                 return response()->json([
                     'success' => true,
                     'message' => $result['message'],
@@ -2576,6 +2811,8 @@ class IpdController extends Controller
                 'success' => false,
                 'message' => $result['message'],
             ], 422);
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return response()->json($e->toArray() + ['success' => false], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

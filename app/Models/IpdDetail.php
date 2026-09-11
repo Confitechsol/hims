@@ -69,6 +69,11 @@ class IpdDetail extends Model
         'final_bill_generated_by',
         'include_post_discharge_bed_charge',
         'physical_release_at',
+        'is_reopened',
+        'reopened_at',
+        'reopened_by',
+        'reopen_reason',
+        'reopen_closed_at',
         'net_amount',
         'tax',
         'amount',
@@ -93,11 +98,26 @@ class IpdDetail extends Model
         'final_bill_generated_at' => 'datetime',
         'physical_release_at' => 'datetime',
         'include_post_discharge_bed_charge' => 'boolean',
+        'is_reopened' => 'boolean',
+        'reopened_at' => 'datetime',
+        'reopen_closed_at' => 'datetime',
     ];
 
     public function isFinalBillGenerated(): bool
     {
-        return ! empty($this->final_bill_generated_at);
+        return ! empty($this->final_bill_generated_at) && ! (bool) ($this->is_reopened ?? false);
+    }
+
+    public function isReopened(): bool
+    {
+        return (bool) ($this->is_reopened ?? false);
+    }
+
+    public function canReopenDischarge(): bool
+    {
+        return ($this->discharged ?? 'no') === 'yes'
+            && ! empty($this->final_bill_generated_at)
+            && ! $this->isReopened();
     }
 
     /**

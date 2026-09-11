@@ -387,6 +387,23 @@ class OpdController extends Controller
 
             DB::commit();
 
+            app(\App\Services\Audit\AuditLogger::class)->log([
+                'module' => 'opd',
+                'entity_type' => 'opd_details',
+                'entity_id' => $opd->id,
+                'parent_type' => 'opd_details',
+                'parent_id' => $opd->id,
+                'patient_id' => $opd->patient_id,
+                'case_no' => $opd->opd_no ?? null,
+                'action' => 'updated',
+                'reason' => $request->input('audit_reason'),
+                'new_values' => [
+                    'appointment_date' => (string) $opd->appointment_date,
+                    'doctor_id' => $opd->doctor_id,
+                    'paid_amount' => $opd->paid_amount,
+                ],
+            ]);
+
             return redirect()->route('opd')->with('success', 'OPD record Updated successfully . ');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -587,6 +604,19 @@ class OpdController extends Controller
                 ]);
             }
         }
+
+        app(\App\Services\Audit\AuditLogger::class)->log([
+            'module' => 'opd',
+            'entity_type' => 'opd_prescriptions',
+            'entity_id' => $prescription->id,
+            'parent_type' => 'opd_details',
+            'parent_id' => $prescription->opd_id,
+            'patient_id' => optional(OpdDetail::find($prescription->opd_id))->patient_id,
+            'case_no' => $prescription->prescription_number,
+            'action' => 'created',
+            'reason' => $request->input('audit_reason'),
+        ]);
+
         return redirect()->back()->with('success', 'Prescription created successfully.');
     }
 
@@ -698,6 +728,19 @@ class OpdController extends Controller
                 'date'                => $request->charge_date[$i],
             ]);
         }
+
+        app(\App\Services\Audit\AuditLogger::class)->log([
+            'module' => 'opd',
+            'entity_type' => 'opd_charges',
+            'entity_id' => null,
+            'parent_type' => 'opd_details',
+            'parent_id' => $request->opd_id,
+            'patient_id' => null,
+            'case_no' => null,
+            'action' => 'created',
+            'reason' => $request->input('audit_reason'),
+            'meta' => ['rows' => $count],
+        ]);
 
         return redirect()->back()->with('success', 'Charges saved successfully!');
     }
@@ -923,6 +966,23 @@ class OpdController extends Controller
                 ]);
             }
         }
+
+        app(\App\Services\Audit\AuditLogger::class)->log([
+            'module' => 'opd',
+            'entity_type' => 'opd_prescriptions',
+            'entity_id' => $prescription->id,
+            'parent_type' => 'opd_details',
+            'parent_id' => $prescription->opd_id,
+            'patient_id' => optional(OpdDetail::find($prescription->opd_id))->patient_id,
+            'case_no' => $prescription->prescription_number,
+            'action' => 'updated',
+            'reason' => $request->input('audit_reason'),
+            'new_values' => [
+                'prescribed_by' => $prescription->prescribed_by,
+                'pathology_id' => $prescription->pathology_id,
+                'radiology_id' => $prescription->radiology_id,
+            ],
+        ]);
 
         return redirect()->back()->with('success', 'Prescription updated successfully.');
     }

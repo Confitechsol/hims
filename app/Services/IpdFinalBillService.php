@@ -62,11 +62,32 @@ class IpdFinalBillService
         DB::transaction(function () use ($ipd, $dischargeAt) {
             $this->bedReleaseService->releaseBedsAndCloseHistory((int) $ipd->id, $dischargeAt);
 
+            $wasReopened = (bool) ($ipd->is_reopened ?? false);
+
             $ipd->final_bill_generated_at = Carbon::now();
             $ipd->final_bill_generated_by = Auth::id();
             $ipd->include_post_discharge_bed_charge = false;
             $ipd->physical_release_at = $dischargeAt;
             $ipd->save();
+
+            if ($wasReopened) {
+                app(IpdDischargeReopenService::class)->markReopenClosed($ipd->fresh());
+            } else {
+                app(\App\Services\Audit\AuditLogger::class)->log([
+                    'module' => 'discharge',
+                    'entity_type' => 'ipd_details',
+                    'entity_id' => $ipd->id,
+                    'parent_type' => 'ipd_details',
+                    'parent_id' => $ipd->id,
+                    'patient_id' => $ipd->patient_id,
+                    'case_no' => $ipd->ipd_no,
+                    'action' => 'final_bill_generated',
+                    'new_values' => [
+                        'final_bill_generated_at' => optional($ipd->final_bill_generated_at)?->toDateTimeString(),
+                        'physical_release_at' => $dischargeAt->toDateTimeString(),
+                    ],
+                ]);
+            }
         });
 
         return $ipd->fresh();

@@ -583,6 +583,11 @@
                                         <li><a href="{{ route('reports.daily-collection') }}"
                                                 class="{{ request()->routeIs('reports.daily-collection') ? 'active' : '' }}">Daily
                                                 Collection Report</a></li>
+                                        @if(function_exists('isSuperAdmin') && isSuperAdmin())
+                                        <li><a href="{{ route('reports.audit-log') }}"
+                                                class="{{ request()->routeIs('reports.audit-log*') ? 'active' : '' }}">Audit
+                                                Trail</a></li>
+                                        @endif
                                         <li><a href="{{ route('reports.daily-cash-book') }}"
                                                 class="{{ request()->routeIs('reports.daily-cash-book*') ? 'active' : '' }}">Daily
                                                 Cash Book</a></li>

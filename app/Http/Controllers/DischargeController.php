@@ -443,6 +443,21 @@ class DischargeController extends Controller
             'is_draft'               => ['nullable', 'string'],
         ]);
 
+        $ipdForGuard = IpdDetail::findOrFail($validated['ipd_details_id']);
+        $stayValidator = app(\App\Services\IpdStayWindowValidator::class);
+        try {
+            $stayValidator->assertMutable($ipdForGuard, 'update discharge card');
+            if ($stayValidator->isDischarged($ipdForGuard) || $stayValidator->isReopened($ipdForGuard)) {
+                $stayValidator->assertDischargeImmutable(
+                    $ipdForGuard,
+                    $validated['discharge_date'],
+                    $validated['discharge_time'] ?? null
+                );
+            }
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return redirect()->back()->with('error', $e->getMessage())->withInput();
+        }
+
         // dd($validated);
         DB::beginTransaction();
 

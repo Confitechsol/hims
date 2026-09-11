@@ -109,4 +109,18 @@ return [
         'table' => 'failed_jobs',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Auto-drain queued jobs after web requests
+    |--------------------------------------------------------------------------
+    |
+    | When true, each HTTP request drains audit/bed-charges/default briefly
+    | after the response is sent. Required-friendly for Hostinger shared
+    | hosting where a long-running `queue:work` daemon is not available.
+    |
+    */
+    'auto_drain' => filter_var(env('QUEUE_AUTO_DRAIN', true), FILTER_VALIDATE_BOOLEAN),
+    'auto_drain_queues' => env('QUEUE_AUTO_DRAIN_QUEUES', 'audit,bed-charges,default'),
+    'auto_drain_max_time' => (int) env('QUEUE_AUTO_DRAIN_MAX_TIME', 10),
+
 ];

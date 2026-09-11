@@ -105,6 +105,13 @@ class PathologyBillingController extends Controller
             'tests.*.amount' => 'required|numeric|min:0',
         ]);
 
+        try {
+            $linkedIpd = app(\App\Services\IpdStayWindowValidator::class)
+                ->assertPatientChargeDateForIpdBilling((int) $validated['patient_id'], $validated['date'], 'Pathology bill date');
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
+        }
+
         DB::beginTransaction();
         
         try {
@@ -167,6 +174,22 @@ class PathologyBillingController extends Controller
             }
 
             DB::commit();
+
+            app(\App\Services\Audit\AuditLogger::class)->log([
+                'module' => 'ipd',
+                'entity_type' => 'pathology_billing',
+                'entity_id' => $bill->id,
+                'parent_type' => $linkedIpd ? 'ipd_details' : null,
+                'parent_id' => $linkedIpd?->id,
+                'patient_id' => $bill->patient_id,
+                'case_no' => $linkedIpd?->ipd_no,
+                'action' => 'created',
+                'reason' => $request->input('audit_reason'),
+                'new_values' => [
+                    'date' => (string) $bill->date,
+                    'net_amount' => $bill->net_amount,
+                ],
+            ]);
             
             return redirect()->route('pathology.billing.index')
                 ->with('success', 'Pathology bill created successfully!');
@@ -305,6 +328,13 @@ class PathologyBillingController extends Controller
             'tests.*.amount' => 'required|numeric|min:0',
         ]);
 
+        try {
+            $linkedIpd = app(\App\Services\IpdStayWindowValidator::class)
+                ->assertPatientChargeDateForIpdBilling((int) $validated['patient_id'], $validated['date'], 'Pathology bill date');
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
+        }
+
         DB::beginTransaction();
         
         try {
@@ -383,6 +413,22 @@ class PathologyBillingController extends Controller
                 ->delete();
 
             DB::commit();
+
+            app(\App\Services\Audit\AuditLogger::class)->log([
+                'module' => 'ipd',
+                'entity_type' => 'pathology_billing',
+                'entity_id' => $bill->id,
+                'parent_type' => $linkedIpd ? 'ipd_details' : null,
+                'parent_id' => $linkedIpd?->id,
+                'patient_id' => $bill->patient_id,
+                'case_no' => $linkedIpd?->ipd_no,
+                'action' => 'updated',
+                'reason' => $request->input('audit_reason'),
+                'new_values' => [
+                    'date' => (string) $bill->date,
+                    'net_amount' => $bill->net_amount,
+                ],
+            ]);
             
             return redirect()->route('pathology.billing.index')
                 ->with('success', 'Pathology bill updated successfully!');
@@ -433,11 +479,47 @@ class PathologyBillingController extends Controller
         $validated = $request->validate([
             'field' => 'required|in:show_on_approval_bill,show_on_approval_preview,show_on_final_preview,show_on_final_bill',
             'value' => 'required|boolean',
+            'audit_reason' => 'nullable|string|max:2000',
         ]);
 
         $bill = PathologyBilling::findOrFail($id);
+        $stayValidator = app(\App\Services\IpdStayWindowValidator::class);
+        $linkedIpd = $stayValidator->resolveIpdForPatientBilling((int) $bill->patient_id);
+        if (! $linkedIpd) {
+            $latest = \App\Models\IpdDetail::where('patient_id', $bill->patient_id)
+                ->orderByDesc('date')->orderByDesc('id')->first();
+            if ($latest && $stayValidator->isFinalized($latest)) {
+                return response()->json([
+                    'success' => false,
+                    'code' => 'FINAL_BILL_LOCKED',
+                    'message' => 'Cannot update bill visibility: final bill is generated. Please reopen discharge first.',
+                ], 422);
+            }
+        } else {
+            try {
+                $stayValidator->assertMutable($linkedIpd, 'update pathology bill visibility');
+            } catch (\App\Exceptions\IpdConstraintException $e) {
+                return response()->json($e->toArray() + ['success' => false], 422);
+            }
+        }
+
+        $before = (bool) ($bill->{$validated['field']} ?? false);
         $bill->update([
             $validated['field'] => (bool) $validated['value'],
+        ]);
+
+        app(\App\Services\Audit\AuditLogger::class)->log([
+            'module' => 'pathology',
+            'entity_type' => 'pathology_billing',
+            'entity_id' => $bill->id,
+            'parent_type' => $linkedIpd ? 'ipd_details' : null,
+            'parent_id' => $linkedIpd?->id,
+            'patient_id' => $bill->patient_id,
+            'case_no' => $linkedIpd?->ipd_no,
+            'action' => 'visibility_changed',
+            'reason' => $validated['audit_reason'] ?? null,
+            'old_values' => [$validated['field'] => $before],
+            'new_values' => [$validated['field'] => (bool) $validated['value']],
         ]);
 
         return response()->json([

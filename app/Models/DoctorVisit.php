@@ -58,8 +58,8 @@ class DoctorVisit extends Model
     }
 
     /**
-     * Current open (non-discharged) IPD for patient only.
-     * Returns null if the patient has no active admission.
+     * Current open (non-discharged) IPD for patient, or reopened IPD.
+     * Returns null if the patient has no editable admission.
      */
     public static function resolveIpdIdForPatient(int $patientId): ?int
     {
@@ -72,6 +72,16 @@ class DoctorVisit extends Model
             ->orderByDesc('id')
             ->value('id');
 
-        return $open ? (int) $open : null;
+        if ($open) {
+            return (int) $open;
+        }
+
+        $reopened = IpdDetail::where('patient_id', $patientId)
+            ->where('is_reopened', true)
+            ->orderByDesc('date')
+            ->orderByDesc('id')
+            ->value('id');
+
+        return $reopened ? (int) $reopened : null;
     }
 }

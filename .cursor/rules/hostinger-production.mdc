@@ -1,0 +1,17 @@
+---
+description: Production target is Hostinger — prefer shared-hosting compatible queues, cron, and deploys
+alwaysApply: true
+---
+
+# Hostinger production target
+
+This HIMS app is deployed and must run correctly on **Hostinger** (Linux shared/VPS hosting), not only local XAMPP.
+
+## Rules
+
+- Design features for Hostinger constraints: no Windows Task Scheduler, no always-on desktop `queue:work` window, limited long-running processes on shared plans.
+- Prefer **`QUEUE_AUTO_DRAIN=true`** (drain `audit`, `bed-charges`, `default` after web requests) so queued jobs process without a manual worker.
+- Prefer Laravel **scheduler + Hostinger cron** (`* * * * * php artisan schedule:run`) for minute/hourly tasks — not Windows Startup scripts.
+- Keep Windows helper scripts (`scripts/start-queue-worker.bat`, `install-queue-autostart.ps1`) as **local-dev optional only**; never treat them as required for production.
+- Migrations/SQL deploy notes must work on Hostinger MySQL; avoid assuming local artisan migrate is the only path.
+- Paths, case sensitivity, and file permissions must be Linux-safe (Hostinger).

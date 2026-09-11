@@ -15,6 +15,7 @@ use App\Http\Controllers\BloodBankController;
 use App\Http\Controllers\BloodDonorController;
 use App\Http\Controllers\CashRegisterController;
 use App\Http\Controllers\DailyCollectionReportController;
+use App\Http\Controllers\AuditReportController;
 use App\Http\Controllers\DailyCashBookController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatabaseController;
@@ -702,6 +703,7 @@ Route::prefix('ipd/billing')->group(function () {
     Route::post('/{ipdId}/discount', [IpdBillingController::class, 'updateDiscount'])->name('ipd.billing.discount.update');
     Route::post('/{ipdId}/due-patient-party', [IpdBillingController::class, 'updateDuePatientParty'])->name('ipd.billing.due.patient.party.update');
     Route::get('/{ipdId}/check-discharged', [IpdBillingController::class, 'checkDischarged'])->name('ipd.billing.check.discharged');
+    Route::post('/{ipdId}/reopen-discharge', [IpdBillingController::class, 'reopenDischarge'])->name('ipd.billing.reopen.discharge');
     Route::get('/{ipdId}/final-bill-preview', [IpdBillingController::class, 'previewFinalBill'])->name('ipd.billing.final.preview');
     Route::post('/{ipdId}/generate-final', [IpdBillingController::class, 'generateFinalBill'])->name('ipd.billing.final.generate');
     Route::get('/{ipdId}/check-approval', [IpdBillingController::class, 'checkApprovalBill'])->name('ipd.billing.check.approval');
@@ -1157,6 +1159,8 @@ Route::prefix('reports')->group(function () {
     Route::get('/daily-collection-report', [DailyCollectionReportController::class, 'index'])->name('reports.daily-collection');
     Route::get('/daily-collection-report/excel', [DailyCollectionReportController::class, 'exportExcel'])->name('reports.daily-collection.excel');
     Route::get('/daily-collection-report/pdf', [DailyCollectionReportController::class, 'exportPdf'])->name('reports.daily-collection.pdf');
+    Route::get('/audit-log', [AuditReportController::class, 'index'])->name('reports.audit-log');
+    Route::get('/audit-log/excel', [AuditReportController::class, 'exportExcel'])->name('reports.audit-log.excel');
     Route::get('/daily-cash-book', [DailyCashBookController::class, 'index'])->name('reports.daily-cash-book');
     Route::get('/daily-cash-book/excel', [DailyCashBookController::class, 'exportExcel'])->name('reports.daily-cash-book.excel');
     Route::get('/daily-cash-book/pdf', [DailyCashBookController::class, 'exportPdf'])->name('reports.daily-cash-book.pdf');

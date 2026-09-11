@@ -278,6 +278,19 @@ class IpdBillingController extends Controller
         ]);
 
         $ipd = IpdDetail::findOrFail($ipdId);
+        try {
+            app(\App\Services\IpdStayWindowValidator::class)->assertMutable($ipd, 'update billing discounts');
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return response()->json($e->toArray() + ['success' => false], 422);
+        }
+
+        $before = [
+            'mou_discount' => $ipd->mou_discount,
+            'special_discount' => $ipd->special_discount,
+            'initial_approval_amount' => $ipd->initial_approval_amount,
+            'final_approval_amount' => $ipd->final_approval_amount,
+        ];
+
         $ipd->mou_discount = (float) ($request->input('mou_discount') ?? 0);
         $ipd->special_discount = (float) ($request->input('special_discount') ?? 0);
         if ($ipd->isInsuranceBilling()) {
@@ -293,6 +306,26 @@ class IpdBillingController extends Controller
             }
         }
         $ipd->save();
+
+        [$old, $new] = app(\App\Services\Audit\AuditLogger::class)->diff($before, [
+            'mou_discount' => $ipd->mou_discount,
+            'special_discount' => $ipd->special_discount,
+            'initial_approval_amount' => $ipd->initial_approval_amount,
+            'final_approval_amount' => $ipd->final_approval_amount,
+        ]);
+        app(\App\Services\Audit\AuditLogger::class)->log([
+            'module' => 'billing',
+            'entity_type' => 'ipd_details',
+            'entity_id' => $ipd->id,
+            'parent_type' => 'ipd_details',
+            'parent_id' => $ipd->id,
+            'patient_id' => $ipd->patient_id,
+            'case_no' => $ipd->ipd_no,
+            'action' => 'discount_updated',
+            'reason' => $request->input('audit_reason'),
+            'old_values' => $old,
+            'new_values' => $new,
+        ]);
 
         $totalDiscount = $ipd->mou_discount + $ipd->special_discount;
         $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
@@ -339,10 +372,33 @@ class IpdBillingController extends Controller
         ]);
 
         $ipd = IpdDetail::findOrFail($ipdId);
+        try {
+            app(\App\Services\IpdStayWindowValidator::class)->assertMutable($ipd, 'update due patient party');
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return response()->json($e->toArray() + ['success' => false], 422);
+        }
+
         $ipd->due_patient_party_doctor_id = $request->input('due_patient_party_doctor_id') ?: null;
         $ipd->due_patient_party_amount = (float) ($request->input('due_patient_party_amount') ?? 0);
         $ipd->due_patient_party_receipt_type = $request->input('due_patient_party_receipt_type') ?: null;
         $ipd->save();
+
+        app(\App\Services\Audit\AuditLogger::class)->log([
+            'module' => 'billing',
+            'entity_type' => 'ipd_details',
+            'entity_id' => $ipd->id,
+            'parent_type' => 'ipd_details',
+            'parent_id' => $ipd->id,
+            'patient_id' => $ipd->patient_id,
+            'case_no' => $ipd->ipd_no,
+            'action' => 'updated',
+            'reason' => $request->input('audit_reason'),
+            'new_values' => [
+                'due_patient_party_doctor_id' => $ipd->due_patient_party_doctor_id,
+                'due_patient_party_amount' => $ipd->due_patient_party_amount,
+                'due_patient_party_receipt_type' => $ipd->due_patient_party_receipt_type,
+            ],
+        ]);
 
         $totalDiscount = (float) ($ipd->mou_discount ?? 0) + (float) ($ipd->special_discount ?? 0);
         $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
@@ -2671,11 +2727,58 @@ class IpdBillingController extends Controller
                 'is_insurance' => $ipd->isInsuranceBilling(),
                 'final_approval_amount' => (float) ($ipd->final_approval_amount ?? 0),
                 'final_bill_generated' => $ipd->isFinalBillGenerated(),
+                'is_reopened' => $ipd->isReopened(),
+                'can_reopen_discharge' => $ipd->canReopenDischarge() && (function_exists('isSuperAdmin') ? isSuperAdmin() : true),
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'discharged' => false,
                 'message' => 'Error checking discharge status: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Reopen a finalized discharge so charges/beds can be corrected under stay-window locks.
+     */
+    public function reopenDischarge(Request $request, $ipdId, \App\Services\IpdDischargeReopenService $reopenService)
+    {
+        if (function_exists('isSuperAdmin') && ! isSuperAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only admin / superadmin can reopen discharge.',
+            ], 403);
+        }
+
+        $request->validate([
+            'reason' => 'required|string|min:5|max:2000',
+        ]);
+
+        try {
+            $ipd = IpdDetail::findOrFail($ipdId);
+            $result = $reopenService->reopen($ipd, (string) $request->input('reason'));
+
+            $message = 'Discharge reopened. Admission and discharge date/time remain locked.';
+            if (! empty($result['warnings'])) {
+                $message .= ' ' . implode(' ', $result['warnings']);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'warnings' => $result['warnings'],
+                'bed_restored' => $result['bed_restored'],
+                'is_reopened' => true,
+                'final_bill_generated' => false,
+            ]);
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return response()->json($e->toArray() + ['success' => false], 422);
+        } catch (\Throwable $e) {
+            \Log::error('Discharge reopen failed', ['ipd_id' => $ipdId, 'message' => $e->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to reopen discharge. Please try again.',
             ], 500);
         }
     }
