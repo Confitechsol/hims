@@ -1591,25 +1591,25 @@ class IpdBillingController extends Controller
     }
 
     /**
-     * Calendar end date for grouped bed charge "Date Range" (display only; billing unchanged).
-     * Uses period_end of the last billed day, capped to billing/discharge calendar date on the final bed row.
+     * Cap printed bed Date Range end on the final bed row (display only).
+     * Never raises above the min-slot end; only prevents showing past discharge/estimate day.
      */
     private function resolveBedChargeDisplayCalendarEnd(
-        string $periodEndYmd,
+        string $minSlotEndYmd,
         bool $isLastBedGroup,
         ?string $billingEndCalendarYmd
     ): string {
         if (! $isLastBedGroup || $billingEndCalendarYmd === null || $billingEndCalendarYmd === '') {
-            return $periodEndYmd;
+            return $minSlotEndYmd;
         }
 
         try {
-            $end = Carbon::parse($periodEndYmd)->startOfDay();
+            $end = Carbon::parse($minSlotEndYmd)->startOfDay();
             $cap = Carbon::parse($billingEndCalendarYmd)->startOfDay();
 
             return $end->lte($cap) ? $end->format('Y-m-d') : $cap->format('Y-m-d');
         } catch (\Throwable $e) {
-            return $periodEndYmd;
+            return $minSlotEndYmd;
         }
     }
 
@@ -1617,10 +1617,10 @@ class IpdBillingController extends Controller
      * Group day-wise bed charges by bed and contiguous date ranges for display.
      * Returns one row per (bed + contiguous date range): e.g. "SINGLE - 5 SINGLE @5000 | 5 Days | 17/01/2026 To 20/01/2026".
      *
-     * Printed "Date Range" uses calendar dates only (display labels):
-     * - from = period_start_date of first billed day (admission-side calendar date)
-     * - to   = period_end_date of last billed day, capped to discharge/billing-end calendar date
-     *          on the chronologically last bed group (never increases day count or amounts).
+     * Printed "Date Range" (display only — day counts/amounts unchanged), cash & insurance:
+     * - from = period_start_date of first billed day
+     * - to   = period_start_date of last billed day (min / start of last 11:00 slot),
+     *          down-capped to discharge/estimate calendar day on the last bed group only
      *
      * @param \Illuminate\Support\Collection $bedChargesDetails Day-wise details from calculateBedChargesFromHistory
      * @param string|null $billingEndCalendarYmd Y-m-d discharge or estimate end (calendar); caps last row end date
@@ -1655,8 +1655,8 @@ class IpdBillingController extends Controller
                     ? $d->charge_date->format('Y-m-d')
                     : Carbon::parse($d->charge_date)->format('Y-m-d');
 
+                // Min/start of the 11:00 slot (not period_end / max upto).
                 $pStart = $this->normalizeBedChargePeriodDate($d->period_start_date ?? null, $dDate);
-                $pEnd = $this->normalizeBedChargePeriodDate($d->period_end_date ?? null, $dDate);
 
                 $isConsecutive = $prevDate !== null && Carbon::parse($prevDate)->addDay()->format('Y-m-d') === $dDate;
 
@@ -1676,7 +1676,7 @@ class IpdBillingController extends Controller
                     }
                     $rangeStart = $dDate;
                     $rangeDisplayFrom = $pStart;
-                    $rangeDisplayTo = $pEnd;
+                    $rangeDisplayTo = $pStart;
                     $rangeDays = 1;
                     $rangeAmount = (float) ($d->bed_charge ?? 0);
                     $rangeRate = (float) ($d->bed_charge_rate ?? 0);
@@ -1685,7 +1685,7 @@ class IpdBillingController extends Controller
                 } else {
                     $rangeDays++;
                     $rangeAmount += (float) ($d->bed_charge ?? 0);
-                    $rangeDisplayTo = $pEnd;
+                    $rangeDisplayTo = $pStart;
                 }
                 $prevDate = $dDate;
             }
