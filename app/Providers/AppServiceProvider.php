@@ -4,8 +4,6 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Models\Hospital;
 use App\Models\Area;
@@ -36,105 +34,64 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-{
-    $this->registerOrganisationInsuranceRelations();
-    $this->registerQueueAutoDrain();
-
-    URL::forceRootUrl(config('app.url'));
-
-    if ($this->app->environment('production')) {
-        URL::forceScheme('http');
-    }
-
-    // ✅ Single Composer for Modal (BloodGroup + Area together)
-    View::composer('components.modals.add-patients-modal', function ($view) {
-
-        $bloodGroups = BloodBankProduct::all();
-        $areas = Area::all();
-
-        $view->with([
-            'bloodGroups' => $bloodGroups,
-            'areas' => $areas,
-        ]);
-    });
-    View::composer('components.modals.bed-modal', function ($view) {
-
-        // Use patientBedHistory (always on Bed) with a constraint — avoids requiring
-        // the activePatient() relationship, which may be missing on older deployments.
-        $beds = Bed::with([
-            'bedGroup:id,name,floor',
-            'patientBedHistory' => function ($query) {
-                $query->where('is_active', 'yes')
-                    ->with('ipd.patient:id,patient_name');
-            },
-        ])->get();
-
-        $grouped = [];
-
-        foreach ($beds as $bed) {
-            $floor = $bed->bedGroup->floor ?? 'Unknown';
-            $groupName = $bed->bedGroup->name ?? 'General';
-
-            $active = $bed->patientBedHistory->first();
-
-            $isOccupied = $active ? true : false;
-            $patientName = $active?->ipd?->patient?->patient_name;
-        
-            $grouped[$floor][$groupName][] = [
-                'id' => $bed->id,
-                'name' => $bed->name,
-                'is_occupied' => $isOccupied,
-                'patient_name' => $patientName,
-            ];
-        }
-        $view->with([
-            'grouped' => $grouped,
-        ]);
-    });
-    // ✅ Share Hospital Data Globally
-    View::composer('*', function ($view) {
-        $hospital = Hospital::first();
-        $view->with('hospitalData', $hospital);
-    });
-}
-
-    /**
-     * Drain queued jobs after each web response so audit/bed-charge jobs
-     * process on Hostinger without a long-lived `queue:work` daemon.
-     */
-    protected function registerQueueAutoDrain(): void
     {
-        if (! config('queue.auto_drain')) {
-            return;
+        $this->registerOrganisationInsuranceRelations();
+
+        URL::forceRootUrl(config('app.url'));
+
+        if ($this->app->environment('production')) {
+            URL::forceScheme('http');
         }
 
-        // CLI already has artisan/schedule; avoid nesting workers.
-        if ($this->app->runningInConsole()) {
-            return;
-        }
+        // ✅ Single Composer for Modal (BloodGroup + Area together)
+        View::composer('components.modals.add-patients-modal', function ($view) {
 
-        $this->app->terminating(function () {
-            try {
-                $lock = Cache::lock('hims-queue-auto-drain', 30);
-                if (! $lock->get()) {
-                    return;
-                }
+            $bloodGroups = BloodBankProduct::all();
+            $areas = Area::all();
 
-                try {
-                    Artisan::call('queue:work', [
-                        '--queue' => (string) config('queue.auto_drain_queues', 'audit,bed-charges,default'),
-                        '--stop-when-empty' => true,
-                        '--max-time' => (int) config('queue.auto_drain_max_time', 10),
-                        '--tries' => 3,
-                    ]);
-                } finally {
-                    optional($lock)->release();
-                }
-            } catch (\Throwable $e) {
-                Log::warning('Queue auto-drain failed', [
-                    'message' => $e->getMessage(),
-                ]);
+            $view->with([
+                'bloodGroups' => $bloodGroups,
+                'areas' => $areas,
+            ]);
+        });
+        View::composer('components.modals.bed-modal', function ($view) {
+
+            // Use patientBedHistory (always on Bed) with a constraint — avoids requiring
+            // the activePatient() relationship, which may be missing on older deployments.
+            $beds = Bed::with([
+                'bedGroup:id,name,floor',
+                'patientBedHistory' => function ($query) {
+                    $query->where('is_active', 'yes')
+                        ->with('ipd.patient:id,patient_name');
+                },
+            ])->get();
+
+            $grouped = [];
+
+            foreach ($beds as $bed) {
+                $floor = $bed->bedGroup->floor ?? 'Unknown';
+                $groupName = $bed->bedGroup->name ?? 'General';
+
+                $active = $bed->patientBedHistory->first();
+
+                $isOccupied = $active ? true : false;
+                $patientName = $active?->ipd?->patient?->patient_name;
+
+                $grouped[$floor][$groupName][] = [
+                    'id' => $bed->id,
+                    'name' => $bed->name,
+                    'is_occupied' => $isOccupied,
+                    'patient_name' => $patientName,
+                ];
             }
+            $view->with([
+                'grouped' => $grouped,
+            ]);
+        });
+        // ✅ Share Hospital Data Globally
+        View::composer('*', function ($view) {
+            $hospital = Hospital::first();
+            $view->with('hospitalData', $hospital);
         });
     }
 

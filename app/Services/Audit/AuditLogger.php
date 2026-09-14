@@ -65,7 +65,9 @@ class AuditLogger
                 'meta' => $payload['meta'] ?? null,
             ];
 
-            RecordAuditEventJob::dispatch($full);
+            // Persist audit inline — never depend on queue:work during web requests
+            // (Artisan queue drain in terminating caused infinite hangs).
+            RecordAuditEventJob::dispatchSync($full);
 
             return true;
         } catch (Throwable $e) {
