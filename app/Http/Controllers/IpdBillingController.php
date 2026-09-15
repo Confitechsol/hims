@@ -278,6 +278,19 @@ class IpdBillingController extends Controller
         ]);
 
         $ipd = IpdDetail::findOrFail($ipdId);
+        try {
+            app(\App\Services\IpdStayWindowValidator::class)->assertMutable($ipd, 'update billing discounts');
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return response()->json($e->toArray() + ['success' => false], 422);
+        }
+
+        $before = [
+            'mou_discount' => $ipd->mou_discount,
+            'special_discount' => $ipd->special_discount,
+            'initial_approval_amount' => $ipd->initial_approval_amount,
+            'final_approval_amount' => $ipd->final_approval_amount,
+        ];
+
         $ipd->mou_discount = (float) ($request->input('mou_discount') ?? 0);
         $ipd->special_discount = (float) ($request->input('special_discount') ?? 0);
         if ($ipd->isInsuranceBilling()) {
@@ -293,6 +306,26 @@ class IpdBillingController extends Controller
             }
         }
         $ipd->save();
+
+        [$old, $new] = app(\App\Services\Audit\AuditLogger::class)->diff($before, [
+            'mou_discount' => $ipd->mou_discount,
+            'special_discount' => $ipd->special_discount,
+            'initial_approval_amount' => $ipd->initial_approval_amount,
+            'final_approval_amount' => $ipd->final_approval_amount,
+        ]);
+        app(\App\Services\Audit\AuditLogger::class)->log([
+            'module' => 'billing',
+            'entity_type' => 'ipd_details',
+            'entity_id' => $ipd->id,
+            'parent_type' => 'ipd_details',
+            'parent_id' => $ipd->id,
+            'patient_id' => $ipd->patient_id,
+            'case_no' => $ipd->ipd_no,
+            'action' => 'discount_updated',
+            'reason' => $request->input('audit_reason'),
+            'old_values' => $old,
+            'new_values' => $new,
+        ]);
 
         $totalDiscount = $ipd->mou_discount + $ipd->special_discount;
         $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
@@ -339,10 +372,33 @@ class IpdBillingController extends Controller
         ]);
 
         $ipd = IpdDetail::findOrFail($ipdId);
+        try {
+            app(\App\Services\IpdStayWindowValidator::class)->assertMutable($ipd, 'update due patient party');
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return response()->json($e->toArray() + ['success' => false], 422);
+        }
+
         $ipd->due_patient_party_doctor_id = $request->input('due_patient_party_doctor_id') ?: null;
         $ipd->due_patient_party_amount = (float) ($request->input('due_patient_party_amount') ?? 0);
         $ipd->due_patient_party_receipt_type = $request->input('due_patient_party_receipt_type') ?: null;
         $ipd->save();
+
+        app(\App\Services\Audit\AuditLogger::class)->log([
+            'module' => 'billing',
+            'entity_type' => 'ipd_details',
+            'entity_id' => $ipd->id,
+            'parent_type' => 'ipd_details',
+            'parent_id' => $ipd->id,
+            'patient_id' => $ipd->patient_id,
+            'case_no' => $ipd->ipd_no,
+            'action' => 'updated',
+            'reason' => $request->input('audit_reason'),
+            'new_values' => [
+                'due_patient_party_doctor_id' => $ipd->due_patient_party_doctor_id,
+                'due_patient_party_amount' => $ipd->due_patient_party_amount,
+                'due_patient_party_receipt_type' => $ipd->due_patient_party_receipt_type,
+            ],
+        ]);
 
         $totalDiscount = (float) ($ipd->mou_discount ?? 0) + (float) ($ipd->special_discount ?? 0);
         $duePatientPartyAmount = (float) ($ipd->due_patient_party_amount ?? 0);
@@ -1535,25 +1591,25 @@ class IpdBillingController extends Controller
     }
 
     /**
-     * Calendar end date for grouped bed charge "Date Range" (display only; billing unchanged).
-     * Uses period_end of the last billed day, capped to billing/discharge calendar date on the final bed row.
+     * Cap printed bed Date Range end on the final bed row (display only).
+     * Never raises above the min-slot end; only prevents showing past discharge/estimate day.
      */
     private function resolveBedChargeDisplayCalendarEnd(
-        string $periodEndYmd,
+        string $minSlotEndYmd,
         bool $isLastBedGroup,
         ?string $billingEndCalendarYmd
     ): string {
         if (! $isLastBedGroup || $billingEndCalendarYmd === null || $billingEndCalendarYmd === '') {
-            return $periodEndYmd;
+            return $minSlotEndYmd;
         }
 
         try {
-            $end = Carbon::parse($periodEndYmd)->startOfDay();
+            $end = Carbon::parse($minSlotEndYmd)->startOfDay();
             $cap = Carbon::parse($billingEndCalendarYmd)->startOfDay();
 
             return $end->lte($cap) ? $end->format('Y-m-d') : $cap->format('Y-m-d');
         } catch (\Throwable $e) {
-            return $periodEndYmd;
+            return $minSlotEndYmd;
         }
     }
 
@@ -1561,10 +1617,10 @@ class IpdBillingController extends Controller
      * Group day-wise bed charges by bed and contiguous date ranges for display.
      * Returns one row per (bed + contiguous date range): e.g. "SINGLE - 5 SINGLE @5000 | 5 Days | 17/01/2026 To 20/01/2026".
      *
-     * Printed "Date Range" uses calendar dates only (display labels):
-     * - from = period_start_date of first billed day (admission-side calendar date)
-     * - to   = period_end_date of last billed day, capped to discharge/billing-end calendar date
-     *          on the chronologically last bed group (never increases day count or amounts).
+     * Printed "Date Range" (display only — day counts/amounts unchanged), cash & insurance:
+     * - from = period_start_date of first billed day
+     * - to   = period_start_date of last billed day (min / start of last 11:00 slot),
+     *          down-capped to discharge/estimate calendar day on the last bed group only
      *
      * @param \Illuminate\Support\Collection $bedChargesDetails Day-wise details from calculateBedChargesFromHistory
      * @param string|null $billingEndCalendarYmd Y-m-d discharge or estimate end (calendar); caps last row end date
@@ -1599,8 +1655,8 @@ class IpdBillingController extends Controller
                     ? $d->charge_date->format('Y-m-d')
                     : Carbon::parse($d->charge_date)->format('Y-m-d');
 
+                // Min/start of the 11:00 slot (not period_end / max upto).
                 $pStart = $this->normalizeBedChargePeriodDate($d->period_start_date ?? null, $dDate);
-                $pEnd = $this->normalizeBedChargePeriodDate($d->period_end_date ?? null, $dDate);
 
                 $isConsecutive = $prevDate !== null && Carbon::parse($prevDate)->addDay()->format('Y-m-d') === $dDate;
 
@@ -1620,7 +1676,7 @@ class IpdBillingController extends Controller
                     }
                     $rangeStart = $dDate;
                     $rangeDisplayFrom = $pStart;
-                    $rangeDisplayTo = $pEnd;
+                    $rangeDisplayTo = $pStart;
                     $rangeDays = 1;
                     $rangeAmount = (float) ($d->bed_charge ?? 0);
                     $rangeRate = (float) ($d->bed_charge_rate ?? 0);
@@ -1629,7 +1685,7 @@ class IpdBillingController extends Controller
                 } else {
                     $rangeDays++;
                     $rangeAmount += (float) ($d->bed_charge ?? 0);
-                    $rangeDisplayTo = $pEnd;
+                    $rangeDisplayTo = $pStart;
                 }
                 $prevDate = $dDate;
             }
@@ -2671,11 +2727,58 @@ class IpdBillingController extends Controller
                 'is_insurance' => $ipd->isInsuranceBilling(),
                 'final_approval_amount' => (float) ($ipd->final_approval_amount ?? 0),
                 'final_bill_generated' => $ipd->isFinalBillGenerated(),
+                'is_reopened' => $ipd->isReopened(),
+                'can_reopen_discharge' => $ipd->canReopenDischarge() && (function_exists('isSuperAdmin') ? isSuperAdmin() : true),
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'discharged' => false,
                 'message' => 'Error checking discharge status: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Reopen a finalized discharge so charges/beds can be corrected under stay-window locks.
+     */
+    public function reopenDischarge(Request $request, $ipdId, \App\Services\IpdDischargeReopenService $reopenService)
+    {
+        if (function_exists('isSuperAdmin') && ! isSuperAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only admin / superadmin can reopen discharge.',
+            ], 403);
+        }
+
+        $request->validate([
+            'reason' => 'required|string|min:5|max:2000',
+        ]);
+
+        try {
+            $ipd = IpdDetail::findOrFail($ipdId);
+            $result = $reopenService->reopen($ipd, (string) $request->input('reason'));
+
+            $message = 'Discharge reopened. Admission and discharge date/time remain locked.';
+            if (! empty($result['warnings'])) {
+                $message .= ' ' . implode(' ', $result['warnings']);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'warnings' => $result['warnings'],
+                'bed_restored' => $result['bed_restored'],
+                'is_reopened' => true,
+                'final_bill_generated' => false,
+            ]);
+        } catch (\App\Exceptions\IpdConstraintException $e) {
+            return response()->json($e->toArray() + ['success' => false], 422);
+        } catch (\Throwable $e) {
+            \Log::error('Discharge reopen failed', ['ipd_id' => $ipdId, 'message' => $e->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to reopen discharge. Please try again.',
             ], 500);
         }
     }

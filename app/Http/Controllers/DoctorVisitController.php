@@ -18,11 +18,17 @@ class DoctorVisitController extends Controller
     public function create()
     {
         $dischargedIds = IpdDetail::getDischargedPatientIds();
+        $reopenedPatientIds = IpdDetail::where('is_reopened', true)->pluck('patient_id')->unique()->filter()->all();
         $ipdPatientIds = IpdDetail::query()->pluck('patient_id')->unique()->filter()->all();
 
         $patients = Patient::select('id', 'patient_name', 'mobileno')
             ->whereIn('id', $ipdPatientIds)
-            ->when(! empty($dischargedIds), fn ($q) => $q->whereNotIn('id', $dischargedIds))
+            ->where(function ($q) use ($dischargedIds, $reopenedPatientIds) {
+                $q->whereNotIn('id', $dischargedIds ?: [0]);
+                if (! empty($reopenedPatientIds)) {
+                    $q->orWhereIn('id', $reopenedPatientIds);
+                }
+            })
             ->orderBy('patient_name')
             ->get();
 
@@ -59,8 +65,13 @@ class DoctorVisitController extends Controller
             }
 
             $ipd = IpdDetail::find($ipdId);
-            if ($ipd && ($ipd->discharged ?? '') === 'yes') {
-                throw new \Exception('Selected patient is already discharged. Doctor visits can only be added for active admissions.');
+            $stayValidator = app(\App\Services\IpdStayWindowValidator::class);
+            if ($ipd) {
+                $stayValidator->assertMutable($ipd, 'add doctor visit');
+                $stayValidator->assertChargeDateInStayWindow($ipd, $request->visit_date, 'Visit date');
+            }
+            if ($ipd && ($ipd->discharged ?? '') === 'yes' && ! $ipd->isReopened()) {
+                throw new \Exception('Selected patient is already discharged. Doctor visits can only be added for active or reopened admissions.');
             }
 
             // Check if editing
@@ -118,6 +129,25 @@ class DoctorVisitController extends Controller
 
             DB::commit();
 
+            if ($ipd) {
+                app(\App\Services\Audit\AuditLogger::class)->log([
+                    'module' => 'ipd',
+                    'entity_type' => 'doctor_visits',
+                    'entity_id' => $request->edit_id ?: null,
+                    'parent_type' => 'ipd_details',
+                    'parent_id' => $ipd->id,
+                    'patient_id' => $ipd->patient_id,
+                    'case_no' => $ipd->ipd_no,
+                    'action' => $request->edit_id ? 'updated' : 'created',
+                    'reason' => $request->input('audit_reason'),
+                    'new_values' => [
+                        'visit_date' => $request->visit_date,
+                        'amount' => $request->amount,
+                        'doctor_id' => $request->doctor_id,
+                    ],
+                ]);
+            }
+
             return redirect()->route('doctor-visit.create')
                 ->with('success', $message);
 
@@ -143,7 +173,7 @@ class DoctorVisitController extends Controller
             }
 
             $ipd = IpdDetail::find($ipdId);
-            if (! $ipd || ($ipd->discharged ?? '') === 'yes') {
+            if (! $ipd || (($ipd->discharged ?? '') === 'yes' && ! $ipd->isReopened())) {
                 return response()->json([]);
             }
 

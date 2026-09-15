@@ -117,6 +117,10 @@
                             <button type="button" id="generateFinalBtn" class="btn btn-sm btn-success">
                                 <i class="fas fa-check me-1"></i> Generate Final Bill
                             </button>
+                            <button type="button" id="reopenDischargeBtn" class="btn btn-sm btn-warning ms-2" style="display:none;">
+                                <i class="fas fa-undo me-1"></i> Reopen Discharge
+                            </button>
+                            <span id="reopenBadge" class="badge bg-warning text-dark ms-2" style="display:none;">Reopened</span>
                         </div>
                     </div>
                 </div>
@@ -431,6 +435,76 @@
                 handleFinalBillAction('generate');
             });
 
+            const reopenDischargeBtn = document.getElementById('reopenDischargeBtn');
+            if (reopenDischargeBtn) {
+                reopenDischargeBtn.addEventListener('click', function() {
+                    const ipdId = requireIpdId();
+                    if (!ipdId) return;
+
+                    Swal.fire({
+                        title: 'Reopen Discharge',
+                        html: '<p class="text-start mb-2">Admission and discharge date/time will stay locked. Charge dates must remain inside the stay window. Bed assignment times stay frozen (rate only).</p>',
+                        input: 'textarea',
+                        inputLabel: 'Reason (required)',
+                        inputPlaceholder: 'Why are you reopening this discharge?',
+                        inputAttributes: { 'aria-label': 'Reopen reason' },
+                        showCancelButton: true,
+                        confirmButtonText: 'Reopen',
+                        confirmButtonColor: '#d39e00',
+                        cancelButtonText: 'Cancel',
+                        inputValidator: (value) => {
+                            if (!value || value.trim().length < 5) {
+                                return 'Please enter a reason (at least 5 characters).';
+                            }
+                        }
+                    }).then((result) => {
+                        if (!result.isConfirmed) return;
+                        fetch('{{ url("ipd/billing") }}/' + ipdId + '/reopen-discharge', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken()
+                            },
+                            body: JSON.stringify({ reason: result.value })
+                        })
+                        .then(r => r.json().then(data => ({ ok: r.ok, data })))
+                        .then(({ ok, data }) => {
+                            if (!ok || !data.success) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Cannot reopen',
+                                    text: data.message || 'Reopen failed',
+                                    confirmButtonColor: '#750096'
+                                });
+                                return;
+                            }
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Reopened',
+                                text: data.message || 'Discharge reopened.',
+                                confirmButtonColor: '#750096'
+                            }).then(() => {
+                                refreshBillingActionButtons(ipdId);
+                                if (typeof loadBreakup === 'function') {
+                                    loadBreakup(ipdId);
+                                } else {
+                                    window.location.reload();
+                                }
+                            });
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Unable to reopen discharge.',
+                                confirmButtonColor: '#750096'
+                            });
+                        });
+                    });
+                });
+            }
+
             function csrfToken() {
                 const meta = document.querySelector('meta[name="csrf-token"]');
                 return meta ? meta.getAttribute('content') : '';
@@ -480,10 +554,14 @@
                 const approvalBtn = document.getElementById('exportApprovalBtn');
                 const previewBtn = document.getElementById('previewFinalBtn');
                 const generateBtn = document.getElementById('generateFinalBtn');
+                const reopenBtn = document.getElementById('reopenDischargeBtn');
+                const reopenBadge = document.getElementById('reopenBadge');
 
                 const isInsurance = !!status.is_insurance;
                 const discharged = !!status.discharged;
                 const finalGenerated = !!status.final_bill_generated;
+                const isReopened = !!status.is_reopened;
+                const canReopen = !!status.can_reopen_discharge;
                 const canPreviewApproval = !!status.can_preview_approval;
                 const canExportApproval = !!status.can_export_approval;
 
@@ -492,6 +570,12 @@
                 }
                 if (approvalBtn) {
                     approvalBtn.style.display = isInsurance ? 'inline-block' : 'none';
+                }
+                if (reopenBtn) {
+                    reopenBtn.style.display = canReopen ? 'inline-block' : 'none';
+                }
+                if (reopenBadge) {
+                    reopenBadge.style.display = isReopened ? 'inline-block' : 'none';
                 }
 
                 if (finalGenerated) {
@@ -532,6 +616,8 @@
                         is_insurance: !!approvalStatus.is_insurance,
                         discharged: !!dischargeStatus.discharged,
                         final_bill_generated: !!dischargeStatus.final_bill_generated,
+                        is_reopened: !!dischargeStatus.is_reopened,
+                        can_reopen_discharge: !!dischargeStatus.can_reopen_discharge,
                         can_preview_approval: !!approvalStatus.can_preview_approval,
                         can_export_approval: !!approvalStatus.can_export_approval,
                     });

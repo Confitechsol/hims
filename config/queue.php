@@ -109,4 +109,19 @@ return [
         'table' => 'failed_jobs',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Auto-drain queued jobs after web requests
+    |--------------------------------------------------------------------------
+    |
+    | DISABLED by default. Calling queue:work from HTTP terminating caused
+    | infinite request hangs. Audit events use dispatchSync instead.
+    | Keep false on local and Hostinger unless you run a real queue worker.
+    |
+    */
+    'auto_drain' => filter_var(env('QUEUE_AUTO_DRAIN', false), FILTER_VALIDATE_BOOLEAN),
+    'auto_drain_queues' => env('QUEUE_AUTO_DRAIN_QUEUES', 'audit,bed-charges,default'),
+    'auto_drain_max_time' => (int) env('QUEUE_AUTO_DRAIN_MAX_TIME', 5),
+    'auto_drain_max_jobs' => (int) env('QUEUE_AUTO_DRAIN_MAX_JOBS', 15),
+
 ];
