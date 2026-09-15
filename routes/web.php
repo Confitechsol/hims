@@ -93,6 +93,8 @@ use App\Http\Controllers\TpamanagmentController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionReportController;
 use App\Http\Controllers\VisitorsController;
+use App\Http\Controllers\BackendBillController;
+use App\Http\Controllers\BackendMoneyReciptController;
 use App\Http\Controllers\VitalController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PatientReportController;
@@ -194,6 +196,30 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/patient-report', [PatientReportController::class, 'patientReportApi']);
     Route::get('/departments', [PatientController::class, 'departments']); 
     Route::post('opd/patient', [PatientController::class, 'opdPatientStore'])->name('opd-patient-store');
+
+    //Backend Bill
+    Route::get('/backend', [BackendBillController::class, 'index'])->name('backend');
+    Route::post('/backend',[BackendBillController::class, 'store'])->name('backend-store');
+    Route::get('/backend-bill/{id}/edit', [BackendBillController::class, 'edit'])->name('backend.edit');
+    Route::put('/backend-bill/update', [BackendBillController::class, 'update'])->name('backend-update');
+    Route::get('/backend-bill/{id}/pdf', [BackendBillController::class, 'downloadPdf'])->name('backend.pdf');
+    Route::delete('/backend/{id}', [BackendBillController::class, 'destroy'])->name('backend-destroy');
+    Route::get('/backend-money-receipt', [BackendMoneyReciptController::class, 'index'])->name('backend-money-receipt');
+
+
+    Route::get( '/ipd/search-ipd-patient',[BackendBillController::class, 'searchIpdPatient'])->name('backend.searchIpdPatient');
+    Route::get( '/opd/search-opd-patient',[BackendBillController::class, 'searchOpdPatient'])->name('backend.searchOpdPatient');
+
+
+    Route::get('/moneyreceipt', [BackendMoneyReciptController::class, 'index'])->name('moneyreceipt');
+    Route::get('/backend-money-receipt/{id}/edit', [BackendMoneyReciptController::class, 'editReceipt'])->name('backend-money-receipt.edit');
+    Route::put('/backend-money-receipt/{id}', [BackendMoneyReciptController::class, 'updateReceipt'])->name('backend-money-receipt.update');
+    Route::delete('/backend-money-receipt/{id}', [BackendMoneyReciptController::class, 'destroyReceipt'])->name('backend-money-receipt.destroy');
+    Route::get('/backend-money-receipt/{id}/pdf', [BackendMoneyReciptController::class, 'downloadPdf'])->name('backend-money-receipt.pdf');
+    Route::get('/backend/search-patient', [BackendMoneyReciptController::class, 'searchPatient'])->name('backend.searchPatient');
+    Route::post('/backend-money-receipt', [BackendMoneyReciptController::class, 'store'])->name('backend-money-receipt.store');
+
+
     
     
     Route::get('/get-doctors/patients/count', [DoctorExportPatientCountController::class, 'getDoctorsPatientCount'])->name('get.doctors.patient.count'  );

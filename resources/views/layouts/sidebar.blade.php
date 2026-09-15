@@ -215,6 +215,9 @@
                                     <li><a href="{{ route('ipd') }}"
                                             class="{{ request()->routeIs('ipd') ? 'active' : '' }}">IPD Patient
                                             Details</a></li>
+                                    <li><a href="{{ route('backend') }}"
+                                            class="{{ request()->routeIs('backend') ? 'active' : '' }}">BACKEND Patient
+                                            Details</a></li>
 
 
                                 </ul>
@@ -435,6 +438,14 @@
                                         class="{{ request()->routeIs('money-receipt.*') ? 'active' : '' }}">Money/Refund
                                         Receipt
                                     </a></li>
+
+                                <li>
+                                    <a href="{{ route('backend-money-receipt') }}"
+                                        class="{{ request()->routeIs('backend-money-receipt*') ? 'active' : '' }}">
+                                        Backend Money Receipt
+                                    </a>
+                                </li>
+
 
                             </ul>
                         </li>
