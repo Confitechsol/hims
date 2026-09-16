@@ -261,6 +261,38 @@
             width: 25%;
         }
 
+        .summary-table {
+            width: 42%;
+            margin: 12px 0 0 auto;
+            border-collapse: collapse;
+            border: 1px solid #d9d9d9;
+        }
+
+        .summary-table td {
+            border-top: 1px solid #d9d9d9;
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+
+        .summary-table tr:first-child td {
+            border-top: 0;
+        }
+
+        .summary-table td:first-child {
+            background: #f1f1f1;
+            font-weight: 700;
+        }
+
+        .summary-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .summary-table .total-row td {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
         .amount-row td {
             background: #fff;
         }
@@ -348,25 +380,51 @@
                 </div>
             </div>
 
+            @php
+                $discountAmount = (float) ($receipt->discount_amount ?? ($bill->adjustment_amount ?? 0));
+                $billItems = $bill?->billItems ?? collect();
+            @endphp
+
             <table class="amount-table" cellspacing="0" cellpadding="0">
                 <thead>
                     <tr>
-                        <th colspan="2">AMOUNT DETAILS</th>
+                        <th>ITEM</th>
+                        <th>AMOUNT</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="amount-row">
+                    @forelse ($billItems as $item)
+                        <tr class="amount-row">
+                            <td>{{ $item->bill_item ?? '-' }}</td>
+                            <td>{{ number_format((float) ($item->amount ?? 0), 2) }}</td>
+                        </tr>
+                    @empty
+                        <tr class="amount-row">
+                            <td>Bill Amount</td>
+                            <td>{{ number_format((float) ($billAmount ?? 0), 2) }}</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+
+            <table class="summary-table" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                        <td>Total Amount</td>
+                        <td>{{ number_format((float) ($billAmount ?? 0), 2) }}</td>
+                    </tr>
+                    <tr>
                         <td>Discount Amount</td>
-                        <td>{{ number_format((float)($receipt->discount_amount ?? 0), 2) }}</td>
+                        <td>{{ number_format($discountAmount, 2) }}</td>
                     </tr>
-                    <tr class="amount-row">
+                    <tr>
                         <td>Received Amount</td>
-                        <td>{{ number_format((float)($receipt->received_amount ?? 0), 2) }}</td>
+                        <td>{{ number_format((float) ($totalReceived ?? $receipt->received_amount ?? 0), 2) }}</td>
                     </tr>
-                    {{-- <tr class="amount-row">
+                    <tr class="total-row">
                         <td>Due Amount</td>
-                        <td>{{ number_format((float)($dueAmount ?? 0), 2) }}</td>
-                    </tr> --}}
+                        <td>{{ number_format((float) ($dueAmount ?? 0), 2) }}</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
