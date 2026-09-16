@@ -721,12 +721,13 @@
             <table class="charges-table">
                 <thead>
                     <tr>
-                        <th colspan="5">IPD Charges</th>
+                        <th colspan="6">IPD Charges</th>
                     </tr>
                     <tr>
                         <th>Date</th>
                         <th>Category</th>
                         <th>Charge Name</th>
+                        <th class="text-right">Rate</th>
                         <th>Qty</th>
                         <th class="text-right">Amount</th>
                     </tr>
@@ -737,12 +738,13 @@
                             <td>{{ \Carbon\Carbon::parse($charge->date)->format('d-m-Y') }}</td>
                             <td>{{ $charge->chargeCategory->name ?? 'N/A' }}</td>
                             <td>{{ $charge->charge->name ?? 'N/A' }}</td>
+                            <td class="text-right">Rs. {{ number_format((float) ($charge->standard_charge ?? 0), 2) }}</td>
                             <td>{{ $charge->qty }}</td>
                             <td class="text-right">Rs. {{ number_format($charge->net_amount, 2) }}</td>
                         </tr>
                     @endforeach
                     <tr style="font-weight: bold;">
-                        <td colspan="4" class="text-right">Subtotal:</td>
+                        <td colspan="5" class="text-right">Subtotal:</td>
                         <td class="text-right">Rs. {{ number_format($ipdChargesTableSubtotal, 2) }}</td>
                     </tr>
                 </tbody>

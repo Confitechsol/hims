@@ -149,9 +149,12 @@
                                                     {{ $charge['description'] ?? ('Package - ' . ($charge['package_name'] ?? 'N/A')) }}
                                                 @elseif($charge['type'] == 'ipd')
                                                     {{ $charge['description'] }}
-                                                    @if(isset($charge['qty']) && $charge['qty'] > 1)
-                                                        <br><small class="text-muted">Qty: {{ $charge['qty'] }}</small>
-                                                    @endif
+                                                    <br><small class="text-muted">
+                                                        Rate: ₹{{ number_format($charge['rate'] ?? 0, 2) }}
+                                                        @if(isset($charge['qty']))
+                                                            &nbsp;|&nbsp;Qty: {{ $charge['qty'] }}
+                                                        @endif
+                                                    </small>
                                                 @elseif($charge['type'] == 'pathology')
                                                     {{ $charge['test_name'] ?? $charge['description'] }}
                                                 @elseif($charge['type'] == 'radiology')
@@ -174,8 +177,9 @@
                                                 @elseif($charge['type'] == 'ipd')
                                                     <small>
                                                         Category: {{ $charge['category'] ?? 'N/A' }}<br>
-                                                        @if(isset($charge['qty']) && $charge['qty'] > 1)
-                                                            Qty: {{ $charge['qty'] }}
+                                                        Rate: ₹{{ number_format($charge['rate'] ?? 0, 2) }}
+                                                        @if(isset($charge['qty']))
+                                                            <br>Qty: {{ $charge['qty'] }}
                                                         @endif
                                                     </small>
                                                 @elseif($charge['type'] == 'doctor_visit')
