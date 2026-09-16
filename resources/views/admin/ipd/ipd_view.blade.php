@@ -3553,8 +3553,8 @@
                                                                 <th>Charge Name / Charge Note</th>
                                                                 <th>Charge Type</th>
                                                                 <th>Charge Category</th>
+                                                                <th>Rate (INR)</th>
                                                                 <th>Qty</th>
-                                                                <th>Standard Charge (INR)</th>
                                                                 <th>Applied Charge (INR)</th>
                                                                 <th>TPA Charge (INR)</th>
                                                                 <th>Discount</th>
@@ -3597,9 +3597,9 @@
                                                                     </td>
 
                                                                     <td class="text-right">
-                                                                        {{ $charge->qty ?? '-' }}</td>
-                                                                    <td class="text-right">
                                                                         {{ $charge->standard_charge ?? '-' }}</td>
+                                                                    <td class="text-right">
+                                                                        {{ $charge->qty ?? '-' }}</td>
                                                                     <td class="text-right">0.00</td>
                                                                     <td>{{ $discountAmount }}&nbsp;({{ $charge->discount }}%)
                                                                     </td>

@@ -984,6 +984,7 @@ class IpdBillingController extends Controller
                     'date' => $charge->date,
                     'category' => $charge->chargeCategory->name ?? 'N/A',
                     'charge_name' => $charge->charge->name ?? 'N/A',
+                    'rate' => (float) ($charge->standard_charge ?? 0),
                     'qty' => $charge->qty ?? 1,
                     'amount' => $charge->net_amount ?? 0,
                     'type' => 'ipd',
