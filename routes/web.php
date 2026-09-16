@@ -385,6 +385,7 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/insurance-rate-panels', [InsuranceRatePanelController::class, 'index'])->name('insurance.rate-panels');
     Route::put('/insurance-rate-panels/companies', [InsuranceRatePanelController::class, 'updateCompanies'])->name('insurance.rate-panels.companies.update');
+    Route::post('/insurance-rate-panels/rates', [InsuranceRatePanelController::class, 'storeRate'])->name('insurance.rate-panels.rates.store');
     Route::post('/insurance-rate-panels/import-pathology', [InsuranceRatePanelController::class, 'importPathology'])->name('insurance.rate-panels.import.pathology');
     Route::post('/insurance-rate-panels/import-radiology', [InsuranceRatePanelController::class, 'importRadiology'])->name('insurance.rate-panels.import.radiology');
     Route::get('/insurance-test-mapping', [InsuranceTestMappingController::class, 'index'])->name('insurance.test-mapping');

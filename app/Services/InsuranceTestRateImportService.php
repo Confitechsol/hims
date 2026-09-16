@@ -16,13 +16,22 @@ class InsuranceTestRateImportService
 
     /**
      * @param  'pathology'|'radiology'  $testType
+     * @param  string|null  $panelCode  When set (e.g. GIPSA), only that panel sheet is imported
      * @return array{panels: int, rates: int, mapped: int, needs_review: int, unmapped: int}
      */
-    public function importFromFile(string $filePath, string $testType, bool $replaceExistingForType = true): array
-    {
+    public function importFromFile(
+        string $filePath,
+        string $testType,
+        bool $replaceExistingForType = true,
+        ?string $panelCode = null
+    ): array {
         if (!in_array($testType, ['pathology', 'radiology'], true)) {
             throw new \InvalidArgumentException('testType must be pathology or radiology');
         }
+
+        $panelCode = $panelCode !== null && trim($panelCode) !== ''
+            ? Str::upper(trim($panelCode))
+            : null;
 
         $spreadsheet = IOFactory::load($filePath);
         $stats = ['panels' => 0, 'rates' => 0, 'mapped' => 0, 'needs_review' => 0, 'unmapped' => 0];
@@ -30,6 +39,10 @@ class InsuranceTestRateImportService
         foreach ($spreadsheet->getAllSheets() as $sheet) {
             $panelConfig = $this->panelConfigForSheet($sheet->getTitle());
             if (!$panelConfig) {
+                continue;
+            }
+
+            if ($panelCode !== null && Str::upper($panelConfig['code']) !== $panelCode) {
                 continue;
             }
 

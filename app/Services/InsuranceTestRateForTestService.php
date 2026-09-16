@@ -41,6 +41,60 @@ class InsuranceTestRateForTestService
     }
 
     /**
+     * Upsert one mapped rate for a single panel + hospital test.
+     *
+     * @param  'pathology'|'radiology'  $testType
+     */
+    public function upsertSingleRate(
+        string $testType,
+        int $panelId,
+        int $testId,
+        string $hospitalTestName,
+        float $rate,
+        ?string $insurerTestName = null
+    ): InsuranceTestRate {
+        if (! in_array($testType, ['pathology', 'radiology'], true)) {
+            throw new \InvalidArgumentException('testType must be pathology or radiology');
+        }
+
+        if ($rate <= 0) {
+            throw new \InvalidArgumentException('Rate must be greater than zero');
+        }
+
+        InsuranceRatePanel::where('id', $panelId)->where('is_active', true)->firstOrFail();
+
+        $testIdColumn = $testType === 'pathology' ? 'pathology_id' : 'radiology_id';
+        $insurerName = trim((string) ($insurerTestName ?? '')) !== ''
+            ? trim((string) $insurerTestName)
+            : $hospitalTestName;
+
+        $existing = InsuranceTestRate::query()
+            ->where('insurance_rate_panel_id', $panelId)
+            ->where('test_type', $testType)
+            ->where($testIdColumn, $testId)
+            ->orderByDesc('id')
+            ->first();
+
+        $data = [
+            'insurance_rate_panel_id' => $panelId,
+            'test_type' => $testType,
+            $testIdColumn => $testId,
+            'hospital_system_name' => $hospitalTestName,
+            'insurer_test_name' => $insurerName,
+            'rate' => round($rate, 2),
+            'mapping_status' => 'mapped',
+        ];
+
+        if ($existing) {
+            $existing->update($data);
+
+            return $existing->fresh();
+        }
+
+        return InsuranceTestRate::create($data);
+    }
+
+    /**
      * @return Collection<int, array{panel: InsuranceRatePanel, rate: InsuranceTestRate|null}>
      */
     protected function getPanelsWithRates(string $testType, int $testId): Collection
