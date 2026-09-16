@@ -948,10 +948,10 @@
                             <i class="bi bi-x-circle"></i>
                             Cancel
                         </button>
-                        <button type="submit" class="btn btn-outline-primary" id="as-draft">
+                        {{-- <button type="submit" class="btn btn-outline-primary" id="as-draft">
                             <i class="bi bi-check-circle"></i>
                             Save As Draft
-                        </button>
+                        </button> --}}
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-circle"></i>
                             Submit

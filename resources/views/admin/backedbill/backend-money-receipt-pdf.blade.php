@@ -249,7 +249,7 @@
         }
 
         .amount-table td {
-            border-top: 1px solid #d9d9d9;
+            border: 1px solid #d9d9d9;
             padding: 10px 12px;
             font-size: 13px;
             background: #fff;
@@ -388,8 +388,8 @@
             <table class="amount-table" cellspacing="0" cellpadding="0">
                 <thead>
                     <tr>
-                        <th>ITEM</th>
-                        <th>AMOUNT</th>
+                        <th style="width: 50%;">ITEM</th>
+                        <th style="width: 50%;">AMOUNT</th>
                     </tr>
                 </thead>
                 <tbody>
