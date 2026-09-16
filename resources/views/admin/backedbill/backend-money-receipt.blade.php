@@ -145,10 +145,20 @@
 							<input type="date" id="datetimepicker" name="date" class="form-control"
 								   value="{{ old('date', $editReceipt->received_date ?? now()->toDateString()) }}" required>
                         </div>
-						<div class="col-md-6">
+						<div class="col-md-4">
 							<label class="form-label">Bill Amount</label>
 							<input type="number" name="bill_amount" id="backendReceiptBillAmount" class="form-control" min="0" step="0.01" readonly {{ $editReceipt ? '' : 'required' }}>
 						</div>
+						<div class="col-md-4">
+                            <label class="form-label">Payment Type</label>
+                            <select name="payment_mode" id="paymentType" class="form-control" {{ $editReceipt ? '' : 'required' }}>
+                                <option value="">Select Payment Type</option>
+                                <option value="Cash">Cash</option>
+                                <option value="UPI">UPI</option>
+                                <option value="Bank">Bank</option>
+                            </select>
+                        </div>
+
 						<div class="col-md-6">
 							<label class="form-label">Receipt Type</label>
 							<select name="receipt_type" class="form-select" required>

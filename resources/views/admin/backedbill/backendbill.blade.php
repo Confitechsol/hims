@@ -455,7 +455,7 @@
                                         </div>
                 
                                         <!-- Payment Type -->
-                                        <div class="col-md-3">
+                                        {{-- <div class="col-md-3">
                                             <label class="form-label">Payment Type</label>
                 
                                             <select name="shift"
@@ -465,7 +465,7 @@
                                                 <option value="">Select Payment Type</option>
                 
                                             </select>
-                                        </div>
+                                        </div> --}}
                 
                                         <!-- Date -->
                                         <div class="col-md-3">
