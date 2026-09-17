@@ -1,3 +1,12 @@
+<style>
+
+    .red {
+    color: black;
+    font-weight: bold;
+}
+
+</style>
+
 {{-- Approval bill footer summary (matches sample: GRAND TOTAL, advance, MOU, initial approval, further request) --}}
 <div class="summary-section">
     <div class="section-title" style="margin-top: 0; margin-bottom: 8px;">Bill Summary (For Approval)</div>
