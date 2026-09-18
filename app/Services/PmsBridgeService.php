@@ -180,5 +180,81 @@ class PmsBridgeService
             ];
         }
     }
+
+    /**
+     * Push a single doctor profile to PMS (report signatory cache).
+     *
+     * @param \App\Models\Doctor $doctor
+     * @return array{success: bool, message: string, data: mixed}
+     */
+    public function pushDoctor(\App\Models\Doctor $doctor): array
+    {
+        try {
+            $baseUrl = rtrim((string) config('services.pms.base_url', env('PMS_BASE_URL')), '/');
+            $token = (string) config('services.pms.token', env('PMS_BRIDGE_TOKEN'));
+
+            if ($baseUrl === '') {
+                return ['success' => false, 'message' => 'PMS_BASE_URL is not configured', 'data' => null];
+            }
+
+            $degree = trim((string) ($doctor->qualification ?? ''));
+            if ($degree === '') {
+                $degree = trim((string) ($doctor->specialization ?? ''));
+            }
+
+            $designation = '';
+            if (! empty($doctor->staff_designation_id)) {
+                $sd = \App\Models\StaffDesignation::find($doctor->staff_designation_id);
+                $designation = $sd ? trim((string) $sd->designation) : '';
+            }
+            if ($designation === '' && is_string($doctor->designation ?? null)) {
+                $designation = trim((string) $doctor->designation);
+            }
+
+            $signatureFile = trim((string) ($doctor->signature ?? ''));
+            $signatureUrl = $signatureFile !== ''
+                ? url('uploads/Doctor/signatures/'.$signatureFile)
+                : null;
+
+            $payload = [
+                'external_id' => (string) $doctor->id,
+                'doctor_code' => $doctor->doctor_id ?? null,
+                'name' => trim(($doctor->name ?? '').' '.($doctor->surname ?? '')),
+                'degree' => $degree !== '' ? $degree : null,
+                'qualification' => $degree !== '' ? $degree : null,
+                'designation' => $designation !== '' ? $designation : null,
+                'registration_no' => $doctor->registration_no ?? null,
+                'signature_filename' => $signatureFile !== '' ? $signatureFile : null,
+                'signature_url' => $signatureUrl,
+                'is_active' => (bool) ($doctor->is_active ?? true),
+            ];
+
+            $url = $baseUrl.'/api/bridge/hims/doctors';
+            $response = Http::withToken($token)->acceptJson()->timeout(30)->post($url, $payload);
+
+            if (! $response->successful()) {
+                Log::warning('PMS doctor push failed', [
+                    'doctor_id' => $doctor->id,
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                return [
+                    'success' => false,
+                    'message' => 'PMS returned HTTP '.$response->status(),
+                    'data' => $response->json(),
+                ];
+            }
+
+            return ['success' => true, 'message' => 'Doctor pushed to PMS', 'data' => $response->json()];
+        } catch (\Throwable $e) {
+            Log::error('PMS doctor push exception', [
+                'doctor_id' => $doctor->id ?? null,
+                'error' => $e->getMessage(),
+            ]);
+
+            return ['success' => false, 'message' => $e->getMessage(), 'data' => null];
+        }
+    }
 }
 

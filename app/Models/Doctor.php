@@ -79,10 +79,16 @@ class Doctor extends Model
         return $this->belongsTo(Department::class, 'department_id');
     }
 
-    // Relation with Designation
+    // Relation with Designation (legacy column name in some DBs)
     public function designation()
     {
         return $this->belongsTo(StaffDesignation::class, 'designation_id');
+    }
+
+    // Primary designation FK used by DoctorController store/update
+    public function staffDesignation()
+    {
+        return $this->belongsTo(StaffDesignation::class, 'staff_designation_id');
     }
 
     public function doctorGlobalShifts()
