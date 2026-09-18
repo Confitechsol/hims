@@ -145,6 +145,12 @@ class DoctorController extends Controller
 
         $doctor->save();
 
+        try {
+            app(\App\Services\PmsBridgeService::class)->pushDoctor($doctor->fresh());
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Doctor push to PMS skipped', ['error' => $e->getMessage()]);
+        }
+
         return redirect()->route('doctors.index')->with('success', 'Doctor details added successfully!');
 
     }
@@ -215,6 +221,12 @@ class DoctorController extends Controller
         }
 
         $Doctor->save();
+
+        try {
+            app(\App\Services\PmsBridgeService::class)->pushDoctor($Doctor->fresh());
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Doctor push to PMS skipped', ['error' => $e->getMessage()]);
+        }
 
         return redirect()->route('doctors.index')->with('success', 'Doctor details added successfully!');
 
