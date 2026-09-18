@@ -99,10 +99,11 @@
     }
     */
     .section-title {
+    display: block;
     text-align: center;
     font-size: 14px;
     text-transform: uppercase;
-    margin: 4px 0;
+    margin: 20px 0 6px;
     text-decoration: underline;
     font-weight: 700;
     color: #000;
@@ -160,12 +161,14 @@
 
     .value {
         width: 60%;
+        font-weight: 700;
     }
 
     .text-box {
         border: 2px solid #9c9c9c;
         padding: 8px;
         margin: 2px 0;
+        font-weight: 700;
     }
 
     /* .footer {
@@ -204,7 +207,8 @@
 
     .discharge-no {
         width: 20%;
-        color: red;
+        color: #000;
+        font-weight: 700;
     }
 
     .page-header {
@@ -212,6 +216,8 @@
         font-size: 15px;
         vertical-align: middle;
         width: 50%;
+        font-weight: 700;
+        color: #000;
     }
 
     .bar-code {
@@ -386,9 +392,9 @@
         <tr>
             <td class="label discharge_no_label">DISCHARGE&nbsp;NO.</td>
             <td class="colon">:</td>
-            <td class="value discharge-no">{{ $data->discharge_number }}</td>
+            <td class="value discharge-no"><strong>{{ $data->discharge_number }}</strong></td>
 
-            <td class="value page-header">{{ $data->reason_discharge }}</td>
+            <td class="value page-header"><strong>{{ $data->reason_discharge }}</strong></td>
             <td class="value bar-code">
                 <img src="{{ $data->barcode }}" id="barcode" class="img-fluid rounded shadow-sm"
                     style="max-height:30px; height:30px; min-width:100px; width:150px; object-fit:cover;">

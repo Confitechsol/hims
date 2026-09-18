@@ -207,10 +207,21 @@ public function downloadPdf(int $id)
         ->sum('received_amount');
     $dueAmount = max(0, $billAmount - $totalReceived);
 
-    $pdf = Pdf::loadView('admin.backedbill.backend-money-receipt-pdf', compact('receipt', 'bill', 'billAmount', 'dueAmount'));
+    $pdf = Pdf::loadView('admin.backedbill.backend-money-receipt-pdf', compact('receipt', 'bill', 'billAmount', 'totalReceived', 'dueAmount'));
     $pdf->setPaper('a4', 'portrait');
 
-    return $pdf->stream('Backend_Money_Receipt_' . $receipt->receipt_no . '.pdf');
+     return $pdf->stream('Backend_Money_Receipt_' . $receipt->receipt_no . '.pdf');
+    // return response()->json([
+    //     'status' => true,
+    //     'message' => 'Money receipt fetched successfully.',
+    //     'data' => [
+    //         'receipt' => $receipt,
+    //         'bill' => $bill,
+    //         'bill_amount' => $billAmount,
+    //         'total_received' => $totalReceived,
+    //         'due_amount' => $dueAmount,
+    //     ],
+    // ], 200);
 }
 
 

@@ -181,6 +181,7 @@
             padding: 4px;
             margin-bottom: 0;
             font-size: 10px;
+            font-weight: 700;
         }
 
         .patient_info table {
