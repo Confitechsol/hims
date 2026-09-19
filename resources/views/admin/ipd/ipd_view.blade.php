@@ -670,27 +670,35 @@
                                         {{ $ipd->patient->patient_name }}
                                     </h5>
                                     @if ($ipd->discharged == 'yes' || $ipd->discharged == 'draft')
-                                        <div class="d-flex align-items-center">
+                                        <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
                                         @if (!empty($ipd->is_reopened))
-                                            <span class="badge bg-warning text-dark me-2">Discharge Reopened</span>
+                                            <span class="badge bg-warning text-dark">Discharge Reopened</span>
+                                            <a href="{{ route('discharge.edit', $ipd->id) }}"
+                                                class="border-0 text-white text-decoration-none"
+                                                style="background-color: #750096;padding: 0.5rem;border-radius: 8px;"
+                                                title="Edit discharge details">
+                                                <i class="bi bi-pencil-square text-white"></i> Edit Discharge
+                                            </a>
                                         @elseif ($ipd->discharged == 'yes' && empty($ipd->final_bill_generated_at))
-                                            <span class="badge bg-info me-2">Bed occupied until final bill</span>
+                                            <span class="badge bg-info">Bed occupied until final bill</span>
                                         @endif
-                                        <button class="border-0 text-white"
-                                            style="background-color: #750096;padding: 0.5rem;border-radius: 8px;"
+                                        <button type="button" class="border-0 text-white"
+                                            style="background-color: #5c6bc0;padding: 0.5rem;border-radius: 8px;"
                                             data-bs-toggle="modal" data-bs-target="#dischargePreviewModal"
                                             data-discharge='@json($ipd->dischargeCard)'
-                                            data-medicines='@json($ipd->discharge_medicines)'><i
-                                                class="bi bi-clipboard-pulse text-white"></i>
-                                            Discharge</button>
+                                            data-medicines='@json($ipd->discharge_medicines)'
+                                            title="View discharge summary">
+                                            <i class="bi bi-eye text-white"></i> View Discharge
+                                        </button>
                                         </div>
                                     @else
-                                        <button class="border-0 text-white" style="background-color: #750096;padding: 0.5rem;border-radius: 8px;" data-bs-toggle="modal"
+                                        <button type="button" class="border-0 text-white" style="background-color: #750096;padding: 0.5rem;border-radius: 8px;" data-bs-toggle="modal"
                                             data-bs-target="#patientDischargeModal" data-ipd="{{ $ipd }}"
                                             data-doctors="{{ $doctors }}" data-user="{{ $currentUser }}"
                                             data-departments="{{ $departments }}"
-                                            data-outstanding={{ $billingSummary['outstanding'] ?? 0 }}><i
-                                                class="bi bi-clipboard-pulse text-white"></i> Discharge</button>
+                                            data-outstanding={{ $billingSummary['outstanding'] ?? 0 }}>
+                                            <i class="bi bi-clipboard-pulse text-white"></i> Discharge
+                                        </button>
                                     @endif
                                 </div>
                             </div>
