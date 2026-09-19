@@ -230,6 +230,12 @@
             word-wrap: break-word;
         }
 
+        .patient_value.fixed-right {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .charges-table {
             width: 100%;
             border-collapse: collapse;
@@ -566,40 +572,28 @@
                                     {{ $ipd->patient ? strtoupper($ipd->patient->gender ?? 'N/A') : 'N/A' }}</td>
                             </tr>
                             <tr>
-                                <td class="patient_label">Adm Date</td>
+                                <td class="patient_label">Adm Date &amp; Time</td>
                                 <td class="patient_colon">:</td>
-                                <td class="patient_value">{{ \Carbon\Carbon::parse($ipd->date)->format('d/m/Y') }}</td>
-                            </tr>
-                            <tr>
-                                <td class="patient_label">Adm Time</td>
-                                <td class="patient_colon">:</td>
-                                <td class="patient_value">{{ \Carbon\Carbon::parse($ipd->date)->format('h:i A') }}</td>
+                                <td class="patient_value fixed-right">{{ \Carbon\Carbon::parse($ipd->date)->format('d/m/Y h:i A') }}</td>
                             </tr>
                             @if($dischargeDate)
                                 <tr>
-                                    <td class="patient_label">Discharge Date</td>
+                                    <td class="patient_label">Dis Date &amp; Time</td>
                                     <td class="patient_colon">:</td>
-                                    <td class="patient_value"><span
-                                            class="red">{{ \Carbon\Carbon::parse($dischargeDate)->format('d/m/Y') }}</span>
+                                    <td class="patient_value fixed-right">
+                                        @php
+                                            $dischargeDateValue = \Carbon\Carbon::parse($dischargeDate);
+                                            if (!empty($dischargeTime)) {
+                                                if (is_string($dischargeTime)) {
+                                                    $dischargeDateValue = \Carbon\Carbon::parse($dischargeDate . ' ' . $dischargeTime);
+                                                } else {
+                                                    $dischargeDateValue = \Carbon\Carbon::parse($dischargeDate . ' ' . \Carbon\Carbon::parse($dischargeTime)->format('H:i:s'));
+                                                }
+                                            }
+                                        @endphp
+                                        {{ $dischargeDateValue->format('d/m/Y h:i A') }}
                                     </td>
                                 </tr>
-                                @if(isset($dischargeTime) && $dischargeTime)
-                                    <tr>
-                                        <td class="patient_label">Discharge Time</td>
-                                        <td class="patient_colon">:</td>
-                                        <td class="patient_value"><span class="red">
-                                                @php
-                                                    // Handle time field - it might be a string like "14:30:00" or Carbon instance
-                                                    if (is_string($dischargeTime)) {
-                                                        $time = \Carbon\Carbon::createFromFormat('H:i:s', $dischargeTime);
-                                                        echo $time->format('h:i A');
-                                                    } else {
-                                                        echo \Carbon\Carbon::parse($dischargeTime)->format('h:i A');
-                                                    }
-                                                @endphp
-                                            </span></td>
-                                    </tr>
-                                @endif
                             @endif
                             @if($ipd->bedDetail)
                                 <tr>
