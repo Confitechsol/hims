@@ -370,7 +370,10 @@ class DischargeController extends Controller
         $departments = Department::where('is_active', 'yes')->get();
         // $dischargeData->med_duration = explode(',', $dischargeData->durations ?? '');
 
-        return view("admin.ipd.edit-discharge", compact('dischargeData', 'doctors', 'departments'));
+        $ipd = IpdDetail::find($id);
+        $isReopened = (bool) ($ipd->is_reopened ?? false);
+
+        return view("admin.ipd.edit-discharge", compact('dischargeData', 'doctors', 'departments', 'isReopened', 'ipd'));
     }
 
     public function updateDischarge(Request $request, $id)
@@ -393,7 +396,7 @@ class DischargeController extends Controller
             'admission_no'           => ['nullable', 'string'],
             'discharge_contact'      => ['nullable', 'string'],
             'discharge_date'         => ['required', 'date'],
-            'discharge_time'         => ['nullable'],
+            'discharge_time'         => ['nullable', 'string', 'max:8', 'regex:/^([01]\d|2[0-3]):([0-5]\d)(:([0-5]\d))?$/'],
             'admission_date'         => ['nullable', 'date'],
             'admit_time'             => ['nullable'],
             'bed'                    => ['nullable', 'string'],
@@ -445,9 +448,23 @@ class DischargeController extends Controller
 
         $ipdForGuard = IpdDetail::findOrFail($validated['ipd_details_id']);
         $stayValidator = app(\App\Services\IpdStayWindowValidator::class);
+        $isReopened = $stayValidator->isReopened($ipdForGuard);
+
+        // After reopen: discharge date is locked; only time may change (max 23:59).
+        if ($isReopened) {
+            $lockedDate = $this->dischargeDateToString(
+                DischargeCard::where('ipd_details_id', $ipdForGuard->id)->value('discharge_date')
+                    ?? $ipdForGuard->discharged_date
+            );
+            if ($lockedDate) {
+                $validated['discharge_date'] = $lockedDate;
+                $request->merge(['discharge_date' => $lockedDate]);
+            }
+        }
+
         try {
             $stayValidator->assertMutable($ipdForGuard, 'update discharge card');
-            if ($stayValidator->isDischarged($ipdForGuard) || $stayValidator->isReopened($ipdForGuard)) {
+            if ($stayValidator->isDischarged($ipdForGuard) || $isReopened) {
                 $stayValidator->assertDischargeImmutable(
                     $ipdForGuard,
                     $validated['discharge_date'],
@@ -456,6 +473,15 @@ class DischargeController extends Controller
             }
         } catch (\App\Exceptions\IpdConstraintException $e) {
             return redirect()->back()->with('error', $e->getMessage())->withInput();
+        }
+
+        $oldDischargeAt = null;
+        if ($isReopened) {
+            try {
+                $oldDischargeAt = $stayValidator->resolveDischargeAt($ipdForGuard);
+            } catch (\Throwable $e) {
+                $oldDischargeAt = null;
+            }
         }
 
         // dd($validated);
@@ -644,12 +670,25 @@ class DischargeController extends Controller
                 IpdDetail::where('id', $validated['ipd_details_id'])
                     ->update(['discharged' => 'yes', 'discharged_date' => $validated['discharge_date']]);
 
+                if ($isReopened && $oldDischargeAt) {
+                    $this->syncBedHistoryToDateOnDischargeEdit(
+                        (int) $validated['ipd_details_id'],
+                        $oldDischargeAt,
+                        $newDischargeAt
+                    );
+                }
+
                 $this->syncBedChargesOnFinalDischarge((int) $validated['ipd_details_id'], $newDischargeAt);
 
                 DB::commit();
                 return redirect()
                     ->route('ipd', ['tab' => 'discharge'])
-                    ->with('success', 'Discharge updated. The bed stays occupied until Generate Final Bill is used in billing.');
+                    ->with(
+                        'success',
+                        $isReopened
+                            ? 'Discharge time updated successfully (date unchanged).'
+                            : 'Discharge updated. The bed stays occupied until Generate Final Bill is used in billing.'
+                    );
             }
 
             // Still draft — keep beds open; no final bed-charge decision yet

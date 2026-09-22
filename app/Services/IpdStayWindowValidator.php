@@ -73,28 +73,78 @@ class IpdStayWindowValidator
             return;
         }
 
-        // After clinical discharge (or reopen), discharge datetime is frozen.
         $current = $this->resolveDischargeAt($ipd);
         $incomingDate = Carbon::parse($newDate)->format('Y-m-d');
-        $incomingTime = trim((string) ($newTime ?? ''));
-
         $currentDate = $current->format('Y-m-d');
-        $currentTime = $current->format('H:i:s');
 
+        // Discharge calendar date is always frozen after clinical discharge / reopen.
+        if ($incomingDate !== $currentDate) {
+            throw new IpdConstraintException(
+                'DISCHARGE_DATE_IMMUTABLE',
+                'Discharge date cannot be changed. Only discharge time can be updated after reopen.',
+                [
+                    'current_date' => $current->format('d/m/Y'),
+                    'attempted_date' => Carbon::parse($newDate)->format('d/m/Y'),
+                ]
+            );
+        }
+
+        $incomingTime = trim((string) ($newTime ?? ''));
         $timeChanged = false;
         if ($incomingTime !== '') {
             try {
-                $normalizedIncoming = Carbon::parse($incomingDate . ' ' . $incomingTime)->format('H:i:s');
-                $timeChanged = $normalizedIncoming !== $currentTime;
+                $normalizedIncoming = Carbon::parse($incomingDate.' '.$incomingTime)->format('H:i:s');
+                $timeChanged = $normalizedIncoming !== $current->format('H:i:s');
             } catch (\Throwable $e) {
                 $timeChanged = true;
             }
         }
 
-        if ($incomingDate !== $currentDate || $timeChanged) {
+        // Reopen mode: allow discharge time update on the same date (max 23:59).
+        if ($this->isReopened($ipd)) {
+            if ($incomingTime === '') {
+                return;
+            }
+
+            try {
+                $parsed = Carbon::parse($incomingDate.' '.$incomingTime);
+            } catch (\Throwable $e) {
+                throw new IpdConstraintException(
+                    'DISCHARGE_TIME_INVALID',
+                    'Discharge time is invalid. Use a time between 00:00 and 23:59.',
+                    []
+                );
+            }
+
+            $minutes = ((int) $parsed->format('H')) * 60 + (int) $parsed->format('i');
+            if ($minutes > (23 * 60 + 59)) {
+                throw new IpdConstraintException(
+                    'DISCHARGE_TIME_INVALID',
+                    'Discharge time cannot be after 23:59.',
+                    ['attempted' => $parsed->format('H:i')]
+                );
+            }
+
+            $admissionAt = Carbon::parse($ipd->date);
+            if ($parsed->lt($admissionAt)) {
+                throw new IpdConstraintException(
+                    'DISCHARGE_TIME_BEFORE_ADMISSION',
+                    'Discharge time cannot be before admission ('.$admissionAt->format('d/m/Y h:i A').').',
+                    [
+                        'admission' => $admissionAt->toDateTimeString(),
+                        'attempted' => $parsed->toDateTimeString(),
+                    ]
+                );
+            }
+
+            return;
+        }
+
+        // Not reopened: keep full discharge datetime frozen.
+        if ($timeChanged) {
             throw new IpdConstraintException(
                 'DISCHARGE_IMMUTABLE',
-                'Discharge date and time cannot be changed after final discharge / reopen.',
+                'Discharge date and time cannot be changed after final discharge. Please reopen discharge to update discharge time only.',
                 [
                     'current' => $current->format('d/m/Y h:i A'),
                 ]
