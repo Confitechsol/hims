@@ -79,6 +79,9 @@
                 <h5 class="card-title" class="mb-0">
                     <i class="bi bi-clipboard-check"></i>
                     Edit Patient Discharge
+                    @if(!empty($isReopened))
+                        <span class="badge bg-warning text-dark ms-2">Reopened — time editable</span>
+                    @endif
                 </h5>
             </div>
             <div class="card-body">
@@ -149,14 +152,40 @@
 
                         <div class="col-md-3">
                             <label class="form-label">Discharge Date</label>
-                            <input type="date" class="form-control" name="discharge_date"
-                                value="{{ $dischargeData->discharge_date }}" autocomplete="off">
+                            @if(!empty($isReopened))
+                                <input type="hidden" name="discharge_date" value="{{ $dischargeData->discharge_date }}">
+                                <input type="date" class="form-control" id="discharge_date"
+                                    value="{{ $dischargeData->discharge_date }}" autocomplete="off" disabled>
+                                <small class="text-muted">Date is locked after discharge reopen.</small>
+                            @else
+                                <input type="date" class="form-control" name="discharge_date"
+                                    id="discharge_date"
+                                    value="{{ $dischargeData->discharge_date }}" autocomplete="off">
+                            @endif
                         </div>
 
                         <div class="col-md-3">
                             <label class="form-label">Discharge Time</label>
+                            @php
+                                $dischargeTimeForInput = '';
+                                if (!empty($dischargeData->discharge_time)) {
+                                    try {
+                                        $dischargeTimeForInput = \Carbon\Carbon::parse($dischargeData->discharge_time)->format('H:i');
+                                    } catch (\Throwable $e) {
+                                        $dischargeTimeForInput = substr((string) $dischargeData->discharge_time, 0, 5);
+                                    }
+                                }
+                            @endphp
                             <input type="time" class="form-control" name="discharge_time"
-                                value="{{ $dischargeData->discharge_time }}" autocomplete="off">
+                                id="discharge_time"
+                                value="{{ $dischargeTimeForInput }}" autocomplete="off"
+                                min="00:00" max="23:59" step="60"
+                                @if(empty($isReopened) && (int) ($dischargeData->is_draft ?? 1) === 0) readonly @endif>
+                            @if(!empty($isReopened))
+                                <small class="text-success">You can update discharge time only (upto 23:59).</small>
+                            @elseif((int) ($dischargeData->is_draft ?? 1) === 0)
+                                <small class="text-muted">Reopen discharge to change time.</small>
+                            @endif
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Admit Time</label>
