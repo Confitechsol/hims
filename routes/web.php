@@ -225,6 +225,10 @@ Route::middleware(['admin'])->group(function () {
     
     Route::get('/get-doctors/patients/count', [DoctorExportPatientCountController::class, 'getDoctorsPatientCount'])->name('get.doctors.patient.count'  );
     Route::get('/doctors/patients/count', [DoctorExportPatientCountController::class, 'getDoctors'])->name('doctors.patient.count');
+    Route::get('/doctors-due-reports', [DoctorExportPatientCountController::class, 'getDoctorsDueReports'])->name('doctors.patient.due-reports');
+    Route::get('/doctors-due-reports/export', [DoctorExportPatientCountController::class, 'exportDoctorsDueReports'])->name('doctors.patient.due-reports.export');
+    Route::get('/doctors-due-reports/export', [DoctorExportPatientCountController::class, 'exportDoctorsDueReports'])->name('doctors.patient.due-reports.export');
+
 
 //    http://localhost/hims/public/doctors/patients/count
 //    http://localhost/hims/public/reports/doctor-reports 

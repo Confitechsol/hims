@@ -35,6 +35,16 @@
                                 </div>
                             </a>
                         </div>
+
+                        <div class="col-md-4">
+                            <a href="{{ route('doctors.patient.due-reports') }}">
+                                <div class="module_billing">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                    <p>Doctor Due Report</p>
+                                </div>
+                            </a>
+                        </div>
+
                     </div>
                 </div>
             </div>
