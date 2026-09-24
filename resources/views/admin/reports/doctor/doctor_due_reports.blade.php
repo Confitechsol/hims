@@ -61,10 +61,9 @@
                         <thead>
                             <tr>
                                 <th>IPD NO</th>
-                                {{-- <th>Admission Date</th> --}}
                                 <th>Patient Name</th>
                                 <th>Doctor</th>
-                                {{-- <th>Doctor ID</th> --}}
+                                <th>Gross Total</th>
                                 <th>Due Amount</th>
                                 <th>Receipt Type</th>
                                 <th>Transaction Amounts</th>
@@ -76,10 +75,9 @@
                             @forelse ($dueReports as $report)
                                 <tr>
                                     <td>{{ $report->ipd_no }}</td>
-                                    {{-- <td>{{ $report->admission_date ?? '-' }}</td> --}}
                                     <td>{{ $report->patient_name ?? '-' }}</td>
                                     <td>{{ $report->doctor_name ?? '-' }}</td>
-                                    {{-- <td>{{ $report->due_patient_party_doctor_id ?? '-' }}</td> --}}
+                                    <td>{{ number_format((float) ($report->gross_total ?? 0), 2) }}</td>
                                     <td>{{ $report->due_patient_party_amount }}</td>
                                     <td>{{ $report->due_patient_party_receipt_type ?? '-' }}</td>
                                     <td>
@@ -93,7 +91,7 @@
                                     <td>{{ $report->created_at }}</td>
                                 </tr>
                             @empty
-                                <tr><td colspan="10" class="text-center">No due reports found.</td></tr>
+                                <tr><td colspan="9" class="text-center">No due reports found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
