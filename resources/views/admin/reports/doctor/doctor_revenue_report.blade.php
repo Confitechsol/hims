@@ -97,8 +97,8 @@
                         </thead>
                         <tbody>
                             @foreach($result['groups'] as $group)
-                                <tr class="table-light">
-                                    <td colspan="12" class="fw-bold">{{ $group['doctor_label'] }}</td>
+                                <tr>
+                                    <td colspan="12" class="fw-bold" style="background:#e8e8e8;color:#212529;">{{ $group['doctor_label'] }}</td>
                                 </tr>
                                 @foreach($group['rows'] as $row)
                                 <tr>
