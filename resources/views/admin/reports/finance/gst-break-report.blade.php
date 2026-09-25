@@ -106,15 +106,19 @@
                         <tbody>
                             @foreach($result['rows'] as $row)
                             <tr>
-                                <td>{{ $row['sl_no'] }}</td>
-                                <td>{{ $row['admission_no'] }}</td>
-                                <td>{{ $row['admission_date'] }}</td>
-                                <td>{{ $row['patient_name'] }}</td>
-                                <td>{{ $row['doctor_name'] }}</td>
-                                <td>{{ $row['bill_no'] }}</td>
-                                <td>{{ $row['bill_date'] }}</td>
-                                <td>{{ $row['discharge_date'] }}</td>
-                                <td>{{ $row['print_head'] }}</td>
+                                @if(($row['patient_rowspan'] ?? 0) > 0)
+                                    <td rowspan="{{ $row['patient_rowspan'] }}" class="align-middle">{{ $row['sl_no'] }}</td>
+                                    <td rowspan="{{ $row['patient_rowspan'] }}" class="align-middle">{{ $row['admission_no'] }}</td>
+                                    <td rowspan="{{ $row['patient_rowspan'] }}" class="align-middle">{{ $row['admission_date'] }}</td>
+                                    <td rowspan="{{ $row['patient_rowspan'] }}" class="align-middle">{{ $row['patient_name'] }}</td>
+                                    <td rowspan="{{ $row['patient_rowspan'] }}" class="align-middle">{{ $row['doctor_name'] }}</td>
+                                    <td rowspan="{{ $row['patient_rowspan'] }}" class="align-middle">{{ $row['bill_no'] }}</td>
+                                    <td rowspan="{{ $row['patient_rowspan'] }}" class="align-middle">{{ $row['bill_date'] }}</td>
+                                    <td rowspan="{{ $row['patient_rowspan'] }}" class="align-middle">{{ $row['discharge_date'] }}</td>
+                                @endif
+                                @if(($row['print_rowspan'] ?? 0) > 0)
+                                    <td rowspan="{{ $row['print_rowspan'] }}" class="align-middle">{{ $row['print_head'] }}</td>
+                                @endif
                                 <td>{{ $row['particulars'] }}</td>
                                 <td class="text-end">{{ number_format($row['amount'], 2) }}</td>
                             </tr>

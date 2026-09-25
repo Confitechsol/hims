@@ -152,19 +152,37 @@ class GstBreakReportController extends Controller
 
         $rowNum = 6;
         foreach ($result['rows'] as $row) {
-            $sheet->fromArray([
-                $row['sl_no'],
-                $row['admission_no'],
-                $row['admission_date'],
-                $row['patient_name'],
-                $row['doctor_name'],
-                $row['bill_no'],
-                $row['bill_date'],
-                $row['discharge_date'],
-                $row['print_head'],
-                $row['particulars'],
-                $row['amount'],
-            ], null, 'A' . $rowNum);
+            if (($row['patient_rowspan'] ?? 0) > 0) {
+                $sheet->setCellValue('A' . $rowNum, $row['sl_no']);
+                $sheet->setCellValue('B' . $rowNum, $row['admission_no']);
+                $sheet->setCellValue('C' . $rowNum, $row['admission_date']);
+                $sheet->setCellValue('D' . $rowNum, $row['patient_name']);
+                $sheet->setCellValue('E' . $rowNum, $row['doctor_name']);
+                $sheet->setCellValue('F' . $rowNum, $row['bill_no']);
+                $sheet->setCellValue('G' . $rowNum, $row['bill_date']);
+                $sheet->setCellValue('H' . $rowNum, $row['discharge_date']);
+                if ($row['patient_rowspan'] > 1) {
+                    $end = $rowNum + $row['patient_rowspan'] - 1;
+                    foreach (range('A', 'H') as $column) {
+                        $sheet->mergeCells($column . $rowNum . ':' . $column . $end);
+                    }
+                    $sheet->getStyle('A' . $rowNum . ':H' . $end)
+                        ->getAlignment()
+                        ->setVertical(Alignment::VERTICAL_CENTER);
+                }
+            }
+            if (($row['print_rowspan'] ?? 0) > 0) {
+                $sheet->setCellValue('I' . $rowNum, $row['print_head']);
+                if ($row['print_rowspan'] > 1) {
+                    $end = $rowNum + $row['print_rowspan'] - 1;
+                    $sheet->mergeCells('I' . $rowNum . ':I' . $end);
+                    $sheet->getStyle('I' . $rowNum . ':I' . $end)
+                        ->getAlignment()
+                        ->setVertical(Alignment::VERTICAL_CENTER);
+                }
+            }
+            $sheet->setCellValue('J' . $rowNum, $row['particulars']);
+            $sheet->setCellValue('K' . $rowNum, $row['amount']);
             $rowNum++;
         }
 

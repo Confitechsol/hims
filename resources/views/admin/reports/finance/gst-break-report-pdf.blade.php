@@ -9,7 +9,7 @@
         .hospital-name { font-size: 12px; font-weight: bold; margin: 0; }
         .report-title { font-size: 11px; font-weight: bold; margin: 4px 0; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #333; padding: 3px; }
+        th, td { border: 1px solid #333; padding: 3px; vertical-align: middle; }
         th { background: #d9d9d9; }
         .text-right { text-align: right; }
         .total-row { font-weight: bold; background: #eee; }
@@ -46,15 +46,19 @@
         <tbody>
             @forelse($result['rows'] as $row)
             <tr>
-                <td>{{ $row['sl_no'] }}</td>
-                <td>{{ $row['admission_no'] }}</td>
-                <td>{{ $row['admission_date'] }}</td>
-                <td>{{ $row['patient_name'] }}</td>
-                <td>{{ $row['doctor_name'] }}</td>
-                <td>{{ $row['bill_no'] }}</td>
-                <td>{{ $row['bill_date'] }}</td>
-                <td>{{ $row['discharge_date'] }}</td>
-                <td>{{ $row['print_head'] }}</td>
+                @if(($row['patient_rowspan'] ?? 0) > 0)
+                    <td rowspan="{{ $row['patient_rowspan'] }}">{{ $row['sl_no'] }}</td>
+                    <td rowspan="{{ $row['patient_rowspan'] }}">{{ $row['admission_no'] }}</td>
+                    <td rowspan="{{ $row['patient_rowspan'] }}">{{ $row['admission_date'] }}</td>
+                    <td rowspan="{{ $row['patient_rowspan'] }}">{{ $row['patient_name'] }}</td>
+                    <td rowspan="{{ $row['patient_rowspan'] }}">{{ $row['doctor_name'] }}</td>
+                    <td rowspan="{{ $row['patient_rowspan'] }}">{{ $row['bill_no'] }}</td>
+                    <td rowspan="{{ $row['patient_rowspan'] }}">{{ $row['bill_date'] }}</td>
+                    <td rowspan="{{ $row['patient_rowspan'] }}">{{ $row['discharge_date'] }}</td>
+                @endif
+                @if(($row['print_rowspan'] ?? 0) > 0)
+                    <td rowspan="{{ $row['print_rowspan'] }}">{{ $row['print_head'] }}</td>
+                @endif
                 <td>{{ $row['particulars'] }}</td>
                 <td class="text-right">{{ number_format($row['amount'], 2) }}</td>
             </tr>

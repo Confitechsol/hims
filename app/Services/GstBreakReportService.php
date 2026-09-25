@@ -39,7 +39,6 @@ class GstBreakReportService
         $billing = app(IpdBillingController::class);
         $errors = [];
         $rows = [];
-        $sl = 1;
 
         $cards = DischargeCard::query()
             ->whereNotNull('ipd_details_id')
@@ -98,7 +97,6 @@ class GstBreakReportService
 
                 foreach ($lines as $line) {
                     $rows[] = array_merge($header, [
-                        'sl_no' => $sl++,
                         'print_head' => (string) ($line['charge_category_head'] ?? '-'),
                         'particulars' => (string) ($line['charge_details'] ?? ''),
                         'amount' => round((float) ($line['amount'] ?? 0), 2),
@@ -117,6 +115,8 @@ class GstBreakReportService
             }
         }
 
+        $rows = $this->markMergeSpans($rows);
+
         $total = 0.0;
         foreach ($rows as $row) {
             $total = round($total + (float) $row['amount'], 2);
@@ -132,6 +132,56 @@ class GstBreakReportService
             'total_amount' => $total,
             'errors' => $errors,
         ];
+    }
+
+    /**
+     * One serial per admission. Identity columns share a rowspan; the same print head
+     * on consecutive lines is merged so particulars and amounts stay on their own rows.
+     *
+     * @param  list<array<string, mixed>>  $rows
+     * @return list<array<string, mixed>>
+     */
+    private function markMergeSpans(array $rows): array
+    {
+        $groups = [];
+        $order = [];
+        foreach ($rows as $row) {
+            $key = $row['admission_no'] . '|' . $row['bill_no'];
+            if (! isset($groups[$key])) {
+                $order[] = $key;
+                $groups[$key] = [];
+            }
+            $groups[$key][] = $row;
+        }
+
+        $out = [];
+        $serial = 1;
+        foreach ($order as $key) {
+            $lines = $groups[$key];
+            $count = count($lines);
+            $printSpans = [];
+            for ($i = 0; $i < $count; $i++) {
+                if ($i > 0 && $lines[$i]['print_head'] === $lines[$i - 1]['print_head']) {
+                    $printSpans[$i] = 0;
+                    continue;
+                }
+                $span = 1;
+                for ($j = $i + 1; $j < $count && $lines[$j]['print_head'] === $lines[$i]['print_head']; $j++) {
+                    $span++;
+                }
+                $printSpans[$i] = $span;
+            }
+
+            foreach ($lines as $i => $line) {
+                $line['sl_no'] = $serial;
+                $line['patient_rowspan'] = $i === 0 ? $count : 0;
+                $line['print_rowspan'] = $printSpans[$i];
+                $out[] = $line;
+            }
+            $serial++;
+        }
+
+        return $out;
     }
 
     /**
