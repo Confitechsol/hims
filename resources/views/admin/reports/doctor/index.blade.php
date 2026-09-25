@@ -45,6 +45,15 @@
                             </a>
                         </div>
 
+                        <div class="col-md-4">
+                            <a href="{{ route('doctors.patient.revenue-report') }}">
+                                <div class="module_billing">
+                                    <i class="fa-solid fa-chart-line"></i>
+                                    <p>Doctor Revenue Report</p>
+                                </div>
+                            </a>
+                        </div>
+
                     </div>
                 </div>
             </div>

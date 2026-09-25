@@ -100,6 +100,7 @@ use App\Http\Controllers\VitalController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PatientReportController;
 use App\Http\Controllers\DoctorExportPatientCountController;
+use App\Http\Controllers\DoctorRevenueReportController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -227,7 +228,9 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/doctors/patients/count', [DoctorExportPatientCountController::class, 'getDoctors'])->name('doctors.patient.count');
     Route::get('/doctors-due-reports', [DoctorExportPatientCountController::class, 'getDoctorsDueReports'])->name('doctors.patient.due-reports');
     Route::get('/doctors-due-reports/export', [DoctorExportPatientCountController::class, 'exportDoctorsDueReports'])->name('doctors.patient.due-reports.export');
-    Route::get('/doctors-due-reports/export', [DoctorExportPatientCountController::class, 'exportDoctorsDueReports'])->name('doctors.patient.due-reports.export');
+    Route::get('/doctors-revenue-report', [DoctorRevenueReportController::class, 'index'])->name('doctors.patient.revenue-report');
+    Route::get('/doctors-revenue-report/excel', [DoctorRevenueReportController::class, 'exportExcel'])->name('doctors.patient.revenue-report.excel');
+    Route::get('/doctors-revenue-report/pdf', [DoctorRevenueReportController::class, 'exportPdf'])->name('doctors.patient.revenue-report.pdf');
 
 
 //    http://localhost/hims/public/doctors/patients/count
