@@ -85,8 +85,8 @@ class DoctorRevenueReportService
                 continue;
             }
 
-            $doctorId = (int) ($ipd->cons_doctor ?? 0);
-            if ($doctorId <= 0) {
+            $consultingDoctorId = (int) ($ipd->cons_doctor ?? 0);
+            if ($consultingDoctorId <= 0) {
                 continue;
             }
 
@@ -107,15 +107,15 @@ class DoctorRevenueReportService
                 $billAmount = round($bed + $diag + $other + $service + $package + $doctorVisit, 2);
                 $netHospital = round(max(0, $billAmount - $doctorVisit - $discount), 2);
 
-                if (! isset($grouped[$doctorId])) {
+                if (! isset($grouped[$consultingDoctorId])) {
                     $doctor = $ipd->doctor;
                     if (! $doctor) {
-                        $doctor = Doctor::query()->find($doctorId);
+                        $doctor = Doctor::query()->find($consultingDoctorId);
                     }
                     $name = trim((string) ($doctor->name ?? 'Unknown Doctor'));
                     $reg = trim((string) ($doctor->registration_no ?? ''));
-                    $grouped[$doctorId] = [
-                        'doctor_id' => $doctorId,
+                    $grouped[$consultingDoctorId] = [
+                        'doctor_id' => $consultingDoctorId,
                         'doctor_name' => $name,
                         'registration_no' => $reg,
                         'doctor_label' => $reg !== '' ? "{$name} ({$reg})" : $name,
@@ -141,10 +141,10 @@ class DoctorRevenueReportService
                     'net_hospital_amount' => $netHospital,
                 ];
 
-                $grouped[$doctorId]['rows'][] = $row;
+                    $grouped[$consultingDoctorId]['rows'][] = $row;
                 foreach (self::NUMERIC_COLUMNS as $column) {
-                    $grouped[$doctorId]['totals'][$column] = round(
-                        $grouped[$doctorId]['totals'][$column] + (float) $row[$column],
+                    $grouped[$consultingDoctorId]['totals'][$column] = round(
+                        $grouped[$consultingDoctorId]['totals'][$column] + (float) $row[$column],
                         2
                     );
                 }
