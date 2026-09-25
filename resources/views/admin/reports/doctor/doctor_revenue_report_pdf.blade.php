@@ -33,6 +33,8 @@
         Date From: {{ \Carbon\Carbon::parse($result['date_from'])->format('d/M/Y') }}
         &nbsp;&nbsp;To:&nbsp;&nbsp;
         {{ \Carbon\Carbon::parse($result['date_to'])->format('d/M/Y') }}
+        &nbsp;&nbsp;|&nbsp;&nbsp;Doctor:
+        {{ $result['doctor_filter_label'] ?? 'All' }}
         &nbsp;&nbsp;({{ $result['patient_count'] ?? 0 }} patient bill(s))
     </div>
     <table>

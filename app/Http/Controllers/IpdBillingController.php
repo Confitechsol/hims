@@ -1768,12 +1768,14 @@ class IpdBillingController extends Controller
         // IPD charges (from ipd_charges, date <= discharge)
         $ipdCharges = IpdCharges::where('ipd_id', $ipdId)
             ->where('date', '<=', $dischargeDate)
-            ->with(['charge', 'chargeCategory'])
+            ->with(['charge', 'chargeCategory.chargeType'])
             ->orderBy('date')
             ->get();
         foreach ($ipdCharges as $c) {
             $rows[] = [
-                'charge_category_head' => $c->chargeCategory->name ?? 'IPD Charges',
+                'charge_category_head' => $c->chargeCategory?->chargeType?->charge_type
+                    ?? $c->chargeCategory->name
+                    ?? 'IPD Charges',
                 'charge_details' => ($c->charge->name ?? 'N/A') . ' x ' . ($c->qty ?? 1),
                 'amount' => (float) ($c->net_amount ?? 0),
             ];

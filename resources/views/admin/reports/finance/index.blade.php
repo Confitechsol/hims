@@ -116,6 +116,14 @@
                             </a>
                         </div>
                         <div class="col-md-3">
+                            <a href="{{ route('reports.gst-break') }}">
+                                <div class="module_billing">
+                                    <i class="fa-solid fa-file-invoice"></i>
+                                    <p>GST Break Report</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3">
                             <a href="{{ route('reports.daily-collection') }}">
                                 <div class="module_billing">
                                     <i class="fa-solid fa-calendar-day"></i>

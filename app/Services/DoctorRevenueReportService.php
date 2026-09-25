@@ -35,11 +35,13 @@ class DoctorRevenueReportService
      *     grand_total: array<string, float>,
      *     date_from: string,
      *     date_to: string,
+     *     doctor_id: int|null,
+     *     doctor_filter_label: string|null,
      *     patient_count: int,
      *     errors: list<array{ipd_id: int, ipd_no: string, message: string}>
      * }
      */
-    public function build(string $dateFrom, string $dateTo): array
+    public function build(string $dateFrom, string $dateTo, ?int $doctorId = null): array
     {
         $from = Carbon::parse($dateFrom)->startOfDay();
         $to = Carbon::parse($dateTo)->startOfDay();
@@ -67,6 +69,9 @@ class DoctorRevenueReportService
             ->whereIn('id', $ipdIds)
             ->where('discharged', 'yes')
             ->whereNotNull('cons_doctor')
+            ->when($doctorId, function ($query) use ($doctorId) {
+                $query->where('cons_doctor', $doctorId);
+            })
             ->get()
             ->keyBy('id');
 
@@ -179,11 +184,23 @@ class DoctorRevenueReportService
         }
         unset($group);
 
+        $doctorFilterLabel = null;
+        if ($doctorId) {
+            $selectedDoctor = Doctor::query()->find($doctorId);
+            if ($selectedDoctor) {
+                $name = trim((string) $selectedDoctor->name);
+                $reg = trim((string) ($selectedDoctor->registration_no ?? ''));
+                $doctorFilterLabel = $reg !== '' ? "{$name} ({$reg})" : $name;
+            }
+        }
+
         return [
             'groups' => $groups,
             'grand_total' => $this->buildGrandTotal($groups),
             'date_from' => $from->toDateString(),
             'date_to' => $to->toDateString(),
+            'doctor_id' => $doctorId,
+            'doctor_filter_label' => $doctorFilterLabel,
             'patient_count' => $patientCount,
             'errors' => $errors,
         ];

@@ -36,6 +36,7 @@ use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\InventoriesController;
 use App\Http\Controllers\IpdBillingController;
 use App\Http\Controllers\IpdFinalBillRegisterController;
+use App\Http\Controllers\GstBreakReportController;
 use App\Http\Controllers\MedicineCategoryController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicineGroupController;
@@ -1191,6 +1192,10 @@ Route::prefix('reports')->group(function () {
     Route::get('/ipd-final-bill-register', [IpdFinalBillRegisterController::class, 'index'])->name('reports.ipd-final-bill-register');
     Route::get('/ipd-final-bill-register/excel', [IpdFinalBillRegisterController::class, 'exportExcel'])->name('reports.ipd-final-bill-register.excel');
     Route::get('/ipd-final-bill-register/pdf', [IpdFinalBillRegisterController::class, 'exportPdf'])->name('reports.ipd-final-bill-register.pdf');
+    Route::get('/gst-break-report', [GstBreakReportController::class, 'index'])->name('reports.gst-break');
+    Route::get('/gst-break-report/search', [GstBreakReportController::class, 'searchIpd'])->name('reports.gst-break.search');
+    Route::get('/gst-break-report/excel', [GstBreakReportController::class, 'exportExcel'])->name('reports.gst-break.excel');
+    Route::get('/gst-break-report/pdf', [GstBreakReportController::class, 'exportPdf'])->name('reports.gst-break.pdf');
     Route::get('/daily-collection-report', [DailyCollectionReportController::class, 'index'])->name('reports.daily-collection');
     Route::get('/daily-collection-report/excel', [DailyCollectionReportController::class, 'exportExcel'])->name('reports.daily-collection.excel');
     Route::get('/daily-collection-report/pdf', [DailyCollectionReportController::class, 'exportPdf'])->name('reports.daily-collection.pdf');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Doctor;
 use App\Models\Hospital;
 use App\Services\DoctorRevenueReportService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -23,6 +24,8 @@ class DoctorRevenueReportController extends Controller
     {
         $dateFrom = $request->input('date_from', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $dateTo = $request->input('date_to', Carbon::now()->format('Y-m-d'));
+        $doctorId = $this->doctorIdFromRequest($request);
+        $doctors = $this->doctorOptions();
 
         $result = null;
         $reportError = null;
@@ -31,14 +34,16 @@ class DoctorRevenueReportController extends Controller
             $request->validate([
                 'date_from' => 'required|date',
                 'date_to' => 'required|date|after_or_equal:date_from',
+                'doctor_id' => 'nullable|integer|exists:doctor,id',
             ]);
 
             try {
-                $result = $this->reportService->build($dateFrom, $dateTo);
+                $result = $this->reportService->build($dateFrom, $dateTo, $doctorId);
             } catch (\Throwable $e) {
                 Log::error('Doctor Revenue Report index failed', [
                     'date_from' => $dateFrom,
                     'date_to' => $dateTo,
+                    'doctor_id' => $doctorId,
                     'error' => $e->getMessage(),
                 ]);
                 $reportError = 'Unable to generate the report. Please try again or contact support.';
@@ -49,6 +54,8 @@ class DoctorRevenueReportController extends Controller
             'result',
             'dateFrom',
             'dateTo',
+            'doctorId',
+            'doctors',
             'reportError'
         ));
     }
@@ -58,17 +65,20 @@ class DoctorRevenueReportController extends Controller
         $request->validate([
             'date_from' => 'required|date',
             'date_to' => 'required|date|after_or_equal:date_from',
+            'doctor_id' => 'nullable|integer|exists:doctor,id',
         ]);
 
         $dateFrom = $request->input('date_from');
         $dateTo = $request->input('date_to');
+        $doctorId = $this->doctorIdFromRequest($request);
 
         try {
-            $result = $this->reportService->build($dateFrom, $dateTo);
+            $result = $this->reportService->build($dateFrom, $dateTo, $doctorId);
         } catch (\Throwable $e) {
             Log::error('Doctor Revenue Report Excel export failed', [
                 'date_from' => $dateFrom,
                 'date_to' => $dateTo,
+                'doctor_id' => $doctorId,
                 'error' => $e->getMessage(),
             ]);
 
@@ -96,7 +106,9 @@ class DoctorRevenueReportController extends Controller
                 'Date From: %s  To: %s',
                 Carbon::parse($result['date_from'])->format('d/M/Y'),
                 Carbon::parse($result['date_to'])->format('d/M/Y')
-            )
+            ) . (! empty($result['doctor_filter_label'])
+                ? '  |  Doctor: ' . $result['doctor_filter_label']
+                : '  |  Doctor: All')
         );
         $sheet->mergeCells('A3:M3');
         $sheet->getStyle('A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
@@ -213,17 +225,20 @@ class DoctorRevenueReportController extends Controller
         $request->validate([
             'date_from' => 'required|date',
             'date_to' => 'required|date|after_or_equal:date_from',
+            'doctor_id' => 'nullable|integer|exists:doctor,id',
         ]);
 
         $dateFrom = $request->input('date_from');
         $dateTo = $request->input('date_to');
+        $doctorId = $this->doctorIdFromRequest($request);
 
         try {
-            $result = $this->reportService->build($dateFrom, $dateTo);
+            $result = $this->reportService->build($dateFrom, $dateTo, $doctorId);
         } catch (\Throwable $e) {
             Log::error('Doctor Revenue Report PDF export failed', [
                 'date_from' => $dateFrom,
                 'date_to' => $dateTo,
+                'doctor_id' => $doctorId,
                 'error' => $e->getMessage(),
             ]);
 
@@ -235,5 +250,19 @@ class DoctorRevenueReportController extends Controller
         $pdf->setPaper('a4', 'landscape');
 
         return $pdf->download('Doctor_Revenue_Report_' . $dateFrom . '_to_' . $dateTo . '.pdf');
+    }
+
+    private function doctorIdFromRequest(Request $request): ?int
+    {
+        $id = (int) $request->input('doctor_id');
+
+        return $id > 0 ? $id : null;
+    }
+
+    private function doctorOptions()
+    {
+        return Doctor::query()
+            ->orderBy('name')
+            ->get(['id', 'name', 'registration_no']);
     }
 }

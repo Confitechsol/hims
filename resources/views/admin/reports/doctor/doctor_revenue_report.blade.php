@@ -21,6 +21,24 @@
                 <form action="{{ route('doctors.patient.revenue-report') }}" method="GET">
                     <div class="row align-items-end gy-3">
                         <div class="col-md-3">
+                            <label class="form-label">Doctor</label>
+                            <select id="doctor_id" name="doctor_id" class="form-select">
+                                <option value="">All doctors</option>
+                                @foreach($doctors as $doctor)
+                                    @php
+                                        $doctorLabel = trim((string) $doctor->name);
+                                        $reg = trim((string) ($doctor->registration_no ?? ''));
+                                        if ($reg !== '') {
+                                            $doctorLabel .= ' (' . $reg . ')';
+                                        }
+                                    @endphp
+                                    <option value="{{ $doctor->id }}" @selected((string) ($doctorId ?? '') === (string) $doctor->id)>
+                                        {{ $doctorLabel }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3">
                             <label class="form-label">Date From <span class="text-danger">*</span></label>
                             <input type="date" name="date_from" class="form-control" value="{{ $dateFrom }}" max="{{ date('Y-m-d') }}" required>
                         </div>
@@ -28,7 +46,7 @@
                             <label class="form-label">Date To <span class="text-danger">*</span></label>
                             <input type="date" name="date_to" class="form-control" value="{{ $dateTo }}" max="{{ date('Y-m-d') }}" required>
                         </div>
-                        <div class="col-md-6 d-flex gap-2 align-items-end">
+                        <div class="col-md-3 d-flex gap-2 align-items-end">
                             <button type="submit" class="btn btn-primary btn-sm">Generate Report</button>
                             <a href="{{ route('doctors.patient.revenue-report') }}" class="btn btn-secondary btn-sm">Reset</a>
                         </div>
@@ -47,17 +65,28 @@
                     {{ \Carbon\Carbon::parse($result['date_from'])->format('d/m/Y') }}
                     to
                     {{ \Carbon\Carbon::parse($result['date_to'])->format('d/m/Y') }}
+                    @if(!empty($result['doctor_filter_label']))
+                        — {{ $result['doctor_filter_label'] }}
+                    @else
+                        — All doctors
+                    @endif
                     ({{ $result['patient_count'] ?? 0 }} patient bill(s))
                 </h6>
                 <div class="d-flex gap-2">
                     <form action="{{ route('doctors.patient.revenue-report.excel') }}" method="GET" class="d-inline">
                         <input type="hidden" name="date_from" value="{{ $result['date_from'] }}">
                         <input type="hidden" name="date_to" value="{{ $result['date_to'] }}">
+                        @if(!empty($result['doctor_id']))
+                            <input type="hidden" name="doctor_id" value="{{ $result['doctor_id'] }}">
+                        @endif
                         <button type="submit" class="btn btn-success btn-sm"><i class="ti ti-file-spreadsheet me-1"></i> Export Excel</button>
                     </form>
                     <form action="{{ route('doctors.patient.revenue-report.pdf') }}" method="GET" class="d-inline">
                         <input type="hidden" name="date_from" value="{{ $result['date_from'] }}">
                         <input type="hidden" name="date_to" value="{{ $result['date_to'] }}">
+                        @if(!empty($result['doctor_id']))
+                            <input type="hidden" name="doctor_id" value="{{ $result['doctor_id'] }}">
+                        @endif
                         <button type="submit" class="btn btn-danger btn-sm"><i class="ti ti-file-text me-1"></i> Export PDF</button>
                     </form>
                 </div>
@@ -75,7 +104,7 @@
                 @endif
 
                 @if(empty($result['groups']))
-                    <p class="text-muted mb-0">No referred-doctor discharged bills found for this date range.</p>
+                    <p class="text-muted mb-0">No referred-doctor discharged bills found for this date range{{ !empty($result['doctor_filter_label']) ? ' and doctor' : '' }}.</p>
                 @else
                 <div class="table-responsive">
                     <table class="table table-bordered table-sm mb-0 align-middle">
@@ -158,4 +187,18 @@
     @endif
 </div>
 
+@endsection
+
+@section('script')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(function () {
+        $('#doctor_id').select2({
+            width: '100%',
+            placeholder: 'Search doctor name',
+            allowClear: true
+        });
+    });
+</script>
 @endsection

@@ -562,7 +562,7 @@
                                         Reports</a></li>
                                 <li class="submenu">
                                     <a href="javascript:void(0);"
-                                        class="{{ request()->routeIs('finance') || request()->routeIs('reports.ipd-final-bill-register*') ? 'subdrop' : '' }}">
+                                        class="{{ request()->routeIs('finance') || request()->routeIs('reports.ipd-final-bill-register*') || request()->routeIs('reports.gst-break*') ? 'subdrop' : '' }}">
                                         <span>Finance Report</span>
                                         <span class="menu-arrow"></span>
                                     </a>
@@ -573,6 +573,9 @@
                                         <li><a href="{{ route('reports.ipd-final-bill-register') }}"
                                                 class="{{ request()->routeIs('reports.ipd-final-bill-register*') ? 'active' : '' }}">Final
                                                 Bill Register</a></li>
+                                        <li><a href="{{ route('reports.gst-break') }}"
+                                                class="{{ request()->routeIs('reports.gst-break*') ? 'active' : '' }}">GST
+                                                Break Report</a></li>
                                     </ul>
                                 </li>
                                 <li class="submenu">
