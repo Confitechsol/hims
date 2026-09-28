@@ -4,12 +4,12 @@ namespace App\Services;
 
 use App\Models\DischargeCard;
 use App\Models\IpdDetail;
-use App\Support\BedBillingPeriod;
 use Carbon\Carbon;
 
 /**
- * Insurance IPD: discharge-day bed charge is excluded unless discharge is at/after 3 PM
- * (late approval / late discharge scenario).
+ * Discharge datetime lookup shared by cash and insurance bed billing.
+ * Day count follows the cash 11:00 boundary. Insurance no longer drops the
+ * discharge day when discharge is before 3:00 PM.
  */
 class InsuranceDischargeBedChargeService
 {
@@ -35,7 +35,6 @@ class InsuranceDischargeBedChargeService
                 }
             }
 
-            // No discharge time recorded — treat as early discharge (exclude discharge-day bed charge).
             return Carbon::parse($date)->startOfDay();
         }
 
@@ -47,62 +46,22 @@ class InsuranceDischargeBedChargeService
     }
 
     /**
-     * Whether discharge-day bed charge should be billed for this insurance IPD.
+     * Discharge-day bed charge is included for cash and insurance.
+     * Day count uses the shared 11:00 billing window, not a 3:00 PM cutoff.
      */
     public function shouldIncludeDischargeDayBedCharge(IpdDetail $ipd, ?Carbon $dischargeAt = null): bool
     {
-        if (! $ipd->isInsuranceBilling()) {
-            return true;
-        }
-
-        $dischargeAt = $dischargeAt ?? $this->resolveDischargeAt($ipd);
-        if (! $dischargeAt) {
-            return true;
-        }
-
-        return $dischargeAt->hour >= $this->lateDischargeHour();
+        return true;
     }
 
     /**
-     * Charge label day (Y-m-d) to skip for insurance discharge, or null if none.
-     *
-     * Early discharge (< 3 PM) normally excludes the discharge label day so multi-day
-     * stays do not bill that last day. If that label day is also the first billable day
-     * (typical overnight admit → morning discharge), do not exclude it — otherwise bed
-     * charge becomes ₹0 incorrectly.
+     * No charge label day is skipped for insurance. Same discharge count as cash.
      */
     public function dischargeChargeDateToExclude(
         IpdDetail $ipd,
         ?Carbon $billingEndAt = null,
         ?Carbon $effectiveDischargeAt = null
     ): ?string {
-        if (! $ipd->isInsuranceBilling()) {
-            return null;
-        }
-
-        if (($ipd->discharged ?? 'no') !== 'yes') {
-            return null;
-        }
-
-        $dischargeAt = $effectiveDischargeAt ?? $this->resolveDischargeAt($ipd);
-        if (! $dischargeAt) {
-            return null;
-        }
-
-        if ($this->shouldIncludeDischargeDayBedCharge($ipd, $dischargeAt)) {
-            return null;
-        }
-
-        $labelDay = BedBillingPeriod::chargeLabelDayForMoment(
-            $billingEndAt ?? $dischargeAt
-        );
-
-        $admissionAt = Carbon::parse($ipd->date ?? $ipd->created_at ?? $dischargeAt);
-        $firstChargeDay = BedBillingPeriod::firstChargeCalendarDayFromAnchorDate($admissionAt);
-        if ($firstChargeDay->isSameDay($labelDay)) {
-            return null;
-        }
-
-        return $labelDay->format('Y-m-d');
+        return null;
     }
 }

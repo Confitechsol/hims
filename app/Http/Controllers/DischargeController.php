@@ -279,8 +279,7 @@ class DischargeController extends Controller
             // -------------------------------
             // 🔹 Final Discharge: save card and mark discharged.
             //    Bed stays occupied until Generate Final Bill in billing.
-            //    Insurance: discharge-day bed charge only if final discharge time >= 3:00 PM
-            //    Cash: normal boundary (11:00) using final discharge datetime
+            //    Cash and insurance use the same 11:00 boundary with the discharge datetime.
             // -------------------------------
             $dischargeAt = $this->parseDischargeDateTimeForBedHistory(
                 $validated['discharge_date'] ?? null,
@@ -727,8 +726,7 @@ class DischargeController extends Controller
 
     /**
      * Single datetime for bed history end / release, aligned with discharge card.
-     * Insurance without time → start of day (exclude discharge-day bed until known late time).
-     * Cash without time → end of day (existing behaviour).
+     * Cash and insurance: missing time uses end of the discharge day.
      */
     private function parseDischargeDateTimeForBedHistory(?string $dischargeDate, $dischargeTime, ?int $ipdDetailsId = null): Carbon
     {
@@ -745,18 +743,12 @@ class DischargeController extends Controller
             }
         }
 
-        $ipd = $ipdDetailsId ? IpdDetail::find($ipdDetailsId) : null;
-        if ($ipd && $ipd->isInsuranceBilling()) {
-            return Carbon::parse($dischargeDate)->startOfDay();
-        }
-
         return Carbon::parse($dischargeDate)->endOfDay();
     }
 
     /**
      * After final discharge: sync stored daywise bed charges through the final discharge datetime.
-     * Insurance: discharge-day charge included only if time >= 3:00 PM.
-     * Cash: normal billing boundary using discharge datetime.
+     * Cash and insurance use the same 11:00 billing boundary.
      */
     private function syncBedChargesOnFinalDischarge(int $ipdDetailsId, Carbon $dischargeAt): void
     {

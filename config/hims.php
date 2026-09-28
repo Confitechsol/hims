@@ -22,8 +22,8 @@ return [
     | Insurance discharge bed charge
     |--------------------------------------------------------------------------
     |
-    | For insurance IPD, discharge-day bed charge is excluded unless discharge
-    | time is at or after this hour (default 15 = 3:00 PM).
+    | Retained for compatibility. Insurance bed day count now matches cash
+    | (11:00 billing window). This hour is no longer used to drop a day.
     |
     */
     'insurance_discharge_bed_charge_after_hour' => (int) env('INSURANCE_DISCHARGE_BED_CHARGE_AFTER_HOUR', 15),

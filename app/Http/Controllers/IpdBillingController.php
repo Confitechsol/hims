@@ -537,7 +537,7 @@ class IpdBillingController extends Controller
         while ($currentDate->lte($lastChargeDay)) {
             $chargeDate = $currentDate->format('Y-m-d');
 
-            // Insurance IPD: skip discharge-day bed charge unless discharge is at/after 3 PM.
+            // Kept for callers that still return a skip date. Cash and insurance currently skip none.
             if ($skipInsuranceDischargeChargeDate !== null && $chargeDate === $skipInsuranceDischargeChargeDate) {
                 $currentDate->addDay();
                 continue;
