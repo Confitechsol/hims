@@ -141,8 +141,8 @@ public function exportDoctorsDueReports(Request $request)
         'Gross Total',
         'Due Amount',
         'Receipt Type',
-        'Transaction Amounts',
-        'Total Transaction Amount',
+        'Received Amounts',
+        'Total Payment Received Amount',
         'Admission Date',
     ];
 

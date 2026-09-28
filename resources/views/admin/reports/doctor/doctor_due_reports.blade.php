@@ -66,8 +66,8 @@
                                 <th>Gross Total</th>
                                 <th>Due Amount</th>
                                 <th>Receipt Type</th>
-                                <th>Transaction Amounts</th>
-                                <th>Total Received Amount</th>
+                                <th>Received Amounts</th>
+                                <th>Total Payment Recived</th>
                                 <th>Admission Date</th>
                             </tr>
                         </thead>
