@@ -733,7 +733,8 @@ document.addEventListener('DOMContentLoaded', function () {
         $doctors
     );
 
-    new TomSelect('#prescribe_by', {
+    const prescribeBySelect = document.getElementById('prescribe_by');
+    const doctorSelector = new TomSelect(prescribeBySelect, {
         options: doctordata.map(doc => ({
             value: doc.id,
             label: `${doc.name} ${doc.surname} (${doc.doctor_id ?? 'N/A'})`
@@ -745,6 +746,11 @@ document.addEventListener('DOMContentLoaded', function () {
         persist: false,
         placeholder: 'Select doctors'
     });
+    const ipdContext = document.getElementById('ipdViewContext');
+    const consultantDoctorId = ipdContext?.getAttribute('data-cons-doctor');
+    if (consultantDoctorId && doctordata.some(doc => String(doc.id) === consultantDoctorId)) {
+        doctorSelector.setValue(consultantDoctorId, true);
+    }
 
 });
 </script>
@@ -1652,6 +1658,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (ipdIdField) {
                     ipdIdField.value = ipd_id.trim();
                     console.log('IPD ID set to:', ipdIdField.value);
+                }
+                const ipdContext = document.getElementById('ipdViewContext');
+                const consultantDoctorId = ipdContext && ipdContext.getAttribute('data-ipd-id') === ipd_id.trim()
+                    ? ipdContext.getAttribute('data-cons-doctor')
+                    : '';
+                const prescribeBySelect = document.getElementById('prescribe_by');
+                if (consultantDoctorId && prescribeBySelect && prescribeBySelect.tomselect) {
+                    prescribeBySelect.tomselect.setValue(consultantDoctorId);
                 }
                 if (form) {
                     form.action = ipdRoute; // IPD route
