@@ -539,20 +539,31 @@
             });
             edit_charges.querySelector("select[name='charge_category']").innerHTML = categoryhtml;
             myModal.show();
-            edit_charges.querySelector("select[name='charge_type']").value = charge.category.charge_type_id;
+            edit_charges.querySelector("select[name='charge_type']").value = charge.category?.charge_type_id ?? '';
             edit_charges.querySelector("select[name='charge_category']").value = charge.charge_category_id;
-            edit_charges.querySelector("select[name='unit_type']").value = charge.unit.id;
+            edit_charges.querySelector("select[name='unit_type']").value = charge.unit?.id ?? '';
             edit_charges.querySelector("input[name='charge_name']").value = charge.name;
-            edit_charges.querySelector("select[name='tax_category']").value = charge.tax_category_id;
-            edit_charges.querySelector("input[name='tax_percentage']").value = charge.tax_category.percentage;
+            const taxCategoryInput = edit_charges.querySelector("select[name='tax_category']");
+            if (taxCategoryInput) {
+                taxCategoryInput.value = charge.tax_category_id ?? '';
+            }
+            const taxPercentageInput = edit_charges.querySelector("input[name='tax_percentage']");
+            if (taxPercentageInput) {
+                taxPercentageInput.value = charge.tax_category?.percentage ?? '';
+            }
             edit_charges.querySelector("input[name='standard_charge']").value = charge.standard_charge;
-            edit_charges.querySelector("textarea[name='description']").value = charge.description;
+            edit_charges.querySelector("textarea[name='description']").value = charge.description ?? '';
             organisation_names.map((item, index) => {
                 let name = `input[name='schedule_charge_${item.id}']`;
-                let charge = organisation_charges.filter(innerItem => innerItem.charge_id == id && innerItem
+                const input = edit_charges.querySelector(name);
+                if (!input) {
+                    return;
+                }
+                input.value = '';
+                let organisationCharge = organisation_charges.filter(innerItem => innerItem.charge_id == id && innerItem
                     .org_id == item.id);
-                if (charge.length > 0) {
-                    edit_charges.querySelector(name).value = charge[0].org_charge;
+                if (organisationCharge.length > 0) {
+                    input.value = organisationCharge[0].org_charge;
                 }
             });
 
