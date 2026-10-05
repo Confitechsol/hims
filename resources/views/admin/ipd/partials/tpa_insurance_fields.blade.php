@@ -182,15 +182,25 @@
             </div>
         </div>
 
-        <div class="form-row cols-2">
+          <div class="form-row cols-2">
             <div class="field-group">
-                <label for="initial_approval_amount" class="form-label">Initial Approval Amount (INR)</label>
-                <input type="number" name="initial_approval_amount" id="initial_approval_amount" class="form-control"
-                    step="0.01" min="0"
-                    value="{{ old('initial_approval_amount', isset($ipd->initial_approval_amount) ? number_format((float) $ipd->initial_approval_amount, 2, '.', '') : '') }}"
-                    placeholder="Amount approved by insurer/TPA">
-                <small class="field-hint">Shown on Insurance Approval Bill. Further approval = Grand Total − MOU Discount − this amount.</small>
-            </div>
+               <label for="initial_approval_amount" class="form-label">
+                   Initial Approval Amount (INR)
+               </label>
+           
+               <input type="number"
+                   name="initial_approval_amount"
+                   id="initial_approval_amount"
+                   class="form-control"
+                   step="0.01"
+                   min="0"
+                   value="{{ old('initial_approval_amount', isset($ipd->initial_approval_amount) ? number_format((float) $ipd->initial_approval_amount, 2, '.', '') : '') }}"
+                   placeholder="Amount approved by insurer/TPA">
+           
+               <small class="field-hint">
+                   Shown on Insurance Approval Bill. Further approval = Grand Total − MOU Discount − this amount.
+               </small>
+           </div>
             <div class="field-group">
                 <label for="final_approval_amount" class="form-label">Final Approval Amount (INR)</label>
                 <input type="number" name="final_approval_amount" id="final_approval_amount" class="form-control"
@@ -307,4 +317,10 @@
         boot();
     }
 })();
+</script>
+
+<script>
+document.getElementById('initial_approval_amount').addEventListener('wheel', function (e) {
+    e.preventDefault();
+});
 </script>
