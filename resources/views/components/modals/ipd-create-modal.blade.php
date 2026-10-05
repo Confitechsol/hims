@@ -823,9 +823,17 @@
 
                         <div class="row g-3">
                             <div class="col-md-3">
-                                <label class="form-label">Admission Date & Time<span class="required">*</span></label>
-                                <input type="datetime-local" class="form-control" name="admission_date" required>
-                            </div>
+    <label for="admission_date" class="form-label">
+        Admission Date & Time<span class="required">*</span>
+    </label>
+
+    <input type="datetime-local"
+           class="form-control"
+           name="admission_date"
+           id="admission_date"
+           required>
+</div>
+
                             <!-- <div class="col-md-3">
                                 <label class="form-label">Case</label>
                                 <input type="text" class="form-control" name="case">
@@ -2108,3 +2116,29 @@
         })
     })
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const createIpdModal = document.getElementById('createIpdModal');
+        const admissionDate = document.getElementById('admission_date');
+
+        createIpdModal.addEventListener('shown.bs.modal', function () {
+
+            // Get current system date & time
+            const now = new Date();
+
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+
+            // datetime-local format: YYYY-MM-DDTHH:mm
+            admissionDate.value =
+                `${year}-${month}-${day}T${hours}:${minutes}`;
+        });
+
+    });
+</script>
+
