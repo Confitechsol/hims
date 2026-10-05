@@ -22,6 +22,9 @@ use App\Services\DaywiseBedChargeService;
 use App\Services\IpdPackageService;
 use App\Services\InsuranceFinalBillSummaryService;
 use App\Services\IpdFinalBillService;
+use App\Services\Billing\TemporaryAdmissionEstimateAddon;
+use App\Services\Billing\TemporaryAdmissionEstimateContext;
+use App\Exceptions\InvalidTemporaryAdmissionException;
 use App\Support\BedBillingPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -75,6 +78,7 @@ class IpdBillingController extends Controller
                     'discharged' => $isDischarged,
                     'discharged_date' => $ipd->discharged_date,
                     'final_bill_generated' => $finalBillGenerated,
+                    'admission_date' => $ipd->date,
                     'display_text' => ($ipd->ipd_no ?? 'N/A') . ' - ' . $patientName . $dischargeStatus,
                 ];
             });
@@ -431,7 +435,9 @@ class IpdBillingController extends Controller
             return ['total' => 0, 'details' => []];
         }
 
-        $admissionAt = Carbon::parse($ipd->date ?? $ipd->created_at ?? now());
+        // Estimate add-on only. Null for every normal bill, so cash and insurance rules stay unchanged.
+        $temporaryAdmission = app(TemporaryAdmissionEstimateContext::class)->admissionAt();
+        $admissionAt = $temporaryAdmission ?? Carbon::parse($ipd->date ?? $ipd->created_at ?? now());
         $billableAnchor = BedBillingPeriod::billableAnchorAt($admissionAt);
         // For non-discharged preview/breakup, calculate up to current moment.
         // Date-only end values use discharge card time when available (insurance discharge-day rule).
@@ -2190,18 +2196,25 @@ class IpdBillingController extends Controller
                 $isApprovalPreview ? 'approval_preview' : ($isApprovalBill ? 'approval' : null)
             );
 
-            $breakup = $this->calculateBreakup(
-                $ipdId,
-                $billingEndAtForEstimate ? $billingEndAtForEstimate->format('Y-m-d H:i:s') : null,
-                $ipdChargeBillStage
+            $billingEndForBed = $billingEndAtForEstimate
+                ? $billingEndAtForEstimate->format('Y-m-d H:i:s')
+                : null;
+
+            // Temporary admission, when present, applies only inside this callback and is not saved.
+            [$breakup, $bedChargesData] = app(TemporaryAdmissionEstimateAddon::class)->run(
+                $request,
+                $ipd,
+                $isApprovalBill,
+                function () use ($ipdId, $billingEndForBed, $ipdChargeBillStage) {
+                    $breakup = $this->calculateBreakup($ipdId, $billingEndForBed, $ipdChargeBillStage);
+                    $bedChargesData = $this->calculateBedChargesFromHistory($ipdId, $billingEndForBed);
+
+                    return [$breakup, $bedChargesData];
+                }
             );
             \Log::info('Breakup calculated', ['total_charges' => $breakup['total_charges']]);
 
             // Get detailed breakdown - Calculate dynamically from PatientBedHistory (omit from display when package applied)
-            $bedChargesData = $this->calculateBedChargesFromHistory(
-                $ipdId,
-                $billingEndAtForEstimate ? $billingEndAtForEstimate->format('Y-m-d H:i:s') : null
-            );
             $bedChargesDetails = collect($bedChargesData['details']);
             $bedChargeDisplayEndCalendar = $billingEndAtForEstimate
                 ? Carbon::parse($billingEndAtForEstimate)->format('Y-m-d')
@@ -2535,6 +2548,8 @@ class IpdBillingController extends Controller
                 : 'IPD_Estimate_Bill_' . $ipd->ipd_no . '.pdf';
 
             return $pdf->stream($filename);
+        } catch (InvalidTemporaryAdmissionException $e) {
+            abort(422, $e->getMessage());
         } catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e) {
             throw $e;
         } catch (\Exception $e) {

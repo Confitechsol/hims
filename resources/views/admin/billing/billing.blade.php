@@ -346,12 +346,72 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-estimate?view_mode=detailed', '_blank');
+                        promptTemporaryAdmission(ipdId, 'detailed');
                     } else if (result.isDenied) {
-                        window.open('{{ url("ipd/billing") }}/' + ipdId + '/export-estimate?view_mode=brief', '_blank');
+                        promptTemporaryAdmission(ipdId, 'brief');
                     }
                 });
             });
+
+            function realAdmissionForInput(ipdId) {
+                var row = ipdPatientData.find(function (ipd) {
+                    return String(ipd.id) === String(ipdId);
+                });
+                if (!row || !row.admission_date) {
+                    return '';
+                }
+                var raw = String(row.admission_date).replace(' ', 'T');
+                return raw.length >= 16 ? raw.slice(0, 16) : raw;
+            }
+
+            function openEstimatePdf(ipdId, viewMode, tempAdmission) {
+                var url = '{{ url("ipd/billing") }}/' + ipdId + '/export-estimate?view_mode=' + encodeURIComponent(viewMode);
+                if (tempAdmission) {
+                    url += '&temp_admission_at=' + encodeURIComponent(tempAdmission);
+                }
+                window.open(url, '_blank');
+            }
+
+            function escapeEstimateAttr(value) {
+                return String(value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/</g, '&lt;');
+            }
+
+            function promptTemporaryAdmission(ipdId, viewMode) {
+                var prefill = escapeEstimateAttr(realAdmissionForInput(ipdId));
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Temporary admission for bed charge',
+                    html: '<p style="text-align:left;font-size:14px;margin-bottom:8px;">This time is used only to calculate the bed charge on this estimate. It is not saved. Adm Date and Adm Time on the bill stay the real admission.</p>'
+                        + '<p style="text-align:left;font-size:13px;color:#555;margin-bottom:8px;">If the patient was admitted before 11:00 AM and this estimate is printed before 11:00 AM, set the temporary admission to the previous day to show a bed charge. The 11:00 AM bed rule is unchanged.</p>'
+                        + '<input id="temp_admission_at" type="datetime-local" class="swal2-input" style="width:100%;margin:0;" value="' + prefill + '">',
+                    showCancelButton: true,
+                    showDenyButton: true,
+                    confirmButtonText: 'Generate with this time',
+                    denyButtonText: 'Use real admission',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#750096',
+                    denyButtonColor: '#0d6efd',
+                    focusConfirm: false,
+                    preConfirm: function () {
+                        var el = document.getElementById('temp_admission_at');
+                        var value = el ? String(el.value || '').trim() : '';
+                        if (!value) {
+                            Swal.showValidationMessage('Enter a temporary admission date and time, or choose Use real admission.');
+                            return false;
+                        }
+                        return value;
+                    }
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        openEstimatePdf(ipdId, viewMode, result.value);
+                    } else if (result.isDenied) {
+                        openEstimatePdf(ipdId, viewMode, null);
+                    }
+                });
+            }
 
             document.getElementById('exportApprovalPreviewBtn').addEventListener('click', function() {
                 if (this.disabled) {
