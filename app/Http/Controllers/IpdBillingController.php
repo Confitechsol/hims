@@ -2921,7 +2921,9 @@ class IpdBillingController extends Controller
             
             $dischargeDate = $dischargeCard->discharge_date;
             $dischargeTime = $dischargeCard->discharge_time;
-            $billingEndAt = app(IpdFinalBillService::class)->billingEndAt($ipd)->format('Y-m-d H:i:s');
+            $finalBillService = app(IpdFinalBillService::class);
+            $billingEndAt = $finalBillService->billingEndAt($ipd)->format('Y-m-d H:i:s');
+            $finalDischargeAt = $finalBillService->finalDischargeDisplayAt($ipd);
             
             \Log::info('Discharge information retrieved', [
                 'discharge_date' => $dischargeDate,
@@ -3229,7 +3231,7 @@ class IpdBillingController extends Controller
             $pdf = Pdf::loadView('admin.billing.ipd_final_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGrouped', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
                 'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'packageDetails', 'payments',
-                'hospital', 'billNumber', 'billDate', 'dischargeDate', 'dischargeTime',
+                'hospital', 'billNumber', 'billDate', 'dischargeDate', 'dischargeTime', 'finalDischargeAt',
                 'discount', 'mouDiscount', 'specialDiscount', 'duePatientPartyAmount',
                 'grandTotal', 'totalAdvance', 'balance', 'grandTotalInWords',
                 'totalAdvanceInWords', 'balanceInWords', 'otCharges', 'medicineCharges',

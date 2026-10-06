@@ -64,7 +64,9 @@ class IpdFinalBillService
 
             $wasReopened = (bool) ($ipd->is_reopened ?? false);
 
-            $ipd->final_bill_generated_at = Carbon::now();
+            $generatedAt = Carbon::now();
+            $ipd->final_bill_generated_at = $generatedAt;
+            $ipd->final_discharge_at = $generatedAt->copy();
             $ipd->final_bill_generated_by = Auth::id();
             $ipd->include_post_discharge_bed_charge = false;
             $ipd->physical_release_at = $dischargeAt;
@@ -84,6 +86,7 @@ class IpdFinalBillService
                     'action' => 'final_bill_generated',
                     'new_values' => [
                         'final_bill_generated_at' => optional($ipd->final_bill_generated_at)?->toDateTimeString(),
+                        'final_discharge_at' => optional($ipd->final_discharge_at)?->toDateTimeString(),
                         'physical_release_at' => $dischargeAt->toDateTimeString(),
                     ],
                 ]);
@@ -113,6 +116,24 @@ class IpdFinalBillService
         }
 
         throw new RuntimeException('Discharge date is missing. Please complete the discharge card first.');
+    }
+
+    /**
+     * System date and time stored when the final bill is generated.
+     * Null before generation, so the PDF can keep the user discharge date until then.
+     * Does not read or change the discharge card.
+     */
+    public function finalDischargeDisplayAt(IpdDetail $ipd): ?Carbon
+    {
+        if (! empty($ipd->final_discharge_at)) {
+            return Carbon::parse($ipd->final_discharge_at);
+        }
+
+        if ($this->isGenerated($ipd) && ! empty($ipd->final_bill_generated_at)) {
+            return Carbon::parse($ipd->final_bill_generated_at);
+        }
+
+        return null;
     }
 
     protected function assertCanPreview(IpdDetail $ipd): void
