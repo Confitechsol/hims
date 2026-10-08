@@ -15,7 +15,7 @@
         <span class="summary-value">Rs. {{ number_format($grandTotal ?? 0, 2) }}</span>
     </div>
     <div class="summary-row">
-        <span class="summary-label">Less Advance:</span>
+        <span class="summary-label">Less Paid Amount:</span>
         <span class="summary-value">Rs. {{ number_format($totalAdvance ?? 0, 2) }}</span>
     </div>
     <div class="summary-row">
