@@ -373,6 +373,7 @@ class IpdBillingController extends Controller
             'due_patient_party_doctor_id' => 'nullable|exists:doctor,id',
             'due_patient_party_amount' => 'nullable|numeric|min:0',
             'due_patient_party_receipt_type' => 'nullable|string|in:Current,Patient Due,Corporate Due,In Admissible,Booking,Refund',
+            'patient_party_due' => 'nullable|string|max:255',
         ]);
 
         $ipd = IpdDetail::findOrFail($ipdId);
@@ -385,6 +386,7 @@ class IpdBillingController extends Controller
         $ipd->due_patient_party_doctor_id = $request->input('due_patient_party_doctor_id') ?: null;
         $ipd->due_patient_party_amount = (float) ($request->input('due_patient_party_amount') ?? 0);
         $ipd->due_patient_party_receipt_type = $request->input('due_patient_party_receipt_type') ?: null;
+        $ipd->patient_party_due = $request->input('patient_party_due') ?: null;
         $ipd->save();
 
         app(\App\Services\Audit\AuditLogger::class)->log([
@@ -401,6 +403,7 @@ class IpdBillingController extends Controller
                 'due_patient_party_doctor_id' => $ipd->due_patient_party_doctor_id,
                 'due_patient_party_amount' => $ipd->due_patient_party_amount,
                 'due_patient_party_receipt_type' => $ipd->due_patient_party_receipt_type,
+                'patient_party_due' => $ipd->patient_party_due,
             ],
         ]);
 
@@ -416,6 +419,7 @@ class IpdBillingController extends Controller
             'message' => 'Due on account of patient party saved. It will reflect on the final bill.',
             'due_patient_party_doctor_id' => $ipd->due_patient_party_doctor_id,
             'due_patient_party_amount' => $duePatientPartyAmount,
+
             'outstanding' => $outstanding,
             'net_balance' => $netBalance,
         ]);
