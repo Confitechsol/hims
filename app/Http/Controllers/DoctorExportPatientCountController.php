@@ -39,61 +39,19 @@ class DoctorExportPatientCountController extends Controller
     return view('admin.reports.doctor.doctor_reports', compact('doctors', 'doctorData', 'year'));
 }
    
-// {
-//     $fromDate = $request->input('from_date');
-//     $toDate   = $request->input('to_date');
-
-//     // Optional defaults
-//     if (!$fromDate) {
-//         $fromDate = date('Y-01-01');
-//     }
-
-//     if (!$toDate) {
-//         $toDate = date('Y-12-31');
-//     }
-
-//     $doctors = Doctor::select('id', 'name')->get();
-
-//     $dueReports = DB::table('ipd_details')
-//         ->select(
-//             'cons_doctor',
-//             DB::raw('MONTH(created_at) as month'),
-//             DB::raw('YEAR(created_at) as year'),
-//             DB::raw('COUNT(id) as total')
-//         )
-//         ->whereNotNull('cons_doctor')
-//         ->whereBetween('created_at', [
-//             $fromDate . ' 00:00:00',
-//             $toDate . ' 23:59:59'
-//         ])
-//         ->where('due_patient_party_amount', 'due')
-//         ->groupBy(
-//             'cons_doctor',
-//             DB::raw('MONTH(created_at)'),
-//             DB::raw('YEAR(created_at)')
-//         )
-//         ->get();
-
-//     $doctorDueData = [];
-
-//     foreach ($dueReports as $row) {
-//         $doctorDueData[$row->cons_doctor][$row->year][$row->month] = $row->total;
-//     }
-
-//     return response()->json([
-//         'success' => true,
-//         'from_date' => $fromDate,
-//         'to_date' => $toDate,
-//         'doctors' => $doctors,
-//         'doctor_due_data' => $doctorDueData
-//     ]);
-// }
 
   public function getDoctorsDueReports(Request $request)
 {
     $fromDate = $request->input('from_date');
     $toDate   = $request->input('to_date');
     $dueType  = $request->input('due_type');
+    $validated = $request->validate([
+        'doctor_ids' => 'nullable|array',
+        'doctor_ids.*' => 'integer|exists:doctor,id',
+        'patient_party_due' => 'nullable|string|max:255',
+    ]);
+    $doctorIds = $validated['doctor_ids'] ?? [];
+    $patientPartyDue = $validated['patient_party_due'] ?? null;
 
     // Optional defaults
     if (!$fromDate) {
@@ -104,14 +62,25 @@ class DoctorExportPatientCountController extends Controller
         $toDate = date('Y-12-31');
     }
 
-   $dueReports = $this->fetchDoctorsDueReports($fromDate, $toDate, $dueType);
+   $dueReports = $this->fetchDoctorsDueReports($fromDate, $toDate, $dueType, $doctorIds, $patientPartyDue);
 
    if (!$request->expectsJson()) {
+       $doctors = Doctor::query()->select('id', 'name')->orderBy('name')->get();
+       $patientPartyDues = DB::table('ipd_details')
+           ->whereNotNull('patient_party_due')
+           ->where('patient_party_due', '<>', '')
+           ->distinct()
+           ->orderBy('patient_party_due')
+           ->pluck('patient_party_due');
        return view('admin.reports.doctor.doctor_due_reports', compact(
            'dueReports',
            'fromDate',
            'toDate',
-           'dueType'
+           'dueType',
+           'doctors',
+           'doctorIds',
+           'patientPartyDues',
+           'patientPartyDue'
        ));
    }
 
@@ -128,8 +97,15 @@ public function exportDoctorsDueReports(Request $request)
     $fromDate = $request->input('from_date', date('Y-01-01'));
     $toDate = $request->input('to_date', date('Y-12-31'));
     $dueType = $request->input('due_type');
+    $validated = $request->validate([
+        'doctor_ids' => 'nullable|array',
+        'doctor_ids.*' => 'integer|exists:doctor,id',
+        'patient_party_due' => 'nullable|string|max:255',
+    ]);
+    $doctorIds = $validated['doctor_ids'] ?? [];
+    $patientPartyDue = $validated['patient_party_due'] ?? null;
 
-    $reports = $this->fetchDoctorsDueReports($fromDate, $toDate, $dueType);
+    $reports = $this->fetchDoctorsDueReports($fromDate, $toDate, $dueType, $doctorIds, $patientPartyDue);
 
     $spreadsheet = new Spreadsheet();
     $sheet = $spreadsheet->getActiveSheet();
@@ -183,7 +159,7 @@ public function exportDoctorsDueReports(Request $request)
      *
      * @return \Illuminate\Support\Collection<int, object>
      */
-    private function fetchDoctorsDueReports(string $fromDate, string $toDate, $dueType)
+    private function fetchDoctorsDueReports(string $fromDate, string $toDate, $dueType, array $doctorIds, ?string $patientPartyDue)
     {
         $billingController = app(IpdBillingController::class);
 
@@ -197,6 +173,7 @@ public function exportDoctorsDueReports(Request $request)
                 'patients.patient_name as patient_name',
                 'ipd_details.due_patient_party_doctor_id',
                 'doctor.name as doctor_name',
+                'ipd_details.patient_party_due',
                 'ipd_details.due_patient_party_amount',
                 'ipd_details.due_patient_party_receipt_type',
                 'ipd_details.created_at',
@@ -209,12 +186,19 @@ public function exportDoctorsDueReports(Request $request)
             ->when(in_array($dueType, ['Patient Due', 'Corporate Due'], true), function ($query) use ($dueType) {
                 $query->where('ipd_details.due_patient_party_receipt_type', $dueType);
             })
+            ->when($doctorIds, function ($query) use ($doctorIds) {
+                $query->whereIn('ipd_details.due_patient_party_doctor_id', $doctorIds);
+            })
+            ->when($patientPartyDue !== null && $patientPartyDue !== '', function ($query) use ($patientPartyDue) {
+                $query->where('ipd_details.patient_party_due', $patientPartyDue);
+            })
             ->groupBy(
                 'ipd_details.id',
                 'ipd_details.ipd_no',
                 'patients.patient_name',
                 'ipd_details.due_patient_party_doctor_id',
                 'doctor.name',
+                'ipd_details.patient_party_due',
                 'ipd_details.due_patient_party_amount',
                 'ipd_details.due_patient_party_receipt_type',
                 'ipd_details.created_at'

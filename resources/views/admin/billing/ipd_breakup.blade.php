@@ -387,6 +387,15 @@
                             @endforeach
                         </select>
                     </div>
+                    <div class="col-md-4">
+                        <label for="patient_party_due" class="form-label">Patient Party Due</label>
+                        <input type="text"
+                               class="form-control"
+                               id="patient_party_due"
+                               name="patient_party_due"
+                               value="{{ $ipd->patient_party_due ?? '' }}"
+                               placeholder="Enter Patient Party Due">
+                    </div>
                     <div class="col-md-3">
                         <label for="due_patient_party_receipt_type" class="form-label">Receipt Type</label>
                         <select class="form-select" id="due_patient_party_receipt_type" name="due_patient_party_receipt_type">

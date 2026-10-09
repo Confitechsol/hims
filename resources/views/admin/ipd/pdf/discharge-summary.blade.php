@@ -423,25 +423,29 @@
         </tr>
 
         <tr>
-            <td class="label">Admission Date</td>
+            {{-- <td class="label">Admission Date</td>
             <td class="colon">:</td>
-            <td class="value">{{ \Carbon\Carbon::parse($data->admission_date)->format('d-m-Y') }}</td>
-
+            <td class="value">{{ \Carbon\Carbon::parse($data->admission_date)->format('d-m-Y') }}</td> --}}
+             <td class="label">Admiss Date & Time</td> <td class="colon">:</td> 
+             <td class="value"> {{ \Carbon\Carbon::parse($data->admission_date)->format('d-m-Y') }} {{ $data->admit_time }} </td>
 
             <td class="label">Contact No.</td>
             <td class="colon">:</td>
             <td class="value">{{ $data->phone }}</td>
         </tr>
         <tr>
-            <td class="label">Admission Time</td>
+            {{-- <td class="label">Admission Time</td>
             <td class="colon">:</td>
-            <td class="value">{{ $data->admit_time }}</td>
+            <td class="value">{{ $data->admit_time }}</td> --}}
 
-            <td class="label">Discharge Date</td>
+            {{-- <td class="label">Discharge Date</td>
             <td class="colon">:</td>
             <td class="value">
                 {{ \Carbon\Carbon::parse($data->discharge_date)->format('d-m-Y') }}
-            </td>
+            </td> --}}
+            <td class="label">Disc Date & Time</td>
+            <td class="colon">:</td> 
+            <td class="value"> {{ $data->discharge_date ? \Carbon\Carbon::parse($data->discharge_date)->format('d-m-Y') : '' }} {{ $data->discharge_time }} </td>
         </tr>
         <tr>
             @if ($data->ot_date != null || $data->ot_date != '')
@@ -454,9 +458,9 @@
                 <td class="colon">:</td>
                 <td class="value">{{ $data->discharge_contact }}</td> --}}
             @endif
-            <td class="label">Discharge Time</td>
+            {{-- <td class="label">Discharge Time</td>
             <td class="colon">:</td>
-            <td class="value">{{ $data->discharge_time }}</td>
+            <td class="value">{{ $data->discharge_time }}</td> --}}
         </tr>
 
         <tr>

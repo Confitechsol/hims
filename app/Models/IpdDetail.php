@@ -87,6 +87,7 @@ class IpdDetail extends Model
         'generated_by',
         'is_antenatal',
         'ipd_no',
+        'patient_party_due',
     ];
 
     protected $casts = [
