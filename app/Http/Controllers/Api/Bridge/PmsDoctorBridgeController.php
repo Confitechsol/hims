@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Api\Bridge;
 
 use App\Http\Controllers\Controller;
 use App\Models\Doctor;
+use App\Models\IpdDetail;
+use App\Models\IpdPatient;
+use App\Models\IpdPrescription;
 use App\Models\StaffDesignation;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -110,5 +114,101 @@ class PmsDoctorBridgeController extends Controller
         }
 
         return response()->json(['message' => 'Doctor not found'], 404);
+    }
+
+    /**
+     * Referring doctor for a PMS report that came from an IPD admission.
+     * Prefers the admission consultant, then the doctor who wrote the prescription.
+     */
+    public function referredDoctor(Request $request): JsonResponse
+    {
+        $encounter = trim((string) $request->query('encounter', ''));
+        $patientId = trim((string) $request->query('patient_id', ''));
+        $orderDate = trim((string) $request->query('order_date', ''));
+
+        $ipd = $this->findIpdForReferral($encounter, $patientId, $orderDate);
+        $doctor = $ipd ? $this->referringDoctor($ipd) : null;
+        $name = $doctor ? trim(($doctor->name ?? '').' '.($doctor->surname ?? '')) : '';
+
+        if ($name === '') {
+            return response()->json(['data' => null]);
+        }
+
+        return response()->json([
+            'data' => [
+                'external_doctor_id' => (string) $doctor->id,
+                'name' => $name,
+            ],
+        ]);
+    }
+
+    private function findIpdForReferral(string $encounter, string $patientId, string $orderDate): ?IpdDetail
+    {
+        if ($encounter !== '') {
+            $ipd = IpdDetail::with('doctor')
+                ->where(function ($query) use ($encounter) {
+                    $query->where('ipd_no', $encounter);
+                    if (ctype_digit($encounter)) {
+                        $query->orWhere('id', (int) $encounter);
+                    }
+                })
+                ->orderByDesc('id')
+                ->first();
+
+            if ($ipd) {
+                return $ipd;
+            }
+        }
+
+        if ($patientId === '' || ! ctype_digit($patientId)) {
+            return null;
+        }
+
+        $base = IpdDetail::with('doctor')->where('patient_id', (int) $patientId);
+
+        if ($orderDate !== '') {
+            try {
+                $day = Carbon::parse($orderDate)->toDateString();
+                $matched = (clone $base)
+                    ->whereDate('date', '<=', $day)
+                    ->orderByDesc('date')
+                    ->orderByDesc('id')
+                    ->first();
+                if ($matched) {
+                    return $matched;
+                }
+            } catch (\Throwable $e) {
+                // Ignore a bad date and use the latest admission.
+            }
+        }
+
+        return $base->orderByDesc('id')->first();
+    }
+
+    private function referringDoctor(IpdDetail $ipd): ?Doctor
+    {
+        if ($ipd->doctor) {
+            return $ipd->doctor;
+        }
+
+        $prescription = IpdPrescription::query()
+            ->with('prescribedBy')
+            ->where('ipd_id', $ipd->id)
+            ->whereNotNull('prescribed_by')
+            ->orderByDesc('id')
+            ->first();
+
+        if ($prescription?->prescribedBy) {
+            return $prescription->prescribedBy;
+        }
+
+        $link = IpdPatient::query()
+            ->with('doctor')
+            ->where('ipd_id', $ipd->id)
+            ->whereNotNull('doctor_id')
+            ->orderByDesc('id')
+            ->first();
+
+        return $link?->doctor;
     }
 }

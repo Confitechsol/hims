@@ -24,6 +24,7 @@ class PmsBridgeService
     {
         try {
             $ipd = $prescription->ipd()->with('patient', 'bedGroup', 'bedDetail', 'doctor')->first();
+            $prescription->loadMissing('prescribedBy');
             if (!$ipd || !$ipd->patient) {
                 return [
                     'success' => false,
@@ -92,7 +93,7 @@ class PmsBridgeService
             })->values()->all();
 
             $patient = $ipd->patient;
-            $doctor = $ipd->doctor;
+            $doctor = $ipd->doctor ?: $prescription->prescribedBy;
 
             $payload = [
                 'external_system' => 'HIMS',
