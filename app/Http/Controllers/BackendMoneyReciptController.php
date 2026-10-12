@@ -225,5 +225,129 @@ public function downloadPdf(int $id)
 }
 
 
+  public function backendReport(Request $request)
+    {
+        $perPage = min(max((int) $request->get('per_page', 10), 10), 100);
+        $search = $request->get('search');
+
+       
+       
+         $bills = BackendBill::query()
+             ->leftJoin(
+                 'backend_money_receipt as receipt',
+                 'backend_bill.id',
+                 '=',
+                 'receipt.backend_bill_id'
+             )
+             ->leftJoin(
+                 'backend_bill_item as bill_item',
+                 'backend_bill.case_no',
+                 '=',
+                 'bill_item.case_no'
+             )
+             ->select(
+                 'backend_bill.*',
+                 'receipt.id as receipt_id',
+                 'receipt.receipt_no',
+                 'receipt.receipt_type',
+                 'receipt.received_amount',
+                 'receipt.payment_mode',
+                 'receipt.payment_details',
+                 'receipt.received_by',
+                 'receipt.received_date',
+                 'bill_item.id as bill_item_id',
+                 'bill_item.bill_item as item_name',
+                 'bill_item.amount as item_amount',
+                 'bill_item.patient_id as item_patient_id'
+             )
+             ->when($search, function ($query) use ($search) {
+                 $query->where(function ($query) use ($search) {
+                     $query->where('backend_bill.case_no', 'like', "%{$search}%")
+                         ->orWhere('backend_bill.patient_name', 'like', "%{$search}%")
+                         ->orWhere('backend_bill.patient_id', 'like', "%{$search}%")
+                         ->orWhere('backend_bill.doctor_name', 'like', "%{$search}%")
+                         ->orWhere('receipt.receipt_no', 'like', "%{$search}%")
+                         ->orWhere('receipt.receipt_type', 'like', "%{$search}%")
+                         ->orWhere('receipt.received_amount', 'like', "%{$search}%")
+                         ->orWhere('bill_item.bill_item', 'like', "%{$search}%")
+                         ->orWhere('bill_item.amount', 'like', "%{$search}%");
+                 });
+             })
+             ->orderByDesc('backend_bill.id')
+             ->get()
+             ->groupBy('case_no')
+             ->map(function ($rows) {
+             $bill = $rows->first()->only([
+             'id',
+             'patient_name',
+             'age',
+             'gender',
+             'address',
+             'patienttype',
+             'updated_at',
+             'created_at',
+             'date',
+             'patient_id',
+             'case_no',
+             'doctor_id',
+             'doctor_name',
+             'deleted_at',
+             'shift',
+             'discount_percentage',
+             'total_amount',
+             'adjustment_type',
+             'adjustment_amount',
+         ]);
+         
+                 $bill['receipts'] = $rows
+                     ->whereNotNull('receipt_id')
+                     ->unique('receipt_id')
+                     ->map(function ($row) {
+                         return [
+                             'id' => $row->receipt_id,
+                             'receipt_no' => $row->receipt_no,
+                             'receipt_type' => $row->receipt_type,
+                             'received_amount' => $row->received_amount,
+                             'payment_mode' => $row->payment_mode,
+                             'payment_details' => $row->payment_details,
+                             'received_by' => $row->received_by,
+                             'received_date' => $row->received_date,
+                         ];
+                     })
+                     ->values();
+         
+                 $bill['bill_items'] = $rows
+                     ->whereNotNull('bill_item_id')
+                     ->unique('bill_item_id')
+                     ->map(function ($row) {
+                         return [
+                             'id' => $row->bill_item_id,
+                             'bill_item' => $row->item_name,
+                             'amount' => $row->item_amount,
+                             'patient_id' => $row->item_patient_id,
+                         ];
+                     })
+                     ->values();
+         
+                 return $bill;
+             })
+             ->values();
+         
+                 return view('admin.reports.hospital.backend_bill_report', [
+                     'bills' => $bills,
+                     'perPage' => $perPage,
+                 ]);
+         
+        //      return response()->json([
+        //      'status' => true,
+        //      'message' => 'Patient reports fetched successfully',
+        //      'data' => $bills,
+        //      'total' => $bills->count(),
+        //  ], 200);
+        //      }
+         
+            
+    }
+
 
 }

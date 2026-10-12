@@ -1284,7 +1284,7 @@ Route::get('/reports/patient-reports', function () {
     return view('admin.reports.patient.patient_reports');
 })->name('patient-reports');
 
-    Route::get('/patient-reports', [PatientReportController::class, 'patientReport'])->name('patient.patient_reports');
+Route::get('/patient-reports', [PatientReportController::class, 'patientReport'])->name('patient.patient_reports');
 
 
     // Patient report view
@@ -1305,3 +1305,11 @@ Route::get('/reports/doctor-reports-index', function () {
 Route::get('/reports/doctor-reports', function () {
     return view('admin.reports.doctor.doctor_reports');
 })->name('doctor-reports');
+
+
+Route::get('/reports/backend-bill-reports', [BackendMoneyReciptController::class, 'backendReport'])
+    ->name('hospital.backend_bill_reports');
+Route::get('/backends-bill-reports', function () {
+    return redirect()->route('hospital.backend_bill_reports', request()->query());
+});
+
