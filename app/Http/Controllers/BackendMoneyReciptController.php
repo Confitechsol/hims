@@ -338,13 +338,15 @@ public function downloadPdf(int $id)
                      'perPage' => $perPage,
                  ]);
          
-        //      return response()->json([
-        //      'status' => true,
-        //      'message' => 'Patient reports fetched successfully',
-        //      'data' => $bills,
-        //      'total' => $bills->count(),
-        //  ], 200);
-        //      }
+
+// return response()->json([
+//     'status' => true,
+//     'message' => 'Patient reports fetched successfully',
+//     'data' => $bills,
+//     'total' => $bills->count(),
+//     'per_page' => $perPage,
+// ], 200);
+
          
             
     }

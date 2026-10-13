@@ -95,16 +95,18 @@
                                                 <table class="table border" id="ipd-reports-table">
                                                     <thead class="thead-light">
                                                         <tr>
-
-
-                                                            <th>Backend Bill ID</th>
+                                                            <th>Case No</th>
+                                                            <th>Bill No</th>
                                                             <th>Patient Name</th>
                                                             <th>Age</th>
                                                             <th>Gender</th>
                                                             <th>Patient Type</th>
-                                                            <th>Address</th>
+                                                            {{-- <th>Address</th> --}}
                                                             <th>Doctor Name </th>
-                                                            <th>Status</th>
+                                                            <th>Bill Amount</th>
+                                                            <th>Received Amount</th>
+                                                            <th>Due Amount</th>
+                                                            <th>Particulars</th>
                                                             <th>Date</th>
                                                         </tr>
                                                     </thead>
@@ -112,15 +114,68 @@
 
                                                         @foreach ($bills as $bill)
                                                             <tr>
-                                                                <td>{{ $bill['id'] ?? '' }}</td>
+                                                               <td>{{ $bill['case_no'] ?? '' }}</td>
+                                                                <td>
+                                                                    @forelse($bill['receipts'] ?? [] as $receipt)
+                                                                        {{ $receipt['receipt_no'] ?? '-' }}<br>
+                                                                    @empty
+                                                                        -
+                                                                    @endforelse
+                                                                </td>
                                                                 <td>{{ $bill['patient_name'] ?? '' }}</td>
                                                                 <td>{{ $bill['age'] ?? '' }}</td>
                                                                 <td>{{ $bill['gender'] ?? '' }}</td>
                                                                 <td>{{ $bill['patienttype'] ?? '' }}</td>
-                                                                <td>{{ $bill['address'] ?? '' }}</td>
+                                                                {{-- <td>{{ $bill['address'] ?? '' }}</td> --}}
                                                                 <td>{{ $bill['doctor_name'] ?? '' }}</td>
-                                                                <td>{{ $bill['status'] ?? '' }}</td>
-                                                                <td>{{ $bill['created_at'] ?? '' }}</td>
+                                                                 
+                                                                {{-- Bill Amount --}}
+                                                                <td>
+                                                                    ₹{{ number_format((float) ($bill['total_amount'] ?? 0), 2) }}
+                                                                </td>
+                                                                
+                                                                {{-- Received Amount --}}
+                                                                <td>
+                                                                    @php
+                                                                        $totalReceived = collect($bill['receipts'] ?? [])
+                                                                            ->sum(fn($receipt) => (float) ($receipt['received_amount'] ?? 0));
+                                                                    @endphp
+                                                                
+                                                                    @forelse($bill['receipts'] ?? [] as $receipt)
+                                                                        ₹{{ number_format((float) ($receipt['received_amount'] ?? 0), 2) }}<br>
+                                                                    @empty
+                                                                        ₹0.00
+                                                                    @endforelse
+                                                                
+                                                                    <hr class="my-1">
+                                                                    <strong>Total: ₹{{ number_format($totalReceived, 2) }}</strong>
+                                                                </td>
+                                                                
+                                                                {{-- Due Amount --}}
+                                                                <td>
+                                                                    @php
+                                                                        $billAmount = (float) ($bill['total_amount'] ?? 0);
+                                                                        $dueAmount = $billAmount - $totalReceived;
+                                                                    @endphp
+                                                                
+                                                                    <strong>
+                                                                        ₹{{ number_format(max(0, $dueAmount), 2) }}
+                                                                    </strong>
+                                                                </td>
+
+                                                                {{-- Particulars --}}
+                                                                <td>
+                                                                    @forelse($bill['bill_items'] ?? [] as $item)
+                                                                        {{ $item['bill_item'] ?? '-' }}
+                                                                        (₹{{ number_format((float) ($item['amount'] ?? 0), 2) }})
+                                                                        <br>
+                                                                    @empty
+                                                                        -
+                                                                    @endforelse
+                                                                </td>
+
+
+                                                                <td>{{ $bill['date'] ?? '' }}</td>
                                                             </tr>
                                                         @endforeach
                                                     </tbody>
