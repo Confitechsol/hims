@@ -102,6 +102,9 @@
                             <i class="fas fa-file-invoice me-2"></i> IPD Bill Breakup
                         </h5>
                         <div>
+                            <button type="button" id="exportInvestigationBreakupBtn" class="btn btn-sm btn-outline-success me-2">
+                                <i class="fas fa-file-pdf me-1"></i> Pathology + Radiology PDF
+                            </button>
                             <button type="button" id="exportEstimateBtn" class="btn btn-sm btn-outline-primary me-2">
                                 <i class="fas fa-file-pdf me-1"></i> Export Estimate Bill
                             </button>
@@ -314,6 +317,14 @@
                     return;
                 }
                 loadBreakupBill(ipdId);
+            });
+
+            document.getElementById('exportInvestigationBreakupBtn').addEventListener('click', function() {
+                const ipdId = requireIpdId();
+                if (!ipdId) {
+                    return;
+                }
+                window.open('{{ url("ipd/billing") }}/' + encodeURIComponent(ipdId) + '/export-investigation-breakup', '_blank');
             });
 
             // Handle export buttons

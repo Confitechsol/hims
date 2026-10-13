@@ -2139,6 +2139,37 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * Export only pathology and radiology charges for an IPD patient.
+     */
+    public function exportInvestigationBreakup($ipdId)
+    {
+        $ipd = IpdDetail::with(['patient', 'doctor'])->findOrFail($ipdId);
+        $investigationRows = $this->getPathologyRadiologyDatewise($ipd);
+        $investigationRowsByCase = $investigationRows->groupBy(function ($row) {
+            return $row['case_no'] ?? '-';
+        });
+        $pathologyTotal = (float) $investigationRows
+            ->where('type', 'pathology')
+            ->sum('amount');
+        $radiologyTotal = (float) $investigationRows
+            ->where('type', 'radiology')
+            ->sum('amount');
+        $hospital = Hospital::first();
+
+        $pdf = Pdf::loadView('admin.billing.ipd_investigation_breakup_pdf', compact(
+            'ipd',
+            'investigationRows',
+            'investigationRowsByCase',
+            'pathologyTotal',
+            'radiologyTotal',
+            'hospital'
+        ));
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->stream('IPD_Investigation_Breakup_' . $ipd->id . '.pdf');
+    }
+
+    /**
      * Export Estimate/Breakup Bill PDF
      */
     public function exportEstimate($ipdId, Request $request)
