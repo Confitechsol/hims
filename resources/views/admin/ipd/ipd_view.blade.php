@@ -6,7 +6,7 @@
     @endphp
     {{-- Hidden element for back-dated prescription: admission date used when Add Prescription modal opens --}}
     <div id="ipdViewContext" data-admission-date="{{ $ipd->date ? \Carbon\Carbon::parse($ipd->date)->format('Y-m-d') : '' }}"
-        data-ipd-id="{{ $ipd->id ?? '' }}" style="display:none"></div>
+        data-ipd-id="{{ $ipd->id ?? '' }}" data-cons-doctor="{{ $ipd->cons_doctor ?? '' }}" style="display:none"></div>
     <style>
         .module_billing {
             border-radius: 8px;

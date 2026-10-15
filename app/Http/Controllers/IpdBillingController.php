@@ -22,6 +22,9 @@ use App\Services\DaywiseBedChargeService;
 use App\Services\IpdPackageService;
 use App\Services\InsuranceFinalBillSummaryService;
 use App\Services\IpdFinalBillService;
+use App\Services\Billing\TemporaryAdmissionEstimateAddon;
+use App\Services\Billing\TemporaryAdmissionEstimateContext;
+use App\Exceptions\InvalidTemporaryAdmissionException;
 use App\Support\BedBillingPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -75,6 +78,7 @@ class IpdBillingController extends Controller
                     'discharged' => $isDischarged,
                     'discharged_date' => $ipd->discharged_date,
                     'final_bill_generated' => $finalBillGenerated,
+                    'admission_date' => $ipd->date,
                     'display_text' => ($ipd->ipd_no ?? 'N/A') . ' - ' . $patientName . $dischargeStatus,
                 ];
             });
@@ -378,6 +382,7 @@ class IpdBillingController extends Controller
             'due_patient_party_doctor_id' => 'nullable|exists:doctor,id',
             'due_patient_party_amount' => 'nullable|numeric|min:0',
             'due_patient_party_receipt_type' => 'nullable|string|in:Current,Patient Due,Corporate Due,In Admissible,Booking,Refund',
+            'patient_party_due' => 'nullable|string|max:255',
         ]);
 
         $ipd = IpdDetail::findOrFail($ipdId);
@@ -390,6 +395,7 @@ class IpdBillingController extends Controller
         $ipd->due_patient_party_doctor_id = $request->input('due_patient_party_doctor_id') ?: null;
         $ipd->due_patient_party_amount = (float) ($request->input('due_patient_party_amount') ?? 0);
         $ipd->due_patient_party_receipt_type = $request->input('due_patient_party_receipt_type') ?: null;
+        $ipd->patient_party_due = $request->input('patient_party_due') ?: null;
         $ipd->save();
 
         app(\App\Services\Audit\AuditLogger::class)->log([
@@ -406,6 +412,7 @@ class IpdBillingController extends Controller
                 'due_patient_party_doctor_id' => $ipd->due_patient_party_doctor_id,
                 'due_patient_party_amount' => $ipd->due_patient_party_amount,
                 'due_patient_party_receipt_type' => $ipd->due_patient_party_receipt_type,
+                'patient_party_due' => $ipd->patient_party_due,
             ],
         ]);
 
@@ -421,6 +428,7 @@ class IpdBillingController extends Controller
             'message' => 'Due on account of patient party saved. It will reflect on the final bill.',
             'due_patient_party_doctor_id' => $ipd->due_patient_party_doctor_id,
             'due_patient_party_amount' => $duePatientPartyAmount,
+
             'outstanding' => $outstanding,
             'net_balance' => $netBalance,
         ]);
@@ -440,7 +448,9 @@ class IpdBillingController extends Controller
             return ['total' => 0, 'details' => []];
         }
 
-        $admissionAt = Carbon::parse($ipd->date ?? $ipd->created_at ?? now());
+        // Estimate add-on only. Null for every normal bill, so cash and insurance rules stay unchanged.
+        $temporaryAdmission = app(TemporaryAdmissionEstimateContext::class)->admissionAt();
+        $admissionAt = $temporaryAdmission ?? Carbon::parse($ipd->date ?? $ipd->created_at ?? now());
         $billableAnchor = BedBillingPeriod::billableAnchorAt($admissionAt);
         // For non-discharged preview/breakup, calculate up to current moment.
         // Date-only end values use discharge card time when available (insurance discharge-day rule).
@@ -2144,6 +2154,37 @@ class IpdBillingController extends Controller
     }
 
     /**
+     * Export only pathology and radiology charges for an IPD patient.
+     */
+    public function exportInvestigationBreakup($ipdId)
+    {
+        $ipd = IpdDetail::with(['patient', 'doctor'])->findOrFail($ipdId);
+        $investigationRows = $this->getPathologyRadiologyDatewise($ipd);
+        $investigationRowsByCase = $investigationRows->groupBy(function ($row) {
+            return $row['case_no'] ?? '-';
+        });
+        $pathologyTotal = (float) $investigationRows
+            ->where('type', 'pathology')
+            ->sum('amount');
+        $radiologyTotal = (float) $investigationRows
+            ->where('type', 'radiology')
+            ->sum('amount');
+        $hospital = Hospital::first();
+
+        $pdf = Pdf::loadView('admin.billing.ipd_investigation_breakup_pdf', compact(
+            'ipd',
+            'investigationRows',
+            'investigationRowsByCase',
+            'pathologyTotal',
+            'radiologyTotal',
+            'hospital'
+        ));
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->stream('IPD_Investigation_Breakup_' . $ipd->id . '.pdf');
+    }
+
+    /**
      * Export Estimate/Breakup Bill PDF
      */
     public function exportEstimate($ipdId, Request $request)
@@ -2205,18 +2246,25 @@ class IpdBillingController extends Controller
                 $isApprovalPreview ? 'approval_preview' : ($isApprovalBill ? 'approval' : null)
             );
 
-            $breakup = $this->calculateBreakup(
-                $ipdId,
-                $billingEndAtForEstimate ? $billingEndAtForEstimate->format('Y-m-d H:i:s') : null,
-                $ipdChargeBillStage
+            $billingEndForBed = $billingEndAtForEstimate
+                ? $billingEndAtForEstimate->format('Y-m-d H:i:s')
+                : null;
+
+            // Temporary admission, when present, applies only inside this callback and is not saved.
+            [$breakup, $bedChargesData] = app(TemporaryAdmissionEstimateAddon::class)->run(
+                $request,
+                $ipd,
+                $isApprovalBill,
+                function () use ($ipdId, $billingEndForBed, $ipdChargeBillStage) {
+                    $breakup = $this->calculateBreakup($ipdId, $billingEndForBed, $ipdChargeBillStage);
+                    $bedChargesData = $this->calculateBedChargesFromHistory($ipdId, $billingEndForBed);
+
+                    return [$breakup, $bedChargesData];
+                }
             );
             \Log::info('Breakup calculated', ['total_charges' => $breakup['total_charges']]);
 
             // Get detailed breakdown - Calculate dynamically from PatientBedHistory (omit from display when package applied)
-            $bedChargesData = $this->calculateBedChargesFromHistory(
-                $ipdId,
-                $billingEndAtForEstimate ? $billingEndAtForEstimate->format('Y-m-d H:i:s') : null
-            );
             $bedChargesDetails = collect($bedChargesData['details']);
             $bedChargeDisplayEndCalendar = $billingEndAtForEstimate
                 ? Carbon::parse($billingEndAtForEstimate)->format('Y-m-d')
@@ -2550,6 +2598,8 @@ class IpdBillingController extends Controller
                 : 'IPD_Estimate_Bill_' . $ipd->ipd_no . '.pdf';
 
             return $pdf->stream($filename);
+        } catch (InvalidTemporaryAdmissionException $e) {
+            abort(422, $e->getMessage());
         } catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -2921,7 +2971,9 @@ class IpdBillingController extends Controller
             
             $dischargeDate = $dischargeCard->discharge_date;
             $dischargeTime = $dischargeCard->discharge_time;
-            $billingEndAt = app(IpdFinalBillService::class)->billingEndAt($ipd)->format('Y-m-d H:i:s');
+            $finalBillService = app(IpdFinalBillService::class);
+            $billingEndAt = $finalBillService->billingEndAt($ipd)->format('Y-m-d H:i:s');
+            $finalDischargeAt = $finalBillService->finalDischargeDisplayAt($ipd);
             
             \Log::info('Discharge information retrieved', [
                 'discharge_date' => $dischargeDate,
@@ -3229,7 +3281,7 @@ class IpdBillingController extends Controller
             $pdf = Pdf::loadView('admin.billing.ipd_final_pdf', compact(
                 'ipd', 'breakup', 'bedChargesDetails', 'bedChargesGrouped', 'bedChargesGroupedForDisplay', 'ipdChargesDetails',
                 'pathologyDetails', 'radiologyDetails', 'doctorVisitDetails', 'packageDetails', 'payments',
-                'hospital', 'billNumber', 'billDate', 'dischargeDate', 'dischargeTime',
+                'hospital', 'billNumber', 'billDate', 'dischargeDate', 'dischargeTime', 'finalDischargeAt',
                 'discount', 'mouDiscount', 'specialDiscount', 'duePatientPartyAmount',
                 'grandTotal', 'totalAdvance', 'balance', 'grandTotalInWords',
                 'totalAdvanceInWords', 'balanceInWords', 'otCharges', 'medicineCharges',

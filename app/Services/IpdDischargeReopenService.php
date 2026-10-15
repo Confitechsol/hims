@@ -69,13 +69,15 @@ class IpdDischargeReopenService
         DB::transaction(function () use ($ipd, $reason, &$warnings, &$bedRestored) {
             $before = [
                 'final_bill_generated_at' => optional($ipd->final_bill_generated_at)?->toDateTimeString(),
+                'final_discharge_at' => optional($ipd->final_discharge_at)?->toDateTimeString(),
                 'final_bill_generated_by' => $ipd->final_bill_generated_by,
                 'physical_release_at' => optional($ipd->physical_release_at)?->toDateTimeString(),
                 'is_reopened' => (bool) ($ipd->is_reopened ?? false),
             ];
 
-            // Keep discharged=yes and discharge card; clear final-bill lock only.
+            // Keep discharged=yes and the user discharge date/time. Clear only the final-bill snapshot.
             $ipd->final_bill_generated_at = null;
+            $ipd->final_discharge_at = null;
             $ipd->final_bill_generated_by = null;
             $ipd->physical_release_at = null;
             $ipd->is_reopened = true;
@@ -104,6 +106,7 @@ class IpdDischargeReopenService
                 'old_values' => $before,
                 'new_values' => [
                     'final_bill_generated_at' => null,
+                    'final_discharge_at' => null,
                     'is_reopened' => true,
                     'reopened_at' => optional($ipd->reopened_at)?->toDateTimeString(),
                     'bed_restored' => $bedRestored,

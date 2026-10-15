@@ -1,10 +1,16 @@
+@php
+    $patient = $IpdPatient->patient ?? $IpdPatient->ipd?->patient ?? [];
+    $ipd = $IpdPatient->ipd;
+    $admissionDate = $ipd?->date;
+@endphp
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $IpdPatient->patient['patient_name'] }}</title>
+    <title>{{ $patient['patient_name'] ?? '' }}</title>
 </head>
 <style>
     body {
@@ -269,19 +275,19 @@ margin: 10px 0;
         <div class="admission_info">
             <div class="admission_item">
                 <p>
-                    <b>ADMISSION NO.</b> : <b class="red">{{ $IpdPatient->ipd['ipd_no'] }}</b>
+                    <b>ADMISSION NO.</b> : <b class="red">{{ $ipd['ipd_no'] ?? '' }}</b>
                 </p>
             </div>
             <div class="admission_item">
                 <p>
-                    <b>ADMISSION DATE.</b> : {{ $IpdPatient->ipd['date'] ? \Carbon\Carbon::parse($IpdPatient->ipd['date'])->format('d-m-Y') : '' }}
+                    <b>ADMISSION DATE.</b> : {{ $admissionDate ? \Carbon\Carbon::parse($admissionDate)->format('d-m-Y') : '' }}
                 </p>
             </div>
             <div class="admission_item">
                 <p>
                     <b>ADMISSION TIME</b> : <span
-                        class="red">{{ \Carbon\Carbon::parse($IpdPatient->ipd['date'])->format('h:i') ?? '' }}
-                        {{ \Carbon\Carbon::parse($IpdPatient->ipd['date'])->format('A') ?? '' }}</span>
+                        class="red">{{ $admissionDate ? \Carbon\Carbon::parse($admissionDate)->format('h:i') : '' }}
+                        {{ $admissionDate ? \Carbon\Carbon::parse($admissionDate)->format('A') : '' }}</span>
                 </p>
             </div>
         </div>
@@ -297,7 +303,7 @@ margin: 10px 0;
                     :
                     <div class="patient_data">
                         <strong>
-                            {{ $IpdPatient->patient['patient_name'] }}
+                            {{ $patient['patient_name'] ?? '' }}
                         </strong>
                     </div>
                 </div>
@@ -308,7 +314,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['address'] }}
+                        {{ $patient['address'] ?? '' }}
                     </div>
                 </div>
 
@@ -318,10 +324,10 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['religion'] ?? '' }}
+                        {{ $patient['religion'] ?? '' }}
                     </div>
                 </div>
-                <div class="patient_items">
+                {{-- <div class="patient_items">
                     <div class="patient_head">
                         URN
                     </div>
@@ -336,9 +342,9 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['occupation'] ?? '' }}
+                        {{ $patient['occupation'] ?? '' }}
                     </div>
-                </div>
+                </div> --}}
 
                 <div class="patient_items">
                     <div class="patient_head">
@@ -346,7 +352,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['gender'] }}
+                        {{ $patient['gender'] ?? '' }}
                     </div>
                 </div>
 
@@ -356,7 +362,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['pin_code'] }}
+                        {{ $patient['pin_code'] ?? '' }}
                     </div>
                 </div>
 
@@ -371,7 +377,7 @@ margin: 10px 0;
                         </div>
                         :
                         <div class="patient_data">
-                            {{ $IpdPatient->patient['age'] }} y
+                            {{ $patient['age'] ?? '' }} y
                         </div>
                     </div>
 
@@ -383,7 +389,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['area'] }}
+                        {{ $patient['area'] ?? '' }}
                     </div>
                 </div>
                 <div class="patient_items">
@@ -392,7 +398,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['marital_status'] }}
+                        {{ $patient['marital_status'] ?? '' }}
                     </div>
                 </div>
                 <div class="patient_items">
@@ -401,7 +407,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['emergency_contact_no'] ?? '' }}
+                        {{ $patient['emergency_contact_no'] ?? '' }}
                     </div>
                 </div>
                 <div class="patient_items">
@@ -410,7 +416,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['nationality'] ?? '' }}
+                        {{ $patient['nationality'] ?? '' }}
                     </div>
                 </div>
 
@@ -420,7 +426,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['police_station'] }}
+                        {{ $patient['police_station'] ?? '' }}
                     </div>
                 </div>
 
@@ -438,7 +444,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['guardian_name'] }}
+                        {{ $patient['guardian_name'] ?? '' }}
                     </div>
                 </div>
 
@@ -448,7 +454,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['mobileno'] }}
+                        {{ $patient['mobileno'] ?? '' }}
                     </div>
                 </div>
 
@@ -462,7 +468,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['guardian_relation'] ?? '' }}
+                        {{ $patient['guardian_relation'] ?? '' }}
                     </div>
                 </div>
 
@@ -473,11 +479,11 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient['guardian_phone'] ?? '' }}
-                        @if (!empty($IpdPatient->patient['guardian_phone']) && !empty($IpdPatient->patient['emergency_contact_no']))
+                        {{ $patient['guardian_phone'] ?? '' }}
+                        @if (!empty($patient['guardian_phone']) && !empty($patient['emergency_contact_no']))
                             ,
                         @endif
-                        {{ $IpdPatient->patient['emergency_contact_no'] ?? '' }}
+                        {{ $patient['emergency_contact_no'] ?? '' }}
                     </div>
                 </div>
 
@@ -509,7 +515,7 @@ margin: 10px 0;
                         </div>
                         :
                         <div class="patient_data">
-                            {{ $IpdPatient->ipd['bedDetail']['bedGroup']['bed_cost'] ?? '' }}
+                            {{ $bedChargeRate ?? '' }}
                         </div>
                     </div> -->
 
@@ -580,7 +586,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->ipd['bedDetail']['bedGroup']['bed_cost'] ?? '' }}
+                        {{ $bedChargeRate ?? '' }}
                     </div>
                 </div>
                 <div class="patient_items">
@@ -608,7 +614,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
-                        {{ $IpdPatient->patient->organisation['organisation_name'] ?? '' }}
+                        {{ data_get($patient, 'organisation.organisation_name', '') }}
                     </div>
                 </div>
 
@@ -622,6 +628,7 @@ margin: 10px 0;
                     </div>
                     :
                     <div class="patient_data">
+                        {{ $IpdPatient->ipd?->insuranceCompany?->name ?? '' }}
                     </div>
                 </div>
 
@@ -716,18 +723,18 @@ margin: 10px 0;
             <div class="admission_item">
                 <p>
                     <b>Date of Admission </b>:
-                    {{ \Carbon\Carbon::parse($IpdPatient->ipd['date'])->format('d-m-Y') ?? '' }}
+                    {{ $admissionDate ? \Carbon\Carbon::parse($admissionDate)->format('d-m-Y') : '' }}
                 </p>
             </div>
             <div class="admission_item">
                 <p>
-                    <b>ADMISSION TIME.</b> : {{ \Carbon\Carbon::parse($IpdPatient->ipd['date'])->format('h:i') ?? '' }}
-                    {{ \Carbon\Carbon::parse($IpdPatient->ipd['date'])->format('A') ?? '' }}
+                    <b>ADMISSION TIME.</b> : {{ $admissionDate ? \Carbon\Carbon::parse($admissionDate)->format('h:i') : '' }}
+                    {{ $admissionDate ? \Carbon\Carbon::parse($admissionDate)->format('A') : '' }}
                 </p>
             </div>
             <div class="admission_item">
                 <p>
-                    <b>Admission No</b> : <span class="red">{{ $IpdPatient->ipd['ipd_no'] }}</span>
+                    <b>Admission No</b> : <span class="red">{{ $ipd['ipd_no'] ?? '' }}</span>
                 </p>
             </div>
             <div class="admission_item">
@@ -831,7 +838,7 @@ margin: 10px 0;
             </div>
 
             <p><b>DATE : </b></p>
-            <p><b>{{ $IpdPatient->ipd['date'] ? \Carbon\Carbon::parse($IpdPatient->ipd['date'])->format('d-m-Y') : '' }}</b></p>
+            <p><b>{{ $admissionDate ? \Carbon\Carbon::parse($admissionDate)->format('d-m-Y') : '' }}</b></p>
         </div>
 
 

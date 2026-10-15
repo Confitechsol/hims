@@ -576,23 +576,26 @@
                                 <td class="patient_colon">:</td>
                                 <td class="patient_value fixed-right">{{ \Carbon\Carbon::parse($ipd->date)->format('d/m/Y h:i A') }}</td>
                             </tr>
-                            @if($dischargeDate)
+                            @php
+                                $dischargeDateValue = null;
+                                if (!empty($finalDischargeAt)) {
+                                    $dischargeDateValue = \Carbon\Carbon::parse($finalDischargeAt);
+                                } elseif ($dischargeDate) {
+                                    $dischargeDateValue = \Carbon\Carbon::parse($dischargeDate);
+                                    if (!empty($dischargeTime)) {
+                                        if (is_string($dischargeTime)) {
+                                            $dischargeDateValue = \Carbon\Carbon::parse($dischargeDate . ' ' . $dischargeTime);
+                                        } else {
+                                            $dischargeDateValue = \Carbon\Carbon::parse($dischargeDate . ' ' . \Carbon\Carbon::parse($dischargeTime)->format('H:i:s'));
+                                        }
+                                    }
+                                }
+                            @endphp
+                            @if($dischargeDateValue)
                                 <tr>
                                     <td class="patient_label">Dis Date &amp; Time</td>
                                     <td class="patient_colon">:</td>
-                                    <td class="patient_value fixed-right">
-                                        @php
-                                            $dischargeDateValue = \Carbon\Carbon::parse($dischargeDate);
-                                            if (!empty($dischargeTime)) {
-                                                if (is_string($dischargeTime)) {
-                                                    $dischargeDateValue = \Carbon\Carbon::parse($dischargeDate . ' ' . $dischargeTime);
-                                                } else {
-                                                    $dischargeDateValue = \Carbon\Carbon::parse($dischargeDate . ' ' . \Carbon\Carbon::parse($dischargeTime)->format('H:i:s'));
-                                                }
-                                            }
-                                        @endphp
-                                        {{ $dischargeDateValue->format('d/m/Y h:i A') }}
-                                    </td>
+                                    <td class="patient_value fixed-right">{{ $dischargeDateValue->format('d/m/Y h:i A') }}</td>
                                 </tr>
                             @endif
                             @if($ipd->bedDetail)

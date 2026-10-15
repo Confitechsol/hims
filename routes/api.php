@@ -17,5 +17,6 @@ Route::get('/user', function (Request $request) {
 */
 Route::middleware(BridgeTokenMiddleware::class)->prefix('bridge/pms')->group(function () {
     Route::get('doctors', [PmsDoctorBridgeController::class, 'index']);
+    Route::get('referred-doctor', [PmsDoctorBridgeController::class, 'referredDoctor']);
     Route::get('doctors/{id}', [PmsDoctorBridgeController::class, 'show']);
 });

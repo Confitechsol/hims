@@ -743,6 +743,7 @@ Route::prefix('ipd/billing')->group(function () {
     Route::get('/{ipdId}/final-bill-preview', [IpdBillingController::class, 'previewFinalBill'])->name('ipd.billing.final.preview');
     Route::post('/{ipdId}/generate-final', [IpdBillingController::class, 'generateFinalBill'])->name('ipd.billing.final.generate');
     Route::get('/{ipdId}/check-approval', [IpdBillingController::class, 'checkApprovalBill'])->name('ipd.billing.check.approval');
+    Route::get('/{ipdId}/export-investigation-breakup', [IpdBillingController::class, 'exportInvestigationBreakup'])->name('ipd.billing.export.investigation-breakup');
     Route::get('/{ipdId}/export-estimate', [IpdBillingController::class, 'exportEstimate'])->name('ipd.billing.export.estimate');
     Route::get('/{ipdId}/export-approval', [IpdBillingController::class, 'exportApprovalBill'])->name('ipd.billing.export.approval');
     Route::get('/{ipdId}/export-approval-preview', [IpdBillingController::class, 'exportApprovalBillPreview'])->name('ipd.billing.export.approval.preview');
@@ -1284,7 +1285,7 @@ Route::get('/reports/patient-reports', function () {
     return view('admin.reports.patient.patient_reports');
 })->name('patient-reports');
 
-    Route::get('/patient-reports', [PatientReportController::class, 'patientReport'])->name('patient.patient_reports');
+Route::get('/patient-reports', [PatientReportController::class, 'patientReport'])->name('patient.patient_reports');
 
 
     // Patient report view
@@ -1305,3 +1306,10 @@ Route::get('/reports/doctor-reports-index', function () {
 Route::get('/reports/doctor-reports', function () {
     return view('admin.reports.doctor.doctor_reports');
 })->name('doctor-reports');
+
+
+Route::get('/reports/backend-bill-reports', [BackendMoneyReciptController::class, 'backendReport'])
+    ->name('hospital.backend_bill_reports');
+Route::get('/backends-bill-reports', function () {
+    return redirect()->route('hospital.backend_bill_reports', request()->query());
+});

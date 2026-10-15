@@ -11,6 +11,7 @@ use App\Models\TaxCategory;
 use App\Models\Organisation;
 use App\Models\ChargeCategory;
 use App\Models\OrganisationsCharge;
+use Illuminate\Support\Facades\DB;
 
 
 class HospitalChargesController extends Controller
@@ -54,89 +55,132 @@ class HospitalChargesController extends Controller
     }
    
     public function store(Request $request){
-    $request->validate ( [
-        'charge_type' => 'required',
-        'charge_category' => 'required',
-        'tax_category' => 'nullable',
-        'standard_charge'=>'required',
-        'charge_name'=>'required',
-        'unit_type'=>'required',
-        'schedule_charge_id'=>'required|array',
-        'schedule_charge_id.*'=>'required|exists:organisations_charges,id',
-    ]);
-    // dd(request->all());
-    $organisation_ids = $request->schedule_charge_id;
-    $charge =  Charge::create([
-            'charge_category_id'=>$request->charge_category,
-            'tax_category_id'=>$request->tax_category,
-            'charge_unit_id'=>$request->unit_type,
-            'name'=>$request->charge_name,
-            'standard_charge'=>$request->standard_charge,
-            'date'=>null,
-            'description'=>$request->description,
-            'status'=>'',
-            // 'hospital_id'=>'HS001'
-        ]);
-        $newChargeId = $charge->id;
-        foreach($organisation_ids as $org_id){
-            if($request['schedule_charge_'.$org_id]){
-                OrganisationsCharge::create([
-                    'charge_id'=>$newChargeId,
-                    'org_id'=>$org_id,
-                    'org_charge'=>$request['schedule_charge_'.$org_id],
-                ]);
-            }
-            
-        }
-           return redirect()->back()->with("success","Charges Created Sucessfully!");
-    }
-    public function update(Request $request){
-        //dd($request->all());
-        $request->validate ( [
-            'charge_id'=>'required',
+        $validated = $request->validate([
             'charge_type' => 'required',
             'charge_category' => 'required',
-            'tax_category' => 'required',
-            'standard_charge'=>'required',
-            'charge_name'=>'required',
-            'unit_type'=>'required',
-            'schedule_charge_id'=>'required|array',
-            'schedule_charge_id.*'=>'required|exists:organisations_charges,id',
+            'tax_category' => 'nullable',
+            'standard_charge' => 'required|numeric|min:0',
+            'charge_name' => 'required|string|max:200',
+            'description' => 'nullable|string',
+            'unit_type' => 'required',
+            'schedule_charge_id' => 'required|array',
+            'schedule_charge_id.*' => 'required|integer|distinct|exists:organisation,id',
         ]);
-        $organisation_ids = $request->schedule_charge_id;
-        $charge = Charge::findOrFail($request->charge_id);
-        $charge->update([
-            'charge_category_id' => $request->charge_category,
-            'tax_category_id' => $request->tax_category,
-            'charge_unit_id' => $request->unit_type,
-            'name' => $request->charge_name,
-            'standard_charge' => $request->standard_charge,
-            'date' => null, // Assuming you still want to keep it null
-            'description' => $request->description,
-            'status' => '', // You can update the status field accordingly
-        ]);
-        foreach ($organisation_ids as $org_id) {
-            if ($request['schedule_charge_' . $org_id]) {
-                $organisationCharge = OrganisationsCharge::where('charge_id', $charge->id)
-                                                         ->where('org_id', $org_id)
-                                                         ->first();
-        
-                if ($organisationCharge) {
-                    // If the record exists, update it
-                    $organisationCharge->update([
-                        'org_charge' => $request['schedule_charge_' . $org_id],
-                    ]);
-                } else {
-                    // If the record doesn't exist, create it
+
+        $organisationIds = $validated['schedule_charge_id'];
+        $scheduleChargeRules = [];
+        foreach ($organisationIds as $organisationId) {
+            $scheduleChargeRules["schedule_charge_{$organisationId}"] = 'nullable|numeric|min:0';
+        }
+        $validatedScheduleCharges = $request->validate($scheduleChargeRules);
+
+        $user = $request->user();
+        $hospitalId = $user->hospital_id ?? session('hospital_id', '1');
+        $branchId = $user->branch_id ?? session('branch_id', '1');
+
+        DB::transaction(function () use ($validated, $validatedScheduleCharges, $organisationIds, $hospitalId, $branchId) {
+            $charge = Charge::create([
+                'hospital_id' => $hospitalId,
+                'branch_id' => $branchId,
+                'charge_category_id' => $validated['charge_category'],
+                'tax_category_id' => $validated['tax_category'] ?? null,
+                'charge_unit_id' => $validated['unit_type'],
+                'name' => $validated['charge_name'],
+                'standard_charge' => $validated['standard_charge'],
+                'date' => null,
+                'description' => $validated['description'] ?? null,
+                'status' => '',
+            ]);
+
+            foreach ($organisationIds as $organisationId) {
+                $inputName = "schedule_charge_{$organisationId}";
+                if (isset($validatedScheduleCharges[$inputName]) && $validatedScheduleCharges[$inputName] !== '') {
                     OrganisationsCharge::create([
+                        'hospital_id' => $hospitalId,
+                        'branch_id' => $branchId,
                         'charge_id' => $charge->id,
-                        'org_id' => $org_id,
-                        'org_charge' => $request['schedule_charge_' . $org_id],
+                        'org_id' => $organisationId,
+                        'org_charge' => $validatedScheduleCharges[$inputName],
                     ]);
                 }
             }
+        });
+
+        return redirect()->back()->with('success', 'Charges Created Successfully!');
+    }
+    public function update(Request $request){
+        $rules = [
+            'charge_id' => 'required|exists:charges,id',
+            'charge_type' => 'required|exists:charge_type_master,id',
+            'charge_category' => 'required|exists:charge_categories,id',
+            'tax_category' => 'nullable|exists:tax_category,id',
+            'standard_charge' => 'required|numeric|min:0',
+            'charge_name' => 'required|string|max:200',
+            'description' => 'nullable|string',
+            'unit_type' => 'required|exists:charge_units,id',
+            'schedule_charge_id' => 'required|array',
+            'schedule_charge_id.*' => 'required|integer|distinct|exists:organisation,id',
+        ];
+
+        $validated = $request->validate($rules);
+        $organisationIds = $validated['schedule_charge_id'];
+        $scheduleChargeRules = [];
+        foreach ($organisationIds as $organisationId) {
+            $scheduleChargeRules["schedule_charge_{$organisationId}"] = 'nullable|numeric|min:0';
         }
-        return redirect()->back()->with("success",$charge->name." Charge Updated Sucessfully!");
+        $validatedScheduleCharges = $request->validate($scheduleChargeRules);
+        $charge = Charge::findOrFail($validated['charge_id']);
+        $scheduleChargeValues = [];
+        foreach ($validated['schedule_charge_id'] as $organisationId) {
+            $inputName = "schedule_charge_{$organisationId}";
+            $scheduleChargeValues[$organisationId] = $validatedScheduleCharges[$inputName] ?? null;
+        }
+
+        $user = $request->user();
+        $hospitalId = $user->hospital_id ?? session('hospital_id', '1');
+        $branchId = $user->branch_id ?? session('branch_id', '1');
+
+        DB::transaction(function () use ($charge, $validated, $scheduleChargeValues, $hospitalId, $branchId) {
+            $charge->update([
+                'charge_category_id' => $validated['charge_category'],
+                'tax_category_id' => $validated['tax_category'] ?? null,
+                'charge_unit_id' => $validated['unit_type'],
+                'name' => $validated['charge_name'],
+                'standard_charge' => $validated['standard_charge'],
+                'date' => null,
+                'description' => $validated['description'] ?? null,
+                'status' => '',
+            ]);
+
+            foreach ($scheduleChargeValues as $organisationId => $orgCharge) {
+                $organisationCharge = OrganisationsCharge::where('charge_id', $charge->id)
+                    ->where('org_id', $organisationId)
+                    ->first();
+
+                if ($orgCharge === null || $orgCharge === '') {
+                    $organisationCharge?->delete();
+                    continue;
+                }
+
+                if ($organisationCharge) {
+                    $organisationCharge->update([
+                        'hospital_id' => $hospitalId,
+                        'branch_id' => $branchId,
+                        'org_charge' => $orgCharge,
+                    ]);
+                } else {
+                    OrganisationsCharge::create([
+                        'hospital_id' => $hospitalId,
+                        'branch_id' => $branchId,
+                        'charge_id' => $charge->id,
+                        'org_id' => $organisationId,
+                        'org_charge' => $orgCharge,
+                    ]);
+                }
+            }
+        });
+
+        return redirect()->back()->with('success', $charge->name . ' Charge Updated Successfully!');
     }
     public function destroy(Request $request)
     {

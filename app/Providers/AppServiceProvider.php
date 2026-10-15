@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\View;
 use App\Http\View\Composers\BloodGroupComposer;
 use App\Http\View\Composers\AreaComposer;
 use App\Models\Bed;
+use App\Services\Billing\TemporaryAdmissionEstimateContext;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // One instance per request so the estimate add-on and bed calculation share it.
+        $this->app->singleton(TemporaryAdmissionEstimateContext::class);
+
         // Ensure permission helpers are always available (even if Composer files
         // autoload was not regenerated on the server).
         $helper = app_path('Helpers/PermissionHelper.php');
