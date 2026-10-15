@@ -145,4 +145,14 @@ class BedBillingPeriod
 
         return $labelDay;
     }
+
+    /**
+     * Hours after 11:00 on the discharge calendar day do not open another full bed day.
+     * A cycle that started the previous day (and ends on the discharge morning) still counts.
+     * The first billable day is not passed here, so a same-day admission still charges 1 day.
+     */
+    public static function isSameDayCycleAfterBoundary(Carbon $periodStart, Carbon $dischargeAt): bool
+    {
+        return $periodStart->isSameDay($dischargeAt) && $dischargeAt->gt($periodStart);
+    }
 }

@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
  * Settlement totals for insurance Final Bill / Tax Invoice.
  *
  * Approval Amount is entered manually after insurer response.
- * Balance Amount (display) = Total Bill − Approval Amount.
+ * Balance Amount (display) = Total Bill − Approval Amount − MOU Discount − Hospital Discount.
  * Due on A/C TPA/Insurer = Approval Amount.
  */
 class InsuranceFinalBillSummaryService
@@ -39,7 +39,7 @@ class InsuranceFinalBillSummaryService
         $approvalAmount = round((float) ($ipd->final_approval_amount ?? 0), 2);
         $duePatientParty = round((float) ($ipd->due_patient_party_amount ?? 0), 2);
 
-        $balanceAmount = round(max(0, $totalBill - $approvalAmount), 2);
+        $balanceAmount = round(max(0, $totalBill - $approvalAmount - $mouDiscount - $specialDiscount), 2);
         $dueOnAccount = $approvalAmount;
 
         $tpaName = strtoupper(trim((string) ($ipd->organisation->organisation_name ?? '')));

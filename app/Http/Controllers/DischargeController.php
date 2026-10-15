@@ -768,12 +768,20 @@ class DischargeController extends Controller
         }
 
         $fromDate = Carbon::parse($history->from_date);
-        $bedChargeRate = (float) ($history->bedGroup->bed_cost ?? 0);
+        // Prefer customized admit/transfer rate already stored in daywise; fall back to master only if none.
+        $daywiseService = app(DaywiseBedChargeService::class);
+        $bedChargeRate = $daywiseService->resolveBedChargeRate(
+            (int) $ipd->id,
+            (int) $history->bed_group_id,
+            $fromDate,
+            $dischargeAt,
+            (int) $history->bed_id
+        );
         if ($bedChargeRate <= 0) {
             return;
         }
 
-        app(DaywiseBedChargeService::class)->syncStoredChargesForBedSegment(
+        $daywiseService->syncStoredChargesForBedSegment(
             $ipd->fresh(),
             $bedChargeRate,
             (int) $history->bed_group_id,

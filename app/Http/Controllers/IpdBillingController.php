@@ -244,7 +244,10 @@ class IpdBillingController extends Controller
         $initialApprovalAmount = (float) ($ipd->initial_approval_amount ?? 0);
         $finalApprovalAmount = (float) ($ipd->final_approval_amount ?? 0);
         $requestFurtherApproval = max(0, $grandTotal - $mouDiscountAmount - $initialApprovalAmount);
-        $insuranceBalanceAmount = max(0, $grandTotal - $finalApprovalAmount);
+        $insuranceBalanceAmount = max(
+            0,
+            $grandTotal - $finalApprovalAmount - $mouDiscountAmount - (float) ($ipd->special_discount ?? 0)
+        );
 
         // Get detailed date-wise breakdown with same boundary as summary.
         $detailedBreakup = $this->getDetailedBreakup($ipdId, $ipd, $endDate);
@@ -335,7 +338,13 @@ class IpdBillingController extends Controller
         $outstandingAfterDiscount = max(0, $outstanding - $totalDiscount);
         $netBalance = max(0, $outstanding - $totalDiscount - $duePatientPartyAmount);
         $approvalAmount = (float) ($ipd->final_approval_amount ?? 0);
-        $balanceAmount = max(0, (float) ($breakup['total_charges'] ?? 0) - $approvalAmount);
+        $balanceAmount = max(
+            0,
+            (float) ($breakup['total_charges'] ?? 0)
+                - $approvalAmount
+                - (float) $ipd->mou_discount
+                - (float) $ipd->special_discount
+        );
         $initialApprovalAmount = (float) ($ipd->initial_approval_amount ?? 0);
         $requestFurtherApproval = max(
             0,
@@ -548,6 +557,12 @@ class IpdBillingController extends Controller
             // Respect requested end moment (discharge datetime for final bill).
             $isFirstAdmissionDay = $currentDate->isSameDay($firstChargeDay);
             if ($periodEnd->lte($billableAnchor) || (! $isFirstAdmissionDay && $periodStart->gte($endAt))) {
+                $currentDate->addDay();
+                continue;
+            }
+
+            // Leaving after 11:00 on the discharge date does not add another full bed day.
+            if (! $isFirstAdmissionDay && BedBillingPeriod::isSameDayCycleAfterBoundary($periodStart, $endAt)) {
                 $currentDate->addDay();
                 continue;
             }

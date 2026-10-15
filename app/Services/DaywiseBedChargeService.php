@@ -354,6 +354,11 @@ class DaywiseBedChargeService
                 continue;
             }
 
+            if (! $isFirstSegmentDay && BedBillingPeriod::isSameDayCycleAfterBoundary($periodStart, $endAt)) {
+                $current->addDay();
+                continue;
+            }
+
             $periodDates = BedBillingPeriod::periodStorageDatesForChargeDay(
                 $current->copy()->startOfDay(),
                 $billableAnchor
