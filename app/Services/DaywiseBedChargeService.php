@@ -354,11 +354,7 @@ class DaywiseBedChargeService
                 continue;
             }
 
-            if (! $isFirstSegmentDay && BedBillingPeriod::isSameDayCycleAfterBoundary($periodStart, $endAt)) {
-                $current->addDay();
-                continue;
-            }
-
+            // Still present at/after 11:00 on discharge day: bill that cycle (partial OK until discharge).
             $periodDates = BedBillingPeriod::periodStorageDatesForChargeDay(
                 $current->copy()->startOfDay(),
                 $billableAnchor

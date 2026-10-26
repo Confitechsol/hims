@@ -571,12 +571,7 @@ class IpdBillingController extends Controller
                 continue;
             }
 
-            // Leaving after 11:00 on the discharge date does not add another full bed day.
-            if (! $isFirstAdmissionDay && BedBillingPeriod::isSameDayCycleAfterBoundary($periodStart, $endAt)) {
-                $currentDate->addDay();
-                continue;
-            }
-
+            // Still present at/after 11:00 on discharge day: bill that cycle (partial OK until discharge).
             $effectiveStart = $isFirstAdmissionDay
                 ? $billableAnchor->copy()
                 : $periodStart->copy()->max($billableAnchor);
