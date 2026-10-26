@@ -60,6 +60,14 @@
                                         <input type="text" id="search-input" class="form-control" placeholder="Search for doctors..."
                                         >
                                     </div>
+                                    @if (session('success'))
+                                        <div class="alert alert-success">{{ session('success') }}</div>
+                                    @endif
+
+                                    @if (session('error'))
+                                        <div class="alert alert-danger">{{ session('error') }}</div>
+                                    @endif
+
                                     <form action="{{ route('doctors.bulkDelete') }}" method="POST" id="bulk-delete-form">
                                         @csrf
                                         @method('DELETE') <!-- Laravel RESTful delete -->
@@ -69,13 +77,6 @@
                                                 <i class="ti ti-trash me-1"></i>Delete Selected
                                             </button>
                                         </div>
-                                        @if (session('success'))
-                                            <div class="alert alert-success">{{ session('success') }}</div>
-                                        @endif
-
-                                        @if (session('error'))
-                                            <div class="alert alert-danger">{{ session('error') }}</div>
-                                        @endif
 
                                         <div class="table-responsive">
                                             <table class="table mb-0" id="doctor-table">

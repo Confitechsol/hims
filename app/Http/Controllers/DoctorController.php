@@ -157,78 +157,73 @@ class DoctorController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            
             'name' => 'required',
-            'email' => 'required|email',
+            'email' => 'nullable|email|unique:doctor,email,' . $id,
         ]);
 
-        // Find Doctor record
-        $Doctor = Doctor::findOrFail($id);
+        $doctor = Doctor::findOrFail($id);
 
-        $Doctor->doctor_id = $request->id;
-        $Doctor->role_id = $request->role;
-        $Doctor->staff_designation_id = $request->designation;
-        $Doctor->department_id = $request->department;
-        $Doctor->specialist = $request->specialist ?? null;
-        $Doctor->name = $request->name;
-        $Doctor->surname = $request->surname;
-        $Doctor->father_name = $request->father_name;
-        $Doctor->mother_name = $request->mother_name;
-        $Doctor->gender = $request->gender;
-        $Doctor->marital_status = $request->marital_status;
-        $Doctor->blood_group = $request->blood_group;
-        $Doctor->dob = $request->dob;
-        $Doctor->date_of_joining = $request->date_of_joining;
-        $Doctor->contact_no = $request->contactno;
-        $Doctor->emergency_contact_no = $request->emgcontactno;
-        $Doctor->email = $request->email;
-        $Doctor->local_address = $request->address;
-        $Doctor->permanent_address = $request->permanent_address;
-        $Doctor->qualification = $request->qualification;
-        $Doctor->work_exp = $request->work_exp;
-        $Doctor->specialization = $request->specialization;
-        $Doctor->note = $request->note;
-        $Doctor->pan_number = $request->pan_number;
-        $Doctor->identification_number = $request->identification_number;
-        // $Doctor->local_identification_number = $request->local_identification_number; // Removed: column does not exist
-        // Do not change password or user_id during update unless required
-        $Doctor->is_active = $request->is_active ?? $Doctor->is_active;
+        // The doctor number is generated on creation and is not editable in this form.
+        $doctor->registration_no = $request->registration_no;
+        $doctor->role_id = $request->role;
+        $doctor->staff_designation_id = $request->designation;
+        $doctor->department_id = $request->department;
+        $doctor->specialist = $request->specialist ?? null;
+        $doctor->name = $request->name;
+        $doctor->surname = $request->surname;
+        $doctor->father_name = $request->father_name;
+        $doctor->mother_name = $request->mother_name;
+        $doctor->gender = $request->gender;
+        $doctor->marital_status = $request->marital_status;
+        $doctor->blood_group = $request->blood_group;
+        $doctor->dob = $request->dob;
+        $doctor->date_of_joining = $request->date_of_joining;
+        $doctor->date_of_leaving = $request->date_of_leaving;
+        $doctor->contact_no = $request->contactno;
+        $doctor->emergency_contact_no = $request->emgcontactno;
+        $doctor->email = $request->email;
+        $doctor->local_address = $request->address;
+        $doctor->permanent_address = $request->permanent_address;
+        $doctor->qualification = $request->qualification;
+        $doctor->work_exp = $request->work_exp;
+        $doctor->specialization = $request->specialization;
+        $doctor->is_active = $request->is_active ?? $doctor->is_active;
 
         // Handle photo upload
         if ($request->file('file')) {
             // Delete old photo
-            if ($Doctor->photo && file_exists(public_path('uploads/Doctor/' . $Doctor->photo))) {
-                unlink(public_path('uploads/Doctor/' . $Doctor->photo));
+            if ($doctor->photo && file_exists(public_path('uploads/Doctor/' . $doctor->photo))) {
+                unlink(public_path('uploads/Doctor/' . $doctor->photo));
             }
 
             $file = $request->file('file');
             $filename = time() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/Doctor'), $filename);
-            $Doctor->photo = $filename;
+            $doctor->photo = $filename;
         }
 
         // Handle signature upload
         if ($request->file('signature')) {
             // Delete old signature
-            if ($Doctor->signature && file_exists(public_path('uploads/Doctor/signatures/' . $Doctor->signature))) {
-                unlink(public_path('uploads/Doctor/signatures/' . $Doctor->signature));
+            if ($doctor->signature && file_exists(public_path('uploads/Doctor/signatures/' . $doctor->signature))) {
+                unlink(public_path('uploads/Doctor/signatures/' . $doctor->signature));
             }
 
             $signatureFile = $request->file('signature');
             $signatureFilename = 'signature_' . time() . '.' . $signatureFile->getClientOriginalExtension();
             $signatureFile->move(public_path('uploads/Doctor/signatures'), $signatureFilename);
-            $Doctor->signature = $signatureFilename;
+            $doctor->signature = $signatureFilename;
         }
 
-        $Doctor->save();
+        $doctor->save();
 
         try {
-            app(\App\Services\PmsBridgeService::class)->pushDoctor($Doctor->fresh());
+            app(\App\Services\PmsBridgeService::class)->pushDoctor($doctor->fresh());
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Doctor push to PMS skipped', ['error' => $e->getMessage()]);
         }
 
-        return redirect()->route('doctors.index')->with('success', 'Doctor details added successfully!');
+        return redirect()->route('doctors.index')->with('success', 'Doctor details updated successfully!');
 
     }
 

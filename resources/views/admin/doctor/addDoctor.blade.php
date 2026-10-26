@@ -651,6 +651,16 @@
 
             <div class="card-body">
 
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <!-- FORM -->
                 <form id="form1"
                       action="{{ $isEdit ? route('doctor.update', $doctor->id) : route('doctor.store') }}"
@@ -847,7 +857,7 @@
                                         <div class="form-group">
                                             <label class="form-label">Date Of Birth</label><small class="req"> *</small>
                                             <input id="dob" name="dob" type="date" class="form-control date"
-                                                value="{{ old('dob', $doctor->dob ?? '') }}">
+                                                value="{{ old('dob', isset($doctor->dob) ? $doctor->dob->format('Y-m-d') : '') }}">
                                         </div>
                                     </div>
 
@@ -893,7 +903,7 @@
                                             <label class="form-label">Photo</label>
                                             <input type="file" class="form-control" name="file">
                                             @if($isEdit && $doctor->photo)
-                                                <small>Current: <img src="{{ asset('uploads/doctor/'.$doctor->photo) }}"
+                                                <small>Current: <img src="{{ asset('uploads/Doctor/'.$doctor->photo) }}"
                                                                     width="40"></small>
                                             @endif
                                         </div>
@@ -905,7 +915,7 @@
                                             <label class="form-label">Signature</label>
                                             <input type="file" class="form-control" name="signature">
                                             @if($isEdit && $doctor->signature)
-                                                <small>Current: <img src="{{ asset('uploads/doctor/'.$doctor->signature) }}"
+                                                <small>Current: <img src="{{ asset('uploads/Doctor/signatures/'.$doctor->signature) }}"
                                                                     width="40"></small>
                                             @endif
                                         </div>
