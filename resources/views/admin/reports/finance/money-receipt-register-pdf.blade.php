@@ -18,6 +18,9 @@
     <h2>Money Receipt Register</h2>
     <div class="meta">
         <strong>Period:</strong> {{ \Carbon\Carbon::parse($result['date_from'])->format('d/m/Y') }} to {{ \Carbon\Carbon::parse($result['date_to'])->format('d/m/Y') }}
+        @if($result['payment_mode'])
+            | <strong>Payment/Receipt Mode:</strong> {{ $result['payment_mode'] }}
+        @endif
         @if($hospital)
             | <strong>{{ $hospital->name ?? '' }}</strong>
         @endif

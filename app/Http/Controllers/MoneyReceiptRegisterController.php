@@ -142,10 +142,10 @@ class MoneyReceiptRegisterController extends Controller
     /**
      * Build register data: date range, grouped by date and Receipt Type (Received / Refund)
      */
-    protected function getRegisterData(string $dateFrom, string $dateTo): array
+    protected function getRegisterData(string $dateFrom, string $dateTo, ?string $paymentMode = null): array
     {
         // Get all transactions with all necessary relationships - ensure patient is loaded through all paths
-        $rows = Transaction::with([
+        $query = Transaction::with([
                 'patient', 
                 'ipd', 
                 'ipd.patient',
@@ -161,8 +161,13 @@ class MoneyReceiptRegisterController extends Controller
                 $dateTo . ' 23:59:59',
             ])
             ->orderBy('payment_date')
-            ->orderBy('id')
-            ->get();
+            ->orderBy('id');
+
+        if ($paymentMode !== null && $paymentMode !== '') {
+            $query->where('payment_mode', $paymentMode);
+        }
+
+        $rows = $query->get();
         
         // Ensure patient_id is populated on transactions from IPD/OPD if missing
         // and properly set the patient relationship
@@ -313,6 +318,7 @@ class MoneyReceiptRegisterController extends Controller
             'grouped' => $grouped,
             'date_from' => $dateFrom,
             'date_to'   => $dateTo,
+            'payment_mode' => $paymentMode,
         ];
     }
 
@@ -323,17 +329,26 @@ class MoneyReceiptRegisterController extends Controller
     {
         $dateFrom = $request->input('date_from', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $dateTo   = $request->input('date_to', Carbon::now()->format('Y-m-d'));
+        $paymentMode = $request->input('payment_mode');
 
         $result = null;
         if ($request->has('date_from') && $request->has('date_to')) {
             $request->validate([
                 'date_from' => 'required|date',
                 'date_to'   => 'required|date|after_or_equal:date_from',
+                'payment_mode' => 'nullable|string|max:100',
             ]);
-            $result = $this->getRegisterData($dateFrom, $dateTo);
+            $result = $this->getRegisterData($dateFrom, $dateTo, $paymentMode);
         }
 
-        return view('admin.reports.finance.money-receipt-register', compact('result', 'dateFrom', 'dateTo'));
+        $paymentModes = Transaction::query()
+            ->whereNotNull('payment_mode')
+            ->where('payment_mode', '<>', '')
+            ->distinct()
+            ->orderBy('payment_mode')
+            ->pluck('payment_mode');
+
+        return view('admin.reports.finance.money-receipt-register', compact('result', 'dateFrom', 'dateTo', 'paymentMode', 'paymentModes'));
     }
 
     /**
@@ -344,10 +359,12 @@ class MoneyReceiptRegisterController extends Controller
         $request->validate([
             'date_from' => 'required|date',
             'date_to'   => 'required|date|after_or_equal:date_from',
+            'payment_mode' => 'nullable|string|max:100',
         ]);
         $dateFrom = $request->input('date_from');
         $dateTo   = $request->input('date_to');
-        $result   = $this->getRegisterData($dateFrom, $dateTo);
+        $paymentMode = $request->input('payment_mode');
+        $result   = $this->getRegisterData($dateFrom, $dateTo, $paymentMode);
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -408,10 +425,12 @@ class MoneyReceiptRegisterController extends Controller
         $request->validate([
             'date_from' => 'required|date',
             'date_to'   => 'required|date|after_or_equal:date_from',
+            'payment_mode' => 'nullable|string|max:100',
         ]);
         $dateFrom = $request->input('date_from');
         $dateTo   = $request->input('date_to');
-        $result   = $this->getRegisterData($dateFrom, $dateTo);
+        $paymentMode = $request->input('payment_mode');
+        $result   = $this->getRegisterData($dateFrom, $dateTo, $paymentMode);
         $hospital = \App\Models\Hospital::first();
 
         $pdf = Pdf::loadView('admin.reports.finance.money-receipt-register-pdf', compact('result', 'hospital'));

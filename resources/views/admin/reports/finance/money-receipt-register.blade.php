@@ -21,7 +21,16 @@
                             <label class="form-label">Date To <span class="text-danger">*</span></label>
                             <input type="date" name="date_to" class="form-control" value="{{ $dateTo }}" max="{{ date('Y-m-d') }}">
                         </div>
-                        <div class="col-md-6 d-flex gap-2 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Payment/Receipt Mode</label>
+                            <select name="payment_mode" class="form-select">
+                                <option value="">All Modes</option>
+                                @foreach($paymentModes as $mode)
+                                    <option value="{{ $mode }}" {{ (string) ($paymentMode ?? '') === (string) $mode ? 'selected' : '' }}>{{ $mode }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex gap-2 align-items-end">
                             <button type="submit" class="btn btn-primary btn-sm">Search</button>
                             <a href="{{ route('reports.money-receipt-register') }}" class="btn btn-secondary btn-sm">Reset</a>
                         </div>
@@ -35,16 +44,22 @@
     <div class="col-md-11 mt-3">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <h6 class="mb-0">Report: {{ \Carbon\Carbon::parse($result['date_from'])->format('d/m/Y') }} to {{ \Carbon\Carbon::parse($result['date_to'])->format('d/m/Y') }}</h6>
+                <h6 class="mb-0">Report: {{ \Carbon\Carbon::parse($result['date_from'])->format('d/m/Y') }} to {{ \Carbon\Carbon::parse($result['date_to'])->format('d/m/Y') }}
+                    @if($result['payment_mode'])
+                        (Mode: {{ $result['payment_mode'] }})
+                    @endif
+                </h6>
                 <div class="d-flex gap-2">
                     <form action="{{ route('reports.money-receipt-register.excel') }}" method="GET" class="d-inline">
                         <input type="hidden" name="date_from" value="{{ $result['date_from'] }}">
                         <input type="hidden" name="date_to" value="{{ $result['date_to'] }}">
+                        <input type="hidden" name="payment_mode" value="{{ $result['payment_mode'] ?? '' }}">
                         <button type="submit" class="btn btn-success btn-sm"><i class="ti ti-file-spreadsheet me-1"></i> Export Excel</button>
                     </form>
                     <form action="{{ route('reports.money-receipt-register.pdf') }}" method="GET" class="d-inline">
                         <input type="hidden" name="date_from" value="{{ $result['date_from'] }}">
                         <input type="hidden" name="date_to" value="{{ $result['date_to'] }}">
+                        <input type="hidden" name="payment_mode" value="{{ $result['payment_mode'] ?? '' }}">
                         <button type="submit" class="btn btn-danger btn-sm"><i class="ti ti-file-text me-1"></i> Export PDF</button>
                     </form>
                 </div>
