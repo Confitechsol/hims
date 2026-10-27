@@ -108,13 +108,30 @@ class GstBreakReportService
                     },
                     0.0
                 ), 2);
-                $tpaDueByIpd[$id] = round((float) ($ipd->final_approval_amount ?? 0), 2);
+                $corporateDueReceived = Transaction::query()
+                    ->where(function ($query) use ($id, $ipd) {
+                        $query->where('ipd_id', $id)
+                            ->orWhere(function ($query) use ($ipd) {
+                                $query->whereNull('ipd_id')
+                                    ->where('final_bill_no', $ipd->ipd_no);
+                            });
+                    })
+                    ->whereNotNull('receipt_no')
+                    ->where('receipt_no', '!=', '')
+                    ->whereNull('deleted_at')
+                    ->whereRaw('LOWER(TRIM(receipt_type)) = ?', ['corporate due'])
+                    ->sum('amount');
+                $tpaDueByIpd[$id] = round(max(
+                    0,
+                    (float) ($ipd->final_approval_amount ?? 0) - $corporateDueReceived
+                ), 2);
                 $tpaName = trim((string) (
                     $ipd->organisation->organisation_name
                     ?? $ipd->insuranceCompany->name
                     ?? ''
                 ));
-                $lines = array_merge($lines, $this->moneyReceiptLines($id));
+                $receiptLines = $this->moneyReceiptLines($id);
+                $lines = array_merge($lines, $receiptLines);
 
                 foreach ($lines as $line) {
                     $rows[] = array_merge($header, [
