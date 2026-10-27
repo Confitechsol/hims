@@ -212,6 +212,14 @@ class PmsBridgeService
                 $designation = trim((string) $doctor->designation);
             }
 
+            $department = '';
+            if (! empty($doctor->department_id)) {
+                $dept = $doctor->relationLoaded('department')
+                    ? $doctor->department
+                    : \App\Models\Department::find($doctor->department_id);
+                $department = $dept ? trim((string) ($dept->department_name ?? '')) : '';
+            }
+
             $signatureFile = trim((string) ($doctor->signature ?? ''));
             $signatureUrl = $signatureFile !== ''
                 ? url('uploads/Doctor/signatures/'.$signatureFile)
@@ -224,6 +232,8 @@ class PmsBridgeService
                 'degree' => $degree !== '' ? $degree : null,
                 'qualification' => $degree !== '' ? $degree : null,
                 'designation' => $designation !== '' ? $designation : null,
+                'department' => $department !== '' ? $department : null,
+                'department_name' => $department !== '' ? $department : null,
                 'registration_no' => $doctor->registration_no ?? null,
                 'signature_filename' => $signatureFile !== '' ? $signatureFile : null,
                 'signature_url' => $signatureUrl,
