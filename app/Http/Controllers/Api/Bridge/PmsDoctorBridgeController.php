@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Bridge;
 
 use App\Http\Controllers\Controller;
+use App\Models\Department;
 use App\Models\Doctor;
 use App\Models\IpdDetail;
 use App\Models\IpdPatient;
@@ -48,11 +49,27 @@ class PmsDoctorBridgeController extends Controller
                 ->all();
         }
 
+        $departmentMap = [];
+        $hasDepartmentId = Schema::hasColumn('doctor', 'department_id');
+        if ($hasDepartmentId && Schema::hasTable('department')) {
+            $departmentMap = Department::query()
+                ->get(['id', 'department_name'])
+                ->keyBy('id')
+                ->map(fn ($row) => trim((string) $row->department_name))
+                ->all();
+        }
+
         $doctors = $query
             ->orderBy('name')
             ->get();
 
-        $data = $doctors->map(function (Doctor $doctor) use ($designationMap, $hasStaffDesignationId, $hasDesignationId) {
+        $data = $doctors->map(function (Doctor $doctor) use (
+            $designationMap,
+            $departmentMap,
+            $hasStaffDesignationId,
+            $hasDesignationId,
+            $hasDepartmentId
+        ) {
             $fullName = trim(($doctor->name ?? '').' '.($doctor->surname ?? ''));
             $degree = trim((string) ($doctor->qualification ?? ''));
             if ($degree === '') {
@@ -67,6 +84,11 @@ class PmsDoctorBridgeController extends Controller
             }
             if ($designation === '' && is_string($doctor->designation ?? null)) {
                 $designation = trim((string) $doctor->designation);
+            }
+
+            $department = '';
+            if ($hasDepartmentId && ! empty($doctor->department_id)) {
+                $department = $departmentMap[(int) $doctor->department_id] ?? '';
             }
 
             $signatureFile = trim((string) ($doctor->signature ?? ''));
@@ -85,6 +107,8 @@ class PmsDoctorBridgeController extends Controller
                 'degree' => $degree !== '' ? $degree : null,
                 'qualification' => $degree !== '' ? $degree : null,
                 'designation' => $designation !== '' ? $designation : null,
+                'department' => $department !== '' ? $department : null,
+                'department_name' => $department !== '' ? $department : null,
                 'registration_no' => $doctor->registration_no ?? null,
                 'signature_filename' => $signatureFile !== '' ? $signatureFile : null,
                 'signature_url' => $signatureUrl,
