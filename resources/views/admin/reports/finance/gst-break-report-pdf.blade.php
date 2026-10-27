@@ -41,6 +41,9 @@
                 <th>Print Head</th>
                 <th>Particulars</th>
                 <th class="text-right">Amount</th>
+                <th>TPA Name</th>
+                <th class="text-right">Total Bill Amount</th>
+                <th class="text-right">Due on TPA</th>
             </tr>
         </thead>
         <tbody>
@@ -61,14 +64,22 @@
                 @endif
                 <td>{{ $row['particulars'] }}</td>
                 <td class="text-right">{{ number_format($row['amount'], 2) }}</td>
+                @if(($row['patient_rowspan'] ?? 0) > 0)
+                    <td rowspan="{{ $row['patient_rowspan'] }}">{{ $row['tpa_name'] }}</td>
+                    <td rowspan="{{ $row['patient_rowspan'] }}" class="text-right">{{ number_format($row['total_bill_amount'], 2) }}</td>
+                    <td rowspan="{{ $row['patient_rowspan'] }}" class="text-right">{{ number_format($row['due_on_tpa'], 2) }}</td>
+                @endif
             </tr>
             @empty
-            <tr><td colspan="11">No data.</td></tr>
+            <tr><td colspan="14">No data.</td></tr>
             @endforelse
             @if(!empty($result['rows']))
             <tr class="total-row">
                 <td colspan="10" class="text-right">Total</td>
                 <td class="text-right">{{ number_format($result['total_amount'], 2) }}</td>
+                <td></td>
+                <td class="text-right">{{ number_format($result['total_bill_amount'], 2) }}</td>
+                <td class="text-right">{{ number_format($result['total_due_on_tpa'], 2) }}</td>
             </tr>
             @endif
         </tbody>

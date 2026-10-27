@@ -118,12 +118,12 @@ class GstBreakReportController extends Controller
         $sheet->setTitle('GST Break');
 
         $sheet->setCellValue('A1', strtoupper($hospital->name ?? 'HOSPITAL'));
-        $sheet->mergeCells('A1:K1');
+        $sheet->mergeCells('A1:N1');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(12);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         $sheet->setCellValue('A2', 'GST BREAK REPORT');
-        $sheet->mergeCells('A2:K2');
+        $sheet->mergeCells('A2:N2');
         $sheet->getStyle('A2')->getFont()->setBold(true);
         $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
@@ -136,19 +136,20 @@ class GstBreakReportController extends Controller
             $meta .= '  |  Patient: ' . $result['patient_label'];
         }
         $sheet->setCellValue('A3', $meta);
-        $sheet->mergeCells('A3:K3');
+        $sheet->mergeCells('A3:N3');
 
         $headers = [
             'Sr. No.', 'Admission No.', 'Admission Date', 'Patient Name', 'Doctor Name',
             'Bill No.', 'Bill Date', 'Discharge Date', 'Print Head', 'Particular Details', 'Amount',
+            'TPA Name', 'Total Bill Amount', 'Due on TPA',
         ];
         $col = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($col . '5', $header);
             $col++;
         }
-        $sheet->getStyle('A5:K5')->getFont()->setBold(true);
-        $sheet->getStyle('A5:K5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9D9D9');
+        $sheet->getStyle('A5:N5')->getFont()->setBold(true);
+        $sheet->getStyle('A5:N5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9D9D9');
 
         $rowNum = 6;
         foreach ($result['rows'] as $row) {
@@ -163,10 +164,10 @@ class GstBreakReportController extends Controller
                 $sheet->setCellValue('H' . $rowNum, $row['discharge_date']);
                 if ($row['patient_rowspan'] > 1) {
                     $end = $rowNum + $row['patient_rowspan'] - 1;
-                    foreach (range('A', 'H') as $column) {
+                    foreach (array_merge(range('A', 'H'), range('L', 'N')) as $column) {
                         $sheet->mergeCells($column . $rowNum . ':' . $column . $end);
                     }
-                    $sheet->getStyle('A' . $rowNum . ':H' . $end)
+                    $sheet->getStyle('A' . $rowNum . ':N' . $end)
                         ->getAlignment()
                         ->setVertical(Alignment::VERTICAL_CENTER);
                 }
@@ -183,15 +184,23 @@ class GstBreakReportController extends Controller
             }
             $sheet->setCellValue('J' . $rowNum, $row['particulars']);
             $sheet->setCellValue('K' . $rowNum, $row['amount']);
+            if (($row['patient_rowspan'] ?? 0) > 0) {
+                $sheet->setCellValue('L' . $rowNum, $row['tpa_name']);
+                $sheet->setCellValue('M' . $rowNum, $row['total_bill_amount']);
+                $sheet->setCellValue('N' . $rowNum, $row['due_on_tpa']);
+            }
             $rowNum++;
         }
 
         $sheet->setCellValue('J' . $rowNum, 'Total');
         $sheet->setCellValue('K' . $rowNum, $result['total_amount']);
-        $sheet->getStyle('A' . $rowNum . ':K' . $rowNum)->getFont()->setBold(true);
+        $sheet->setCellValue('M' . $rowNum, $result['total_bill_amount']);
+        $sheet->setCellValue('N' . $rowNum, $result['total_due_on_tpa']);
+        $sheet->getStyle('A' . $rowNum . ':N' . $rowNum)->getFont()->setBold(true);
         $sheet->getStyle('K6:K' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+        $sheet->getStyle('M6:N' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
 
-        foreach (range('A', 'K') as $column) {
+        foreach (range('A', 'N') as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 

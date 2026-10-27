@@ -101,6 +101,9 @@
                                 <th>Print Head</th>
                                 <th>Particular Details</th>
                                 <th class="text-end">Amount</th>
+                                <th>TPA Name</th>
+                                <th class="text-end">Total Bill Amount</th>
+                                <th class="text-end">Due on TPA</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -121,6 +124,11 @@
                                 @endif
                                 <td>{{ $row['particulars'] }}</td>
                                 <td class="text-end">{{ number_format($row['amount'], 2) }}</td>
+                                @if(($row['patient_rowspan'] ?? 0) > 0)
+                                    <td rowspan="{{ $row['patient_rowspan'] }}" class="align-middle">{{ $row['tpa_name'] }}</td>
+                                    <td rowspan="{{ $row['patient_rowspan'] }}" class="align-middle text-end">{{ number_format($row['total_bill_amount'], 2) }}</td>
+                                    <td rowspan="{{ $row['patient_rowspan'] }}" class="align-middle text-end">{{ number_format($row['due_on_tpa'], 2) }}</td>
+                                @endif
                             </tr>
                             @endforeach
                         </tbody>
@@ -128,6 +136,9 @@
                             <tr style="background:#e8e8e8;color:#212529;" class="fw-bold">
                                 <td colspan="10" class="text-end">Total</td>
                                 <td class="text-end">{{ number_format($result['total_amount'], 2) }}</td>
+                                <td></td>
+                                <td class="text-end">{{ number_format($result['total_bill_amount'], 2) }}</td>
+                                <td class="text-end">{{ number_format($result['total_due_on_tpa'], 2) }}</td>
                             </tr>
                         </tfoot>
                     </table>

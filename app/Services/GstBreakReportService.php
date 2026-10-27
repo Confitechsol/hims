@@ -54,6 +54,8 @@ class GstBreakReportService
             ->with([
                 'patient' => static fn ($q) => $q->withTrashed(),
                 'doctor:id,name,surname,registration_no',
+                'organisation:id,organisation_name',
+                'insuranceCompany:id,name',
             ])
             ->whereIn('id', $ipdIds)
             ->where('discharged', 'yes')
@@ -61,6 +63,8 @@ class GstBreakReportService
             ->keyBy('id');
 
         $patientLabel = null;
+        $billTotalsByIpd = [];
+        $tpaDueByIpd = [];
 
         foreach ($cards as $card) {
             $id = (int) $card->ipd_details_id;
@@ -93,6 +97,23 @@ class GstBreakReportService
             try {
                 $lines = $billing->getFinalBillRegisterRows($id, $billDate->toDateString());
                 $lines = $this->applyPackageBedRule($id, $lines);
+                $billTotalsByIpd[$id] = round(array_reduce(
+                    $lines,
+                    static function (float $total, array $line): float {
+                        if (($line['charge_category_head'] ?? '') === 'Due (Patient Party)') {
+                            return $total;
+                        }
+
+                        return $total + (float) ($line['amount'] ?? 0);
+                    },
+                    0.0
+                ), 2);
+                $tpaDueByIpd[$id] = round((float) ($ipd->final_approval_amount ?? 0), 2);
+                $tpaName = trim((string) (
+                    $ipd->organisation->organisation_name
+                    ?? $ipd->insuranceCompany->name
+                    ?? ''
+                ));
                 $lines = array_merge($lines, $this->moneyReceiptLines($id));
 
                 foreach ($lines as $line) {
@@ -100,6 +121,9 @@ class GstBreakReportService
                         'print_head' => (string) ($line['charge_category_head'] ?? '-'),
                         'particulars' => (string) ($line['charge_details'] ?? ''),
                         'amount' => round((float) ($line['amount'] ?? 0), 2),
+                        'tpa_name' => $tpaName !== '' ? $tpaName : '-',
+                        'total_bill_amount' => $billTotalsByIpd[$id],
+                        'due_on_tpa' => $tpaDueByIpd[$id],
                     ]);
                 }
             } catch (\Throwable $e) {
@@ -130,6 +154,8 @@ class GstBreakReportService
             'patient_label' => $patientLabel,
             'line_count' => count($rows),
             'total_amount' => $total,
+            'total_bill_amount' => round(array_sum($billTotalsByIpd), 2),
+            'total_due_on_tpa' => round(array_sum($tpaDueByIpd), 2),
             'errors' => $errors,
         ];
     }
