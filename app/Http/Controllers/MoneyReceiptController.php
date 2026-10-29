@@ -614,54 +614,90 @@ class MoneyReceiptController extends Controller
     }
 
     /**
-     * API: Get final bill number for a patient (IPD or OPD)
+     * API: Get final bill number for a selected IPD/OPD (or patient fallback).
+     * Prefer bill_id + bill_type from autocomplete so re-admitted patients keep the selected IPD.
      */
     public function getPatientFinalBill(Request $request)
     {
         try {
             $patientId = $request->get('patient_id');
-            
+            $billType = strtoupper(trim((string) $request->get('bill_type', '')));
+            $billId = $request->get('bill_id');
+
+            // Selected IPD from search — never substitute another admission for the same patient.
+            if ($billType === 'IPD' && $billId) {
+                $ipd = IpdDetail::with('duePatientPartyDoctor')->find($billId);
+                if ($ipd && (! $patientId || (int) $ipd->patient_id === (int) $patientId)) {
+                    return response()->json([
+                        'final_bill_no' => $ipd->ipd_no,
+                        'bill_type' => 'IPD',
+                        'bill_id' => $ipd->id,
+                        'doctor_charges' => $ipd->due_patient_party_amount ?? 0,
+                        'doctor_name' => $ipd->duePatientPartyDoctor
+                            ? trim(($ipd->duePatientPartyDoctor->name ?? '') . ' ' . ($ipd->duePatientPartyDoctor->surname ?? ''))
+                            : '',
+                    ]);
+                }
+            }
+
+            // Selected OPD from search
+            if ($billType === 'OPD' && $billId) {
+                $opd = OpdDetail::with('doctor')->find($billId);
+                if ($opd && (! $patientId || (int) $opd->patient_id === (int) $patientId)) {
+                    return response()->json([
+                        'final_bill_no' => $opd->opd_no,
+                        'bill_type' => 'OPD',
+                        'bill_id' => $opd->id,
+                        'doctor_charges' => 0,
+                        'doctor_name' => $opd->doctor
+                            ? trim(($opd->doctor->name ?? '') . ' ' . ($opd->doctor->surname ?? ''))
+                            : '',
+                    ]);
+                }
+            }
+
             if (!$patientId) {
                 return response()->json(['final_bill_no' => null, 'bill_type' => null, 'bill_id' => null]);
             }
-            
-            // Check for IPD final bill (discharged IPD)
+
+            // Fallback only when no specific IPD/OPD was selected (patient-only row).
             $ipd = IpdDetail::with('duePatientPartyDoctor')
                 ->where('patient_id', $patientId)
                 ->where('discharged', 'yes')
                 ->orderBy('discharged_date', 'desc')
                 ->orderBy('date', 'desc')
                 ->first();
-            
+
             if ($ipd) {
                 return response()->json([
                     'final_bill_no' => $ipd->ipd_no,
                     'bill_type' => 'IPD',
                     'bill_id' => $ipd->id,
                     'doctor_charges' => $ipd->due_patient_party_amount ?? 0,
-                    'doctor_name' => $ipd->duePatientPartyDoctor ? 
-                        ($ipd->duePatientPartyDoctor->name ?? '') . ' ' . ($ipd->duePatientPartyDoctor->surname ?? '') : '',
+                    'doctor_name' => $ipd->duePatientPartyDoctor
+                        ? trim(($ipd->duePatientPartyDoctor->name ?? '') . ' ' . ($ipd->duePatientPartyDoctor->surname ?? ''))
+                        : '',
                 ]);
             }
 
-            // Check for OPD (latest OPD record)
             $opd = OpdDetail::with('doctor')
                 ->where('patient_id', $patientId)
                 ->orderBy('appointment_date', 'desc')
                 ->orderBy('id', 'desc')
                 ->first();
-            
+
             if ($opd) {
                 return response()->json([
                     'final_bill_no' => $opd->opd_no,
                     'bill_type' => 'OPD',
                     'bill_id' => $opd->id,
                     'doctor_charges' => 0,
-                    'doctor_name' => $opd->doctor ? 
-                        ($opd->doctor->name ?? '') . ' ' . ($opd->doctor->surname ?? '') : '',
+                    'doctor_name' => $opd->doctor
+                        ? trim(($opd->doctor->name ?? '') . ' ' . ($opd->doctor->surname ?? ''))
+                        : '',
                 ]);
             }
-            
+
             return response()->json(['final_bill_no' => null, 'bill_type' => null, 'bill_id' => null]);
         } catch (\Exception $e) {
             \Log::error('Get patient final bill failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);

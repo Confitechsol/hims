@@ -599,21 +599,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('patient_area').value = e.target.getAttribute('data-area') || '';
                 patientSuggestions.style.display = 'none';
 
-                // Set bill info
+                // Bind Final Bill / IPD-OPD to the selected search row (not latest admission by patient name).
                 if (billType === 'IPD' && billId) {
                     ipdIdInput.value = billId;
                     opdIdInput.value = '';
+                    finalBillNoInput.value = billNo || '';
                 } else if (billType === 'OPD' && billId) {
                     opdIdInput.value = billId;
                     ipdIdInput.value = '';
+                    finalBillNoInput.value = billNo || '';
                 } else {
                     ipdIdInput.value = '';
                     opdIdInput.value = '';
+                    finalBillNoInput.value = '';
                 }
 
-                // Auto-populate Final Bill No and load patient details
                 if (patientId) {
-                    fetch('{{ route("money-receipt.api.patient-final-bill") }}?patient_id=' + patientId)
+                    const finalBillParams = new URLSearchParams({ patient_id: patientId });
+                    if (billType && billId) {
+                        finalBillParams.set('bill_type', billType);
+                        finalBillParams.set('bill_id', billId);
+                    }
+                    fetch('{{ route("money-receipt.api.patient-final-bill") }}?' + finalBillParams.toString())
                         .then(r => {
                             if (!r.ok) {
                                 console.error('Patient final bill response status:', r.status);
@@ -625,15 +632,35 @@ document.addEventListener('DOMContentLoaded', function() {
                                 console.error('Patient final bill error:', data.error);
                                 return;
                             }
-                            
-                            if (data.final_bill_no) {
+
+                            // Keep selected IPD/OPD bill number; only fill from API when none selected.
+                            if (billType === 'IPD' || billType === 'OPD') {
+                                if (billNo) {
+                                    finalBillNoInput.value = billNo;
+                                } else if (data.final_bill_no) {
+                                    finalBillNoInput.value = data.final_bill_no;
+                                }
+                                if (billType === 'IPD' && billId) {
+                                    ipdIdInput.value = billId;
+                                    opdIdInput.value = '';
+                                    if (data.doctor_charges > 0) {
+                                        document.getElementById('doctor_name').value = data.doctor_name || '';
+                                        document.getElementById('doctor_charges').value = '₹ ' + parseFloat(data.doctor_charges).toFixed(2);
+                                        document.getElementById('doctorChargesCard').style.display = 'block';
+                                    } else {
+                                        document.getElementById('doctorChargesCard').style.display = 'none';
+                                    }
+                                } else if (billType === 'OPD' && billId) {
+                                    opdIdInput.value = billId;
+                                    ipdIdInput.value = '';
+                                    document.getElementById('doctorChargesCard').style.display = 'none';
+                                }
+                                updateCasePrescriptionNo();
+                            } else if (data.final_bill_no) {
                                 finalBillNoInput.value = data.final_bill_no;
-                                
                                 if (data.bill_type === 'IPD' && data.bill_id) {
                                     ipdIdInput.value = data.bill_id;
                                     opdIdInput.value = '';
-                                    
-                                    // Show doctor charges if IPD has due patient party
                                     if (data.doctor_charges > 0) {
                                         document.getElementById('doctor_name').value = data.doctor_name || '';
                                         document.getElementById('doctor_charges').value = '₹ ' + parseFloat(data.doctor_charges).toFixed(2);
@@ -648,8 +675,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                 } else {
                                     document.getElementById('doctorChargesCard').style.display = 'none';
                                 }
-                                
-                                // Update case/prescription number if applicable
                                 updateCasePrescriptionNo();
                             } else {
                                 finalBillNoInput.value = '';
@@ -659,16 +684,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         })
                         .catch(err => {
                             console.error('Error fetching patient final bill:', err);
-                            finalBillNoInput.value = '';
+                            if (!(billType === 'IPD' || billType === 'OPD') || !billNo) {
+                                finalBillNoInput.value = '';
+                            }
                             document.getElementById('doctorChargesCard').style.display = 'none';
-                        });
-                    
-                    // Load patient details (age, sex, etc.)
-                    fetch('{{ url("api/patient") }}/' + patientId)
-                        .then(r => r.ok ? r.json() : Promise.reject())
-                        .catch(() => {
-                            // If API doesn't exist, try to get from patient model via form
-                            // We'll populate from the search result if available
                         });
                 }
             }
