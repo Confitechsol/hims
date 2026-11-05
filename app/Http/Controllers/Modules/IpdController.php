@@ -1574,28 +1574,9 @@ class IpdController extends Controller
 
                 DB::commit();
 
-                // PMS sync: create path only ran on "add prescription". Edit must also push
-                // newly added pathology tests (or all tests if never synced).
-                $newlyAddedPathologyIds = [];
-                foreach ($pathologyToAdd as $pathologyId => $count) {
-                    if ($count > 0) {
-                        for ($i = 0; $i < $count; $i++) {
-                            $newlyAddedPathologyIds[] = (int) $pathologyId;
-                        }
-                    }
-                }
-
-                $hasPmsOrderNo = false;
-                try {
-                    $hasPmsOrderNo = \Illuminate\Support\Facades\Schema::hasColumn($prescription->getTable(), 'pms_order_no')
-                        && ! empty($prescription->pms_order_no);
-                } catch (\Throwable $e) {
-                    $hasPmsOrderNo = false;
-                }
-
-                if (! empty($newlyAddedPathologyIds)) {
-                    $this->syncIpdPathologyToPms($prescription->fresh(), array_values(array_unique($newlyAddedPathologyIds)));
-                } elseif (! $hasPmsOrderNo && ! empty($pathology_ids)) {
+                // Always push current pathology set after edit. PMS upserts by external_order_id
+                // and skips tests already on the order (so GGT added later still appears).
+                if (! empty($pathology_ids)) {
                     $this->syncIpdPathologyToPms($prescription->fresh());
                 }
 

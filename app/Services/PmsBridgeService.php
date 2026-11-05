@@ -113,6 +113,8 @@ class PmsBridgeService
             $payload = [
                 'external_system' => 'HIMS',
                 'external_patient_id' => (string) ($patient->id ?? ''),
+                // Stable id so edit/re-sync appends to the same PMS order instead of duplicating.
+                'external_order_id' => 'IPD-RX-'.(string) $prescription->id,
                 'patient' => [
                     'name' => $patient->patient_name ?? '',
                     'gender' => strtolower($patient->gender ?? ''),
