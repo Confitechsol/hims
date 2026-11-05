@@ -18,9 +18,10 @@ class PmsBridgeService
      * It ONLY sends pathology tests (not radiology/pharmacy).
      *
      * @param IpdPrescription $prescription
+     * @param  list<int>|null  $onlyPathologyIds  When set, only these HIMS pathology IDs are sent (e.g. newly added on edit).
      * @return array ['success' => bool, 'message' => string, 'data' => mixed|null]
      */
-    public function sendIpdPathologyOrder(IpdPrescription $prescription): array
+    public function sendIpdPathologyOrder(IpdPrescription $prescription, ?array $onlyPathologyIds = null): array
     {
         try {
             $ipd = $prescription->ipd()->with('patient', 'bedGroup', 'bedDetail', 'doctor')->first();
@@ -34,8 +35,22 @@ class PmsBridgeService
             }
 
             // Collect pathology test IDs from normalized tests table
-            $pathologyTestIds = IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)
-                ->whereNotNull('pathology_id')
+            $query = IpdPrescriptionTest::where('ipd_prescription_id', $prescription->id)
+                ->whereNotNull('pathology_id');
+
+            if ($onlyPathologyIds !== null) {
+                $only = array_values(array_unique(array_map('intval', $onlyPathologyIds)));
+                if (empty($only)) {
+                    return [
+                        'success' => false,
+                        'message' => 'No pathology tests to send for prescription '.$prescription->id,
+                        'data' => null,
+                    ];
+                }
+                $query->whereIn('pathology_id', $only);
+            }
+
+            $pathologyTestIds = $query
                 ->pluck('pathology_id')
                 ->map(fn ($id) => (int) $id)
                 ->unique()
@@ -158,9 +173,17 @@ class PmsBridgeService
             $data = $response->json();
 
             // Optionally: persist PMS order number on prescription for later correlation
-            if (is_array($data) && isset($data['pms_order_no'])) {
-                $prescription->pms_order_no = $data['pms_order_no'];
-                $prescription->save();
+            if (is_array($data) && isset($data['pms_order_no']) && \Illuminate\Support\Facades\Schema::hasColumn($prescription->getTable(), 'pms_order_no')) {
+                try {
+                    $prescription->pms_order_no = $data['pms_order_no'];
+                    $prescription->save();
+                } catch (\Throwable $persistEx) {
+                    Log::warning('PMS order created but failed to store pms_order_no', [
+                        'prescription_id' => $prescription->id ?? null,
+                        'pms_order_no' => $data['pms_order_no'],
+                        'error' => $persistEx->getMessage(),
+                    ]);
+                }
             }
 
             return [

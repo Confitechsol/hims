@@ -1153,33 +1153,7 @@ class IpdController extends Controller
 
                 // Send pathology tests to PMS (if any and PMS is configured)
                 if (! empty($pathology_ids)) {
-                    $pmsBaseUrl = config('services.pms.base_url');
-                    if ($pmsBaseUrl) {
-                        try {
-                            $pmsBridge = app(PmsBridgeService::class);
-                            $pmsResult = $pmsBridge->sendIpdPathologyOrder($prescription);
-                            if (!empty($pmsResult['success'])) {
-                                \Log::info('IPD pathology order synced to PMS', [
-                                    'prescription_id' => $prescription->id ?? null,
-                                    'message' => $pmsResult['message'] ?? null,
-                                ]);
-                            } else {
-                                \Log::warning('IPD pathology PMS sync failed', [
-                                    'prescription_id' => $prescription->id ?? null,
-                                    'message' => $pmsResult['message'] ?? null,
-                                    'data' => $pmsResult['data'] ?? null,
-                                ]);
-                            }
-                        } catch (\Throwable $e) {
-                            \Log::error('Error sending IPD pathology order to PMS: ' . $e->getMessage(), [
-                                'prescription_id' => $prescription->id ?? null,
-                            ]);
-                        }
-                    } else {
-                        \Log::warning('PMS sync skipped: services.pms.base_url is empty', [
-                            'prescription_id' => $prescription->id ?? null,
-                        ]);
-                    }
+                    $this->syncIpdPathologyToPms($prescription);
                 }
                 // Store medicines
                 if (! empty($request->medicines)) {
@@ -1599,6 +1573,32 @@ class IpdController extends Controller
                 }
 
                 DB::commit();
+
+                // PMS sync: create path only ran on "add prescription". Edit must also push
+                // newly added pathology tests (or all tests if never synced).
+                $newlyAddedPathologyIds = [];
+                foreach ($pathologyToAdd as $pathologyId => $count) {
+                    if ($count > 0) {
+                        for ($i = 0; $i < $count; $i++) {
+                            $newlyAddedPathologyIds[] = (int) $pathologyId;
+                        }
+                    }
+                }
+
+                $hasPmsOrderNo = false;
+                try {
+                    $hasPmsOrderNo = \Illuminate\Support\Facades\Schema::hasColumn($prescription->getTable(), 'pms_order_no')
+                        && ! empty($prescription->pms_order_no);
+                } catch (\Throwable $e) {
+                    $hasPmsOrderNo = false;
+                }
+
+                if (! empty($newlyAddedPathologyIds)) {
+                    $this->syncIpdPathologyToPms($prescription->fresh(), array_values(array_unique($newlyAddedPathologyIds)));
+                } elseif (! $hasPmsOrderNo && ! empty($pathology_ids)) {
+                    $this->syncIpdPathologyToPms($prescription->fresh());
+                }
+
                 return response()->json([
                     'success'         => true,
                     'message'         => 'Prescription updated successfully.',
@@ -1628,6 +1628,46 @@ class IpdController extends Controller
                 'message' => 'Something went wrong: ' . $e->getMessage(),
             ], 500);
             return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Push IPD pathology tests to PMS Orders (non-blocking for the HIMS UX).
+     *
+     * @param  list<int>|null  $onlyPathologyIds
+     */
+    private function syncIpdPathologyToPms(IpdPrescription $prescription, ?array $onlyPathologyIds = null): void
+    {
+        $pmsBaseUrl = config('services.pms.base_url');
+        if (! $pmsBaseUrl) {
+            \Log::warning('PMS sync skipped: services.pms.base_url is empty', [
+                'prescription_id' => $prescription->id ?? null,
+            ]);
+
+            return;
+        }
+
+        try {
+            $pmsResult = app(PmsBridgeService::class)->sendIpdPathologyOrder($prescription, $onlyPathologyIds);
+            if (! empty($pmsResult['success'])) {
+                \Log::info('IPD pathology order synced to PMS', [
+                    'prescription_id' => $prescription->id ?? null,
+                    'only_pathology_ids' => $onlyPathologyIds,
+                    'message' => $pmsResult['message'] ?? null,
+                    'pms_order_no' => $pmsResult['data']['pms_order_no'] ?? null,
+                ]);
+            } else {
+                \Log::warning('IPD pathology PMS sync failed', [
+                    'prescription_id' => $prescription->id ?? null,
+                    'only_pathology_ids' => $onlyPathologyIds,
+                    'message' => $pmsResult['message'] ?? null,
+                    'data' => $pmsResult['data'] ?? null,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Error sending IPD pathology order to PMS: '.$e->getMessage(), [
+                'prescription_id' => $prescription->id ?? null,
+            ]);
         }
     }
 
