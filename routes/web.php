@@ -705,6 +705,7 @@ Route::get('/ipd/prescription/{id}', [IpdController::class, 'showPrescription'])
 Route::get('/ipd/prescription/{id}/edit', [IpdController::class, 'editPrescription'])->name('ipd.prescription.edit');
 Route::get('/ipd/prescription/{id}/print', [IpdController::class, 'printPrescription'])->name('ipd.prescription.print');
 Route::put('/ipd/prescription/{id}', [IpdController::class, 'updatePrescription'])->name('ipd.prescription.update');
+Route::post('/ipd/prescription/{id}/sync-pms', [IpdController::class, 'syncPrescriptionToPms'])->name('ipd.prescription.syncPms');
 Route::delete('/ipd/prescription/{id}', [IpdController::class, 'deletePrescription'])->name('ipd.prescription.delete');
 Route::post('/ipd_charge', [IpdController::class, 'addIpdCharge'])->name('ipd.addIpdCharge');
 Route::get('/ipd_charge/{charge}', [IpdController::class, 'getIpdCharge'])->name('ipd.charge.show');

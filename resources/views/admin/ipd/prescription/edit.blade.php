@@ -610,16 +610,31 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 console.log('🔴 Success:', data);
-                // Show success notification
+                const pms = data.pms_sync || null;
+                let pmsText = '';
+                if (pms) {
+                    if (pms.success) {
+                        const orderNo = (pms.data && pms.data.pms_order_no) ? pms.data.pms_order_no : '';
+                        pmsText = orderNo
+                            ? ('\nPMS order: ' + orderNo)
+                            : '\nPathology synced to PMS.';
+                    } else if (pms.skipped) {
+                        pmsText = '\nPMS sync skipped: ' + (pms.message || '');
+                    } else {
+                        pmsText = '\nPMS sync FAILED: ' + (pms.message || 'unknown error');
+                        if (pms.data && pms.data.unmapped_tests) {
+                            pmsText += ' (unmapped: ' + pms.data.unmapped_tests.join(', ') + ')';
+                        }
+                    }
+                }
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: data.message || 'Prescription updated successfully.',
+                        icon: (pms && pms.success === false && !pms.skipped) ? 'warning' : 'success',
+                        title: (pms && pms.success === false && !pms.skipped) ? 'Saved, but PMS sync failed' : 'Success',
+                        text: (data.message || 'Prescription updated successfully.') + pmsText,
                         confirmButtonColor: '#7c3aed',
                         confirmButtonText: 'OK'
                     }).then(() => {
-                        // Redirect back to IPD view page
                         @if($prescription->ipd_id)
                             window.location.href = "{{ route('ipd.show', $prescription->ipd_id) }}";
                         @else
@@ -627,8 +642,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         @endif
                     });
                 } else {
-                    // Fallback if SweetAlert2 is not available
-                    alert(data.message || 'Prescription updated successfully!');
+                    alert((data.message || 'Prescription updated successfully!') + pmsText);
                     @if($prescription->ipd_id)
                         window.location.href = "{{ route('ipd.show', $prescription->ipd_id) }}";
                     @else

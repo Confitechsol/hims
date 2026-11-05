@@ -57,6 +57,23 @@ class PmsBridgeService
                 ->values()
                 ->all();
 
+            // Fallback: legacy CSV column when ipd_prescription_tests rows are missing
+            if (empty($pathologyTestIds) && ! empty($prescription->pathology_id)) {
+                $pathologyTestIds = collect(preg_split('/\s*,\s*/', (string) $prescription->pathology_id) ?: [])
+                    ->map(fn ($id) => (int) trim((string) $id))
+                    ->filter(fn ($id) => $id > 0)
+                    ->unique()
+                    ->values()
+                    ->all();
+                if ($onlyPathologyIds !== null) {
+                    $only = array_fill_keys(array_map('intval', $onlyPathologyIds), true);
+                    $pathologyTestIds = array_values(array_filter(
+                        $pathologyTestIds,
+                        fn ($id) => isset($only[$id])
+                    ));
+                }
+            }
+
             if (empty($pathologyTestIds)) {
                 return [
                     'success' => false,
@@ -109,6 +126,12 @@ class PmsBridgeService
 
             $patient = $ipd->patient;
             $doctor = $ipd->doctor ?: $prescription->prescribedBy;
+            $genderRaw = strtolower(trim((string) ($patient->gender ?? '')));
+            $gender = in_array($genderRaw, ['male', 'female', 'other'], true)
+                ? $genderRaw
+                : (in_array($genderRaw, ['m', 'man', 'boy'], true)
+                    ? 'male'
+                    : (in_array($genderRaw, ['f', 'woman', 'girl'], true) ? 'female' : null));
 
             $payload = [
                 'external_system' => 'HIMS',
@@ -117,7 +140,7 @@ class PmsBridgeService
                 'external_order_id' => 'IPD-RX-'.(string) $prescription->id,
                 'patient' => [
                     'name' => $patient->patient_name ?? '',
-                    'gender' => strtolower($patient->gender ?? ''),
+                    'gender' => $gender,
                     'dob' => $patient->dob ?? null,
                     'mobile' => $patient->mobileno ?? null,
                     'address' => $patient->address ?? null,
@@ -149,26 +172,38 @@ class PmsBridgeService
 
             $response = Http::withToken($token)
                 ->acceptJson()
+                ->timeout(60)
                 ->post($url, $payload);
 
             Log::info('PMS bridge request sent', [
                 'url' => $url,
                 'prescription_id' => $prescription->id ?? null,
+                'external_order_id' => $payload['external_order_id'],
+                'external_patient_id' => $payload['external_patient_id'],
                 'tests' => $testsPayload,
                 'status' => $response->status(),
             ]);
 
             if (!$response->successful()) {
+                $body = $response->json();
                 Log::error('PMS bridge error', [
                     'status' => $response->status(),
                     'body' => $response->body(),
                     'tests_payload' => $testsPayload,
                 ]);
 
+                $msg = 'PMS returned HTTP '.$response->status();
+                if (is_array($body) && ! empty($body['message'])) {
+                    $msg .= ': '.$body['message'];
+                }
+                if (is_array($body) && ! empty($body['unmapped_tests'])) {
+                    $msg .= ' (unmapped: '.implode(', ', $body['unmapped_tests']).')';
+                }
+
                 return [
                     'success' => false,
-                    'message' => 'PMS returned HTTP '.$response->status(),
-                    'data' => $response->json(),
+                    'message' => $msg,
+                    'data' => $body,
                 ];
             }
 

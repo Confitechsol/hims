@@ -1151,10 +1151,6 @@ class IpdController extends Controller
                     }
                 }
 
-                // Send pathology tests to PMS (if any and PMS is configured)
-                if (! empty($pathology_ids)) {
-                    $this->syncIpdPathologyToPms($prescription);
-                }
                 // Store medicines
                 if (! empty($request->medicines)) {
                     foreach ($request->medicines as $i => $med) {
@@ -1170,10 +1166,18 @@ class IpdController extends Controller
                 }
 
                 DB::commit();
+
+                // Sync AFTER commit so PMS can read committed pathology rows.
+                $pmsSync = null;
+                if (! empty($pathology_ids)) {
+                    $pmsSync = $this->syncIpdPathologyToPms($prescription->fresh());
+                }
+
                 return response()->json([
                     'success'         => true,
                     'message'         => 'Prescription created successfully.',
                     'prescription_id' => $prescription->id,
+                    'pms_sync'        => $pmsSync,
                 ], 200);
             } catch (Exception $e) {
                 DB::rollBack();
@@ -1366,11 +1370,34 @@ class IpdController extends Controller
             $prescription = IpdPrescription::findOrFail($id);
             $user         = Auth::user();
 
-            $findingTypes    = array_filter($request->finding_type ?? [], fn($type) => $type !== null && $type !== '');
-            $findings        = array_filter($request->findings ?? [], fn($title) => $title !== null && $title !== '');
-            $pathology_ids   = array_filter($request->pathology ?? [], fn($pathology) => $pathology !== null && $pathology !== '');
-            $radiology_ids   = array_filter($request->radiology ?? [], fn($radio) => $radio !== null && $radio !== '');
+            $findingTypes = array_filter($request->finding_type ?? [], fn($type) => $type !== null && $type !== '');
+            $findings     = array_filter($request->findings ?? [], fn($title) => $title !== null && $title !== '');
+
+            // Defensive pathology/radiology parse (same as create) — FormData may use pathology[].
+            $pathologyInput = $request->input('pathology', []);
+            if (empty($pathologyInput)) {
+                $pathologyInput = $request->input('pathology[]', []);
+            }
+            $radiologyInput = $request->input('radiology', []);
+            if (empty($radiologyInput)) {
+                $radiologyInput = $request->input('radiology[]', []);
+            }
+            if (! is_array($pathologyInput)) {
+                $pathologyInput = $pathologyInput !== null && $pathologyInput !== '' ? [$pathologyInput] : [];
+            }
+            if (! is_array($radiologyInput)) {
+                $radiologyInput = $radiologyInput !== null && $radiologyInput !== '' ? [$radiologyInput] : [];
+            }
+
+            $pathology_ids   = array_values(array_filter($pathologyInput, fn($pathology) => $pathology !== null && $pathology !== ''));
+            $radiology_ids   = array_values(array_filter($radiologyInput, fn($radio) => $radio !== null && $radio !== ''));
             $notification_to = array_filter($request->visible ?? [], fn($notify) => $notify !== null && $notify !== '');
+
+            \Log::info('IPD prescription update pathology input', [
+                'prescription_id' => $id,
+                'pathology_ids' => $pathology_ids,
+                'radiology_ids' => $radiology_ids,
+            ]);
 
             $implodedFindingTypes = implode(", ", $findingTypes);
             $implodedFindings     = implode(", ", $findings);
@@ -1574,16 +1601,31 @@ class IpdController extends Controller
 
                 DB::commit();
 
-                // Always push current pathology set after edit. PMS upserts by external_order_id
-                // and skips tests already on the order (so GGT added later still appears).
-                if (! empty($pathology_ids)) {
-                    $this->syncIpdPathologyToPms($prescription->fresh());
+                // Source of truth after commit: DB rows (and legacy CSV), not only request.
+                $fresh = $prescription->fresh();
+                $dbPathologyCount = IpdPrescriptionTest::where('ipd_prescription_id', $fresh->id)
+                    ->whereNotNull('pathology_id')
+                    ->count();
+                $hasPathology = $dbPathologyCount > 0
+                    || ! empty($pathology_ids)
+                    || trim((string) ($fresh->pathology_id ?? '')) !== '';
+
+                $pmsSync = null;
+                if ($hasPathology) {
+                    $pmsSync = $this->syncIpdPathologyToPms($fresh);
+                } else {
+                    $pmsSync = [
+                        'success' => false,
+                        'message' => 'No pathology tests on prescription to sync to PMS',
+                        'skipped' => true,
+                    ];
                 }
 
                 return response()->json([
                     'success'         => true,
                     'message'         => 'Prescription updated successfully.',
                     'prescription_id' => $prescription->id,
+                    'pms_sync'        => $pmsSync,
                 ], 200);
             } catch (Exception $e) {
                 DB::rollBack();
@@ -1616,8 +1658,9 @@ class IpdController extends Controller
      * Push IPD pathology tests to PMS Orders (non-blocking for the HIMS UX).
      *
      * @param  list<int>|null  $onlyPathologyIds
+     * @return array{success: bool, message: string, data?: mixed, skipped?: bool}
      */
-    private function syncIpdPathologyToPms(IpdPrescription $prescription, ?array $onlyPathologyIds = null): void
+    private function syncIpdPathologyToPms(IpdPrescription $prescription, ?array $onlyPathologyIds = null): array
     {
         $pmsBaseUrl = config('services.pms.base_url');
         if (! $pmsBaseUrl) {
@@ -1625,7 +1668,11 @@ class IpdController extends Controller
                 'prescription_id' => $prescription->id ?? null,
             ]);
 
-            return;
+            return [
+                'success' => false,
+                'message' => 'PMS_BASE_URL is not configured on HIMS',
+                'skipped' => true,
+            ];
         }
 
         try {
@@ -1645,11 +1692,39 @@ class IpdController extends Controller
                     'data' => $pmsResult['data'] ?? null,
                 ]);
             }
+
+            return [
+                'success' => (bool) ($pmsResult['success'] ?? false),
+                'message' => (string) ($pmsResult['message'] ?? 'Unknown PMS sync result'),
+                'data' => $pmsResult['data'] ?? null,
+            ];
         } catch (\Throwable $e) {
             \Log::error('Error sending IPD pathology order to PMS: '.$e->getMessage(), [
                 'prescription_id' => $prescription->id ?? null,
             ]);
+
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ];
         }
+    }
+
+    /**
+     * Force re-push an IPD prescription's pathology tests to PMS (ops / recovery).
+     * GET/POST /ipd/prescription/{id}/sync-pms
+     */
+    public function syncPrescriptionToPms($id): \Illuminate\Http\JsonResponse
+    {
+        $prescription = IpdPrescription::findOrFail($id);
+        $result = $this->syncIpdPathologyToPms($prescription->fresh());
+
+        return response()->json([
+            'success' => (bool) ($result['success'] ?? false),
+            'prescription_id' => $prescription->id,
+            'prescription_number' => $prescription->prescription_number,
+            'pms_sync' => $result,
+        ], ! empty($result['success']) ? 200 : 422);
     }
 
     /**
