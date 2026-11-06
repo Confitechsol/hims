@@ -5,9 +5,9 @@ namespace App\Services\Billing;
 use Carbon\Carbon;
 
 /**
- * Request-only holder for a temporary admission instant.
- * The estimate add-on sets it around bill calculation and always clears it.
- * It is never written to the database.
+ * Request-only holder kept for backward-compatible tests/helpers.
+ * Estimate as-of time is no longer applied as a fake admission; bed calc
+ * always uses the real IPD admission and passes as-of only as billing end.
  */
 class TemporaryAdmissionEstimateContext
 {

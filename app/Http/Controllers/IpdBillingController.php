@@ -23,7 +23,6 @@ use App\Services\IpdPackageService;
 use App\Services\InsuranceFinalBillSummaryService;
 use App\Services\IpdFinalBillService;
 use App\Services\Billing\TemporaryAdmissionEstimateAddon;
-use App\Services\Billing\TemporaryAdmissionEstimateContext;
 use App\Exceptions\InvalidTemporaryAdmissionException;
 use App\Support\BedBillingPeriod;
 use Carbon\Carbon;
@@ -448,9 +447,8 @@ class IpdBillingController extends Controller
             return ['total' => 0, 'details' => []];
         }
 
-        // Estimate add-on only. Null for every normal bill, so cash and insurance rules stay unchanged.
-        $temporaryAdmission = app(TemporaryAdmissionEstimateContext::class)->admissionAt();
-        $admissionAt = $temporaryAdmission ?? Carbon::parse($ipd->date ?? $ipd->created_at ?? now());
+        // Always use the real stored admission. Estimate "as-of" time is passed as $endDate only.
+        $admissionAt = Carbon::parse($ipd->date ?? $ipd->created_at ?? now());
         $billableAnchor = BedBillingPeriod::billableAnchorAt($admissionAt);
         // For non-discharged preview/breakup, calculate up to current moment.
         // Date-only end values use discharge card time when available (insurance discharge-day rule).
@@ -2217,19 +2215,33 @@ class IpdBillingController extends Controller
                 $dischargeAtForBill = Carbon::parse($ipd->discharged_date)->startOfDay();
             }
 
+            // Estimate as-of time (selected in UI): billing end for active estimates only.
+            // Approval / approval preview / discharged / final paths never use this override.
+            $estimateAsOf = null;
+            if (! $isApprovalBill && ! $isApprovalPreview && ! $isDischarged) {
+                $estimateAsOf = app(TemporaryAdmissionEstimateAddon::class)->resolve(
+                    $request,
+                    $ipd,
+                    false
+                );
+            }
+
             // Approval preview (before discharge): bed charges till now.
             // Approval / discharged estimate / final-aligned: stop at discharge datetime.
+            // Active estimate with as-of: stop at selected estimate time (real admission unchanged).
             $billingEndAtForEstimate = null;
             if ($isApprovalPreview) {
                 $billingEndAtForEstimate = null;
             } elseif ($isApprovalBill || $isDischarged) {
                 $billingEndAtForEstimate = $dischargeAtForBill;
+            } elseif ($estimateAsOf) {
+                $billingEndAtForEstimate = $estimateAsOf;
             }
 
             $headerDateLabel = 'Estimate Date';
             $headerTimeLabel = 'Estimate Time';
-            $headerDateValue = Carbon::now()->format('d/m/Y');
-            $headerTimeValue = Carbon::now()->format('H:i:s');
+            $headerDateValue = ($estimateAsOf ?? Carbon::now())->format('d/m/Y');
+            $headerTimeValue = ($estimateAsOf ?? Carbon::now())->format('H:i:s');
             if ($isApprovalBill && $isDischarged && $dischargeAtForBill) {
                 $headerDateLabel = 'Discharge Date';
                 $headerTimeLabel = 'Discharge Time';
@@ -2245,19 +2257,13 @@ class IpdBillingController extends Controller
                 ? $billingEndAtForEstimate->format('Y-m-d H:i:s')
                 : null;
 
-            // Temporary admission, when present, applies only inside this callback and is not saved.
-            [$breakup, $bedChargesData] = app(TemporaryAdmissionEstimateAddon::class)->run(
-                $request,
-                $ipd,
-                $isApprovalBill,
-                function () use ($ipdId, $billingEndForBed, $ipdChargeBillStage) {
-                    $breakup = $this->calculateBreakup($ipdId, $billingEndForBed, $ipdChargeBillStage);
-                    $bedChargesData = $this->calculateBedChargesFromHistory($ipdId, $billingEndForBed);
-
-                    return [$breakup, $bedChargesData];
-                }
-            );
-            \Log::info('Breakup calculated', ['total_charges' => $breakup['total_charges']]);
+            // Real admission always drives bed anchor; as-of time is only the end boundary.
+            $breakup = $this->calculateBreakup($ipdId, $billingEndForBed, $ipdChargeBillStage);
+            $bedChargesData = $this->calculateBedChargesFromHistory($ipdId, $billingEndForBed);
+            \Log::info('Breakup calculated', [
+                'total_charges' => $breakup['total_charges'],
+                'estimate_as_of' => $estimateAsOf?->format('Y-m-d H:i:s'),
+            ]);
 
             // Get detailed breakdown - Calculate dynamically from PatientBedHistory (omit from display when package applied)
             $bedChargesDetails = collect($bedChargesData['details']);

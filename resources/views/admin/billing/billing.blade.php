@@ -364,15 +364,52 @@
                 });
             });
 
-            function realAdmissionForInput(ipdId) {
-                var row = ipdPatientData.find(function (ipd) {
-                    return String(ipd.id) === String(ipdId);
-                });
-                if (!row || !row.admission_date) {
-                    return '';
+            function padEstimateTime(n) {
+                return String(n).padStart(2, '0');
+            }
+
+            function formatDateTimeLocal(date) {
+                return date.getFullYear()
+                    + '-' + padEstimateTime(date.getMonth() + 1)
+                    + '-' + padEstimateTime(date.getDate())
+                    + 'T' + padEstimateTime(date.getHours())
+                    + ':' + padEstimateTime(date.getMinutes());
+            }
+
+            function currentDateTimeForInput() {
+                return formatDateTimeLocal(new Date());
+            }
+
+            function estimateTimeBounds() {
+                var now = new Date();
+                var min = formatDateTimeLocal(now);
+                var max = now.getFullYear()
+                    + '-' + padEstimateTime(now.getMonth() + 1)
+                    + '-' + padEstimateTime(now.getDate())
+                    + 'T23:59';
+                var today = min.slice(0, 10);
+                return { min: min, max: max, today: today };
+            }
+
+            function clampEstimateTimeValue(value) {
+                var bounds = estimateTimeBounds();
+                if (!value) {
+                    return bounds.min;
                 }
-                var raw = String(row.admission_date).replace(' ', 'T');
-                return raw.length >= 16 ? raw.slice(0, 16) : raw;
+                var timePart = value.indexOf('T') >= 0 ? value.split('T')[1] : '';
+                if (!timePart || timePart.length < 5) {
+                    timePart = bounds.min.slice(11, 16);
+                } else {
+                    timePart = timePart.slice(0, 5);
+                }
+                var clamped = bounds.today + 'T' + timePart;
+                if (clamped < bounds.min) {
+                    return bounds.min;
+                }
+                if (clamped > bounds.max) {
+                    return bounds.max;
+                }
+                return clamped;
             }
 
             function openEstimatePdf(ipdId, viewMode, tempAdmission) {
@@ -391,29 +428,63 @@
             }
 
             function promptTemporaryAdmission(ipdId, viewMode) {
-                var prefill = escapeEstimateAttr(realAdmissionForInput(ipdId));
+                var bounds = estimateTimeBounds();
+                var prefill = escapeEstimateAttr(bounds.min);
                 Swal.fire({
                     icon: 'info',
-                    title: 'Temporary admission for bed charge',
-                    html: '<p style="text-align:left;font-size:14px;margin-bottom:8px;">This time is used only to calculate the bed charge on this estimate. It is not saved. Adm Date and Adm Time on the bill stay the real admission.</p>'
-                        + '<p style="text-align:left;font-size:13px;color:#555;margin-bottom:8px;">If the patient was admitted before 11:00 AM and this estimate is printed before 11:00 AM, set the temporary admission to the previous day to show a bed charge. The 11:00 AM bed rule is unchanged.</p>'
-                        + '<input id="temp_admission_at" type="datetime-local" class="swal2-input" style="width:100%;margin:0;" value="' + prefill + '">',
+                    title: 'Estimate time',
+                    html: '<input id="temp_admission_at" type="datetime-local" class="swal2-input" style="width:100%;margin:0;"'
+                        + ' value="' + prefill + '"'
+                        + ' min="' + escapeEstimateAttr(bounds.min) + '"'
+                        + ' max="' + escapeEstimateAttr(bounds.max) + '">',
                     showCancelButton: true,
                     showDenyButton: true,
                     confirmButtonText: 'Generate with this time',
-                    denyButtonText: 'Use real admission',
+                    denyButtonText: 'Use Estimate Time',
                     cancelButtonText: 'Cancel',
                     confirmButtonColor: '#750096',
                     denyButtonColor: '#0d6efd',
                     focusConfirm: false,
+                    didOpen: function () {
+                        var el = document.getElementById('temp_admission_at');
+                        if (!el) {
+                            return;
+                        }
+                        var enforce = function () {
+                            var nextBounds = estimateTimeBounds();
+                            el.min = nextBounds.min;
+                            el.max = nextBounds.max;
+                            el.value = clampEstimateTimeValue(el.value);
+                        };
+                        el.addEventListener('change', enforce);
+                        el.addEventListener('input', enforce);
+                        el.addEventListener('blur', enforce);
+                    },
                     preConfirm: function () {
                         var el = document.getElementById('temp_admission_at');
                         var value = el ? String(el.value || '').trim() : '';
                         if (!value) {
-                            Swal.showValidationMessage('Enter a temporary admission date and time, or choose Use real admission.');
+                            Swal.showValidationMessage('Enter an estimate time, or choose Use Estimate Time.');
                             return false;
                         }
-                        return value;
+                        var clamped = clampEstimateTimeValue(value);
+                        if (el) {
+                            el.value = clamped;
+                        }
+                        var nextBounds = estimateTimeBounds();
+                        if (clamped.slice(0, 10) !== nextBounds.today) {
+                            Swal.showValidationMessage('Estimate date must be today.');
+                            return false;
+                        }
+                        if (clamped < nextBounds.min) {
+                            Swal.showValidationMessage('Estimate time cannot be before the current time.');
+                            return false;
+                        }
+                        if (clamped > nextBounds.max) {
+                            Swal.showValidationMessage('Estimate time cannot be after 11:59 PM today.');
+                            return false;
+                        }
+                        return clamped;
                     }
                 }).then(function (result) {
                     if (result.isConfirmed) {
