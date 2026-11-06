@@ -438,14 +438,27 @@
                         + ' min="' + escapeEstimateAttr(bounds.min) + '"'
                         + ' max="' + escapeEstimateAttr(bounds.max) + '">',
                     showCancelButton: true,
-                    showDenyButton: true,
                     confirmButtonText: 'Generate with this time',
-                    denyButtonText: 'Use Estimate Time',
                     cancelButtonText: 'Cancel',
                     confirmButtonColor: '#750096',
-                    denyButtonColor: '#0d6efd',
+                    reverseButtons: true,
                     focusConfirm: false,
+                    customClass: {
+                        actions: 'estimate-time-swal-actions',
+                        confirmButton: 'estimate-time-swal-confirm',
+                        cancelButton: 'estimate-time-swal-cancel'
+                    },
                     didOpen: function () {
+                        var actions = document.querySelector('.estimate-time-swal-actions');
+                        if (actions) {
+                            actions.style.display = 'flex';
+                            actions.style.flexDirection = 'row';
+                            actions.style.flexWrap = 'nowrap';
+                            actions.style.alignItems = 'center';
+                            actions.style.justifyContent = 'center';
+                            actions.style.gap = '0.5rem';
+                            actions.style.width = '100%';
+                        }
                         var el = document.getElementById('temp_admission_at');
                         if (!el) {
                             return;
@@ -464,7 +477,7 @@
                         var el = document.getElementById('temp_admission_at');
                         var value = el ? String(el.value || '').trim() : '';
                         if (!value) {
-                            Swal.showValidationMessage('Enter an estimate time, or choose Use Estimate Time.');
+                            Swal.showValidationMessage('Enter an estimate time.');
                             return false;
                         }
                         var clamped = clampEstimateTimeValue(value);
@@ -489,8 +502,6 @@
                 }).then(function (result) {
                     if (result.isConfirmed) {
                         openEstimatePdf(ipdId, viewMode, result.value);
-                    } else if (result.isDenied) {
-                        openEstimatePdf(ipdId, viewMode, null);
                     }
                 });
             }
