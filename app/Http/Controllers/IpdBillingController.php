@@ -2238,10 +2238,12 @@ class IpdBillingController extends Controller
                 $billingEndAtForEstimate = $estimateAsOf;
             }
 
+            // Printed Estimate Date/Time always stay current wall-clock time.
+            // Selected/backdated estimate as-of time affects charge calculation only.
             $headerDateLabel = 'Estimate Date';
             $headerTimeLabel = 'Estimate Time';
-            $headerDateValue = ($estimateAsOf ?? Carbon::now())->format('d/m/Y');
-            $headerTimeValue = ($estimateAsOf ?? Carbon::now())->format('H:i:s');
+            $headerDateValue = Carbon::now()->format('d/m/Y');
+            $headerTimeValue = Carbon::now()->format('H:i:s');
             if ($isApprovalBill && $isDischarged && $dischargeAtForBill) {
                 $headerDateLabel = 'Discharge Date';
                 $headerTimeLabel = 'Discharge Time';
