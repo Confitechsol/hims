@@ -797,10 +797,7 @@ class IpdBillingController extends Controller
         // Note: Refund receipts should reduce the net payment,
         // so we treat transactions with receipt_type = 'Refund'
         // as negative amounts in the total.
-        $paymentTransactions = Transaction::where('ipd_id', $ipdId)
-            ->where('type', 'payment')
-            ->where('section', 'ipd')
-            ->get();
+        $paymentTransactions = $this->ipdPaymentTransactionsQuery($ipdId)->get();
 
         $totalPayments = $paymentTransactions->sum(function ($t) {
             $amount = (float) ($t->amount ?? 0);
@@ -826,6 +823,21 @@ class IpdBillingController extends Controller
             'total_payments' => $totalPayments,
             'outstanding' => $outstanding,
         ];
+    }
+
+    /**
+     * Payments linked to an IPD for breakup / estimate / final bill.
+     * Includes section=ipd and money-receipt rows (esp. Refund) that carry ipd_id.
+     */
+    protected function ipdPaymentTransactionsQuery(int $ipdId)
+    {
+        return Transaction::where('ipd_id', $ipdId)
+            ->where('type', 'payment')
+            ->where(function ($q) {
+                $q->where('section', 'ipd')
+                    ->orWhere('section', 'money_receipt')
+                    ->orWhereRaw('LOWER(COALESCE(receipt_type, "")) = ?', ['refund']);
+            });
     }
 
     /**
@@ -2394,11 +2406,9 @@ class IpdBillingController extends Controller
             $showPackageProcedureColumn = $packageDetails->count() > 1;
             $showOriginalAmount = $isApprovalBill && $request->boolean('show_original_amount');
             
-            // Get payment details
+            // Get payment details (includes money-receipt Refunds linked to this IPD)
             \Log::info('Getting payment details');
-            $payments = Transaction::where('ipd_id', $ipdId)
-                ->where('type', 'payment')
-                ->where('section', 'ipd')
+            $payments = $this->ipdPaymentTransactionsQuery($ipdId)
                 ->orderBy('payment_date', 'asc')
                 ->get() ?? collect();
             
@@ -2988,11 +2998,9 @@ class IpdBillingController extends Controller
             $breakup = $this->calculateBreakup($ipdId, $billingEndAt, $ipdChargeBillStage);
             \Log::info('Breakup calculated', ['total_charges' => $breakup['total_charges']]);
 
-            // Get payment details
+            // Get payment details (includes money-receipt Refunds linked to this IPD)
             \Log::info('Getting payment details');
-            $payments = Transaction::where('ipd_id', $ipdId)
-                ->where('type', 'payment')
-                ->where('section', 'ipd')
+            $payments = $this->ipdPaymentTransactionsQuery($ipdId)
                 ->orderBy('payment_date', 'asc')
                 ->get() ?? collect();
 

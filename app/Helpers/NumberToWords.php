@@ -26,6 +26,8 @@ class NumberToWords
             }
 
             $number = (float) $number;
+            $negative = $number < 0;
+            $number = abs($number);
             
             if ($number > 999999999) {
                 return 'Amount too large to convert';
@@ -40,7 +42,8 @@ class NumberToWords
                 $result .= ' and ' . self::convertToWords($paise) . ' Paise';
             }
 
-            return $result . ' Only';
+            $result .= ' Only';
+            return $negative ? ('Minus ' . $result) : $result;
         } catch (\Exception $e) {
             \Log::error('Error in NumberToWords::convert: ' . $e->getMessage(), [
                 'number' => $number,

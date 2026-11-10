@@ -200,9 +200,11 @@ class MoneyReceiptController extends Controller
             $patientId = $opd->patient_id;
         }
 
-        // Determine section based on receipt type
+        // Determine section based on receipt type.
+        // Refund / Patient Due linked to IPD must stay on section=ipd so final bill
+        // preview and report Payment Details include them.
         $section = 'money_receipt';
-        if ($ipd || $isIpdReceiptType) {
+        if ($ipd || $isIpdReceiptType || in_array($request->receipt_type, ['Refund', 'Patient Due'], true)) {
             $section = 'ipd';
         } elseif ($opd || $isOpdReceiptType) {
             $section = 'opd';
@@ -335,6 +337,13 @@ class MoneyReceiptController extends Controller
             }
         }
 
+        // For receipt types that must be linked to a final bill/IPD, enforce linkage
+        if (in_array($request->receipt_type, ['Patient Due', 'Refund'], true) && !$ipd) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['final_bill_no' => 'For Receipt Type "' . $request->receipt_type . '", an IPD / Final Bill must be selected.']);
+        }
+
         // Determine patient_id
         $patientId = $request->patient_id;
         if (!$patientId && $ipd) {
@@ -345,7 +354,7 @@ class MoneyReceiptController extends Controller
 
         // Determine section based on receipt type
         $section = 'money_receipt';
-        if ($ipd || $isIpdReceiptType) {
+        if ($ipd || $isIpdReceiptType || in_array($request->receipt_type, ['Refund', 'Patient Due'], true)) {
             $section = 'ipd';
         } elseif ($opd || $isOpdReceiptType) {
             $section = 'opd';

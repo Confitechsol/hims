@@ -741,7 +741,9 @@
                     setButtonEnabled(estimateBtn, false);
                     setButtonEnabled(approvalPreviewBtn, false);
                     setButtonEnabled(approvalBtn, false);
-                    setButtonEnabled(previewBtn, false);
+                    // Keep preview available after final bill (e.g. after money-receipt refunds)
+                    // so Payment Details / Payment Summary still open like the report.
+                    setButtonEnabled(previewBtn, true);
                     setButtonEnabled(generateBtn, true);
                     if (generateBtn) {
                         generateBtn.style.display = 'inline-block';
@@ -818,10 +820,9 @@
                         refreshBillingActionButtons(ipdId);
 
                         if (mode === 'preview') {
-                            if (data.final_bill_generated) {
-                                return;
-                            }
-                            openFinalPdf(ipdId, 'final_preview');
+                            // After final bill (including post-refund), still open the bill PDF
+                            // so Payment Details / Payment Summary remain visible.
+                            openFinalPdf(ipdId, data.final_bill_generated ? 'final_bill' : 'final_preview');
                             return;
                         }
 
