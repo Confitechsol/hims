@@ -376,33 +376,43 @@
                     + ':' + padEstimateTime(date.getMinutes());
             }
 
-            function currentDateTimeForInput() {
-                return formatDateTimeLocal(new Date());
+            function parseAdmissionDate(raw) {
+                if (!raw) {
+                    return null;
+                }
+                var normalized = String(raw).trim().replace(' ', 'T');
+                var parsed = new Date(normalized);
+                if (isNaN(parsed.getTime())) {
+                    parsed = new Date(String(raw).replace(/-/g, '/'));
+                }
+                return isNaN(parsed.getTime()) ? null : parsed;
             }
 
-            function estimateTimeBounds() {
-                var now = new Date();
-                var min = formatDateTimeLocal(now);
-                var max = now.getFullYear()
-                    + '-' + padEstimateTime(now.getMonth() + 1)
-                    + '-' + padEstimateTime(now.getDate())
-                    + 'T23:59';
-                var today = min.slice(0, 10);
-                return { min: min, max: max, today: today };
+            function admissionDateTimeForInput(ipdId) {
+                var row = ipdPatientData.find(function (ipd) {
+                    return String(ipd.id) === String(ipdId);
+                });
+                if (!row || !row.admission_date) {
+                    return null;
+                }
+                var parsed = parseAdmissionDate(row.admission_date);
+                return parsed ? formatDateTimeLocal(parsed) : null;
             }
 
-            function clampEstimateTimeValue(value) {
-                var bounds = estimateTimeBounds();
-                if (!value) {
-                    return bounds.min;
+            // Min = admission time, Max = current date/time. Past times after admission are allowed.
+            function estimateTimeBounds(ipdId) {
+                var nowLocal = formatDateTimeLocal(new Date());
+                var admissionLocal = admissionDateTimeForInput(ipdId);
+                var min = admissionLocal && admissionLocal <= nowLocal ? admissionLocal : nowLocal;
+                return { min: min, max: nowLocal };
+            }
+
+            function clampEstimateTimeValue(value, ipdId) {
+                var bounds = estimateTimeBounds(ipdId);
+                if (!value || value.indexOf('T') < 0 || value.length < 16) {
+                    return bounds.max;
                 }
-                var timePart = value.indexOf('T') >= 0 ? value.split('T')[1] : '';
-                if (!timePart || timePart.length < 5) {
-                    timePart = bounds.min.slice(11, 16);
-                } else {
-                    timePart = timePart.slice(0, 5);
-                }
-                var clamped = bounds.today + 'T' + timePart;
+                var clamped = value.slice(0, 16);
                 if (clamped < bounds.min) {
                     return bounds.min;
                 }
@@ -428,8 +438,8 @@
             }
 
             function promptTemporaryAdmission(ipdId, viewMode) {
-                var bounds = estimateTimeBounds();
-                var prefill = escapeEstimateAttr(bounds.min);
+                var bounds = estimateTimeBounds(ipdId);
+                var prefill = escapeEstimateAttr(bounds.max);
                 Swal.fire({
                     icon: 'info',
                     title: 'Estimate time',
@@ -464,10 +474,10 @@
                             return;
                         }
                         var enforce = function () {
-                            var nextBounds = estimateTimeBounds();
+                            var nextBounds = estimateTimeBounds(ipdId);
                             el.min = nextBounds.min;
                             el.max = nextBounds.max;
-                            el.value = clampEstimateTimeValue(el.value);
+                            el.value = clampEstimateTimeValue(el.value, ipdId);
                         };
                         el.addEventListener('change', enforce);
                         el.addEventListener('input', enforce);
@@ -480,21 +490,17 @@
                             Swal.showValidationMessage('Enter an estimate time.');
                             return false;
                         }
-                        var clamped = clampEstimateTimeValue(value);
+                        var clamped = clampEstimateTimeValue(value, ipdId);
                         if (el) {
                             el.value = clamped;
                         }
-                        var nextBounds = estimateTimeBounds();
-                        if (clamped.slice(0, 10) !== nextBounds.today) {
-                            Swal.showValidationMessage('Estimate date must be today.');
-                            return false;
-                        }
+                        var nextBounds = estimateTimeBounds(ipdId);
                         if (clamped < nextBounds.min) {
-                            Swal.showValidationMessage('Estimate time cannot be before the current time.');
+                            Swal.showValidationMessage('Estimate time cannot be before admission time.');
                             return false;
                         }
                         if (clamped > nextBounds.max) {
-                            Swal.showValidationMessage('Estimate time cannot be after 11:59 PM today.');
+                            Swal.showValidationMessage('Estimate time cannot be after the current date and time.');
                             return false;
                         }
                         return clamped;

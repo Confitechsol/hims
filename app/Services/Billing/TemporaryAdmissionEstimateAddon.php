@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Log;
 /**
  * Estimate-only as-of time for bed/outstanding calculation on the estimate PDF.
  *
- * The selected time is the billing end ("what will charges look like at this time?").
+ * Selected time = billing end ("charges as of this moment").
+ * Allowed range: admission datetime → current datetime (past times after admission OK).
  * Real admission is never changed. Approval and final bills ignore this add-on.
- * Query param kept as temp_admission_at for existing UI; estimate_at is also accepted.
  */
 class TemporaryAdmissionEstimateAddon
 {
@@ -60,39 +60,48 @@ class TemporaryAdmissionEstimateAddon
         }
 
         $now = Carbon::now();
-        $min = $now->copy()->startOfMinute();
-        $max = $now->copy()->endOfDay()->second(0);
+        $max = $now->copy()->startOfMinute();
 
-        if (! $parsed->isSameDay($now)) {
-            throw new InvalidTemporaryAdmissionException('Estimate time must be on the current date.');
+        $admissionRaw = $ipd->date ?? $ipd->created_at ?? null;
+        if (! $admissionRaw) {
+            throw new InvalidTemporaryAdmissionException('Admission date is missing for this IPD.');
         }
 
-        if ($parsed->lt($min)) {
-            throw new InvalidTemporaryAdmissionException('Estimate time cannot be before the current time.');
+        try {
+            $admissionAt = Carbon::parse($admissionRaw)->startOfMinute();
+        } catch (\Throwable $e) {
+            throw new InvalidTemporaryAdmissionException('Admission date is invalid for this IPD.');
         }
 
-        if ($parsed->gt($max)) {
-            throw new InvalidTemporaryAdmissionException('Estimate time cannot be after 11:59 PM today.');
+        $min = $admissionAt->lte($max) ? $admissionAt : $max;
+        $parsedMinute = $parsed->copy()->startOfMinute();
+
+        if ($parsedMinute->lt($min)) {
+            throw new InvalidTemporaryAdmissionException('Estimate time cannot be before admission time.');
         }
 
-        // Same minute as "now" → treat as use-current (no special as-of override needed).
-        if ($parsed->format('Y-m-d H:i') === $now->format('Y-m-d H:i')) {
+        if ($parsedMinute->gt($max)) {
+            throw new InvalidTemporaryAdmissionException('Estimate time cannot be after the current date and time.');
+        }
+
+        // Same minute as "now" → normal current estimate (no special as-of override).
+        if ($parsedMinute->equalTo($max)) {
             return null;
         }
 
         Log::info('Estimate as-of time applied for bed charge calculation (not saved).', [
             'ipd_id' => $ipd->id,
             'ipd_no' => $ipd->ipd_no,
-            'real_admission' => (string) ($ipd->date ?? ''),
-            'estimate_as_of' => $parsed->format('Y-m-d H:i:s'),
+            'real_admission' => (string) $admissionRaw,
+            'estimate_as_of' => $parsedMinute->format('Y-m-d H:i:s'),
         ]);
 
-        return $parsed;
+        // Past (or earlier today) as-of is intentional: bed calc ends at this moment.
+        return $parsedMinute;
     }
 
     /**
      * @deprecated Admission is never overridden. Prefer resolve() as billing end in exportEstimate.
-     * Kept so existing callers/tests that invoke run() still execute the callback safely.
      *
      * @template T
      * @param callable(): T $callback
@@ -100,7 +109,6 @@ class TemporaryAdmissionEstimateAddon
      */
     public function run(Request $request, IpdDetail $ipd, bool $isApprovalBill, callable $callback)
     {
-        // Do not set TemporaryAdmissionEstimateContext — real admission must drive bed anchor.
         $this->resolve($request, $ipd, $isApprovalBill);
 
         return $callback();
