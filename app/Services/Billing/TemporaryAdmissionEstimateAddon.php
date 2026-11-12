@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Log;
  * Estimate-only as-of time for bed/outstanding calculation on the estimate PDF.
  *
  * Selected time = billing end ("charges as of this moment").
- * Allowed range: admission datetime → current datetime (past times after admission OK).
+ * Allowed range: admission datetime → 11:59 PM of the current calendar day
+ * (past after admission, and later today up to 23:59, are OK).
  * Real admission is never changed. Approval and final bills ignore this add-on.
  */
 class TemporaryAdmissionEstimateAddon
@@ -60,7 +61,10 @@ class TemporaryAdmissionEstimateAddon
         }
 
         $now = Carbon::now();
-        $max = $now->copy()->startOfMinute();
+        // Client rule: may increase estimate time up to 11:59 PM of the current date
+        // so bed cycles (e.g. crossing 11:00) can be projected for today.
+        $max = $now->copy()->endOfDay()->startOfMinute(); // 23:59 today
+        $nowMinute = $now->copy()->startOfMinute();
 
         $admissionRaw = $ipd->date ?? $ipd->created_at ?? null;
         if (! $admissionRaw) {
@@ -81,11 +85,11 @@ class TemporaryAdmissionEstimateAddon
         }
 
         if ($parsedMinute->gt($max)) {
-            throw new InvalidTemporaryAdmissionException('Estimate time cannot be after the current date and time.');
+            throw new InvalidTemporaryAdmissionException('Estimate time cannot be after 11:59 PM of the current date.');
         }
 
-        // Same minute as "now" → normal current estimate (no special as-of override).
-        if ($parsedMinute->equalTo($max)) {
+        // Same minute as wall-clock "now" → normal current estimate (no special as-of override).
+        if ($parsedMinute->equalTo($nowMinute)) {
             return null;
         }
 
@@ -96,7 +100,7 @@ class TemporaryAdmissionEstimateAddon
             'estimate_as_of' => $parsedMinute->format('Y-m-d H:i:s'),
         ]);
 
-        // Past (or earlier today) as-of is intentional: bed calc ends at this moment.
+        // Past or later-today (up to 23:59) as-of: bed calc ends at this moment.
         return $parsedMinute;
     }
 

@@ -67,7 +67,33 @@ class TemporaryAdmissionEstimateAddonTest extends TestCase
         }
     }
 
-    public function test_after_current_time_is_rejected(): void
+    public function test_later_today_up_to_end_of_day_is_allowed(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-11-10 15:00:00'));
+
+        $addon = new TemporaryAdmissionEstimateAddon(new TemporaryAdmissionEstimateContext());
+        $ipd = $this->ipd('2026-11-09 10:00:00');
+
+        $laterToday = $addon->resolve(
+            Request::create('/estimate', 'GET', ['temp_admission_at' => '2026-11-10T16:00']),
+            $ipd,
+            false
+        );
+        $this->assertNotNull($laterToday);
+        $this->assertSame('2026-11-10 16:00:00', $laterToday->format('Y-m-d H:i:s'));
+
+        $endOfDay = $addon->resolve(
+            Request::create('/estimate', 'GET', ['temp_admission_at' => '2026-11-10T23:59']),
+            $ipd,
+            false
+        );
+        $this->assertNotNull($endOfDay);
+        $this->assertSame('2026-11-10 23:59:00', $endOfDay->format('Y-m-d H:i:s'));
+
+        Carbon::setTestNow();
+    }
+
+    public function test_after_end_of_today_is_rejected(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-11-10 15:00:00'));
 
@@ -75,13 +101,13 @@ class TemporaryAdmissionEstimateAddonTest extends TestCase
             $addon = new TemporaryAdmissionEstimateAddon(new TemporaryAdmissionEstimateContext());
             $ipd = $this->ipd('2026-11-09 10:00:00');
             $addon->resolve(
-                Request::create('/estimate', 'GET', ['temp_admission_at' => '2026-11-10T16:00']),
+                Request::create('/estimate', 'GET', ['temp_admission_at' => '2026-11-11T00:00']),
                 $ipd,
                 false
             );
             $this->fail('Expected InvalidTemporaryAdmissionException');
         } catch (InvalidTemporaryAdmissionException $e) {
-            $this->assertStringContainsString('current date and time', $e->getMessage());
+            $this->assertStringContainsString('11:59 PM of the current date', $e->getMessage());
         } finally {
             Carbon::setTestNow();
         }
