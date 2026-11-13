@@ -399,18 +399,26 @@
                 return parsed ? formatDateTimeLocal(parsed) : null;
             }
 
-            // Min = admission time, Max = current date/time. Past times after admission are allowed.
+            // Min = admission time, Max = 11:59 PM of current date.
+            // Prefill stays "now"; user may decrease (after admission) or increase up to 23:59 today.
+            function endOfTodayLocal() {
+                var end = new Date();
+                end.setHours(23, 59, 0, 0);
+                return formatDateTimeLocal(end);
+            }
+
             function estimateTimeBounds(ipdId) {
                 var nowLocal = formatDateTimeLocal(new Date());
+                var maxLocal = endOfTodayLocal();
                 var admissionLocal = admissionDateTimeForInput(ipdId);
-                var min = admissionLocal && admissionLocal <= nowLocal ? admissionLocal : nowLocal;
-                return { min: min, max: nowLocal };
+                var min = admissionLocal && admissionLocal <= maxLocal ? admissionLocal : maxLocal;
+                return { min: min, max: maxLocal, now: nowLocal };
             }
 
             function clampEstimateTimeValue(value, ipdId) {
                 var bounds = estimateTimeBounds(ipdId);
                 if (!value || value.indexOf('T') < 0 || value.length < 16) {
-                    return bounds.max;
+                    return bounds.now;
                 }
                 var clamped = value.slice(0, 16);
                 if (clamped < bounds.min) {
@@ -439,14 +447,16 @@
 
             function promptTemporaryAdmission(ipdId, viewMode) {
                 var bounds = estimateTimeBounds(ipdId);
-                var prefill = escapeEstimateAttr(bounds.max);
+                // Default to current time; max allows later today up to 23:59 for bed projection.
+                var prefill = escapeEstimateAttr(bounds.now);
                 Swal.fire({
                     icon: 'info',
                     title: 'Estimate time',
-                    html: '<input id="temp_admission_at" type="datetime-local" class="swal2-input" style="width:100%;margin:0;"'
+                    html: '<input id="temp_admission_at" type="datetime-local" step="60" class="swal2-input" style="width:100%;margin:0;"'
                         + ' value="' + prefill + '"'
                         + ' min="' + escapeEstimateAttr(bounds.min) + '"'
-                        + ' max="' + escapeEstimateAttr(bounds.max) + '">',
+                        + ' max="' + escapeEstimateAttr(bounds.max) + '"'
+                        + ' title="Use keyboard arrows/typing or the calendar picker. Range: admission → 11:59 PM today.">',
                     showCancelButton: true,
                     confirmButtonText: 'Generate with this time',
                     cancelButtonText: 'Cancel',
@@ -473,15 +483,32 @@
                         if (!el) {
                             return;
                         }
-                        var enforce = function () {
+                        // Refresh min/max only while typing so keyboard edits are not fighting clamp.
+                        var refreshBoundsAttrs = function () {
                             var nextBounds = estimateTimeBounds(ipdId);
                             el.min = nextBounds.min;
                             el.max = nextBounds.max;
+                        };
+                        // Clamp after picker/mouse change, blur, or Enter — works with keyboard + mouse.
+                        var enforceValue = function () {
+                            refreshBoundsAttrs();
                             el.value = clampEstimateTimeValue(el.value, ipdId);
                         };
-                        el.addEventListener('change', enforce);
-                        el.addEventListener('input', enforce);
-                        el.addEventListener('blur', enforce);
+                        el.addEventListener('input', refreshBoundsAttrs);
+                        el.addEventListener('change', enforceValue);
+                        el.addEventListener('blur', enforceValue);
+                        el.addEventListener('keydown', function (e) {
+                            if (e.key === 'Enter') {
+                                enforceValue();
+                            }
+                        });
+                        // Focus so keyboard arrows / segment edits work immediately.
+                        try {
+                            el.focus();
+                            if (typeof el.showPicker === 'function') {
+                                // Do not auto-open picker; mouse click on calendar icon still works.
+                            }
+                        } catch (err) {}
                     },
                     preConfirm: function () {
                         var el = document.getElementById('temp_admission_at');
@@ -500,7 +527,7 @@
                             return false;
                         }
                         if (clamped > nextBounds.max) {
-                            Swal.showValidationMessage('Estimate time cannot be after the current date and time.');
+                            Swal.showValidationMessage('Estimate time cannot be after 11:59 PM of the current date.');
                             return false;
                         }
                         return clamped;
