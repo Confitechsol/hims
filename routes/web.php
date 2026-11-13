@@ -102,6 +102,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PatientReportController;
 use App\Http\Controllers\DoctorExportPatientCountController;
 use App\Http\Controllers\DoctorRevenueReportController;
+use App\Http\Controllers\CorparateDueReportController;
 
 Route::get('/', function () {
     return view('home.homeScreen');
@@ -1304,6 +1305,10 @@ Route::get('/reports/hospital-reports', function () {
     return view('admin.reports.hospital.hospital_reports');
 })->name('hospital-reports');
 
+Route::get('/reports/corporate-due-report', function () {
+    return view('admin.reports.hospital.corporate_due_report');
+})->name('hospital.corporate_due_report');
+
     // Route::get('/hospital-reports', [PatientReportController::class, 'hospitalReport'])->name('hospital.hospital_reports');
 Route::get('/reports/doctor-reports-index', function () {
     return view('admin.reports.doctor.index');
@@ -1324,3 +1329,6 @@ Route::get('/ipd-discharge-patient-reports', [
     DischargeController::class,
     'ipdDischargePatientReport'
 ])->name('ipd.ipd-discharge-patient-reports');
+
+
+Route::get('/corparate-due-report', [CorparateDueReportController::class, 'index'])->name('corparate-due-report');

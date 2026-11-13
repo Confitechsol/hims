@@ -43,6 +43,14 @@
                                 </div>
                             </a>
                         </div>
+                        <div class="col-md-4">
+                            <a href="{{ route('hospital.corporate_due_report') }}">
+                                <div class="module_billing">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                    <p>Corporate Due</p>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
