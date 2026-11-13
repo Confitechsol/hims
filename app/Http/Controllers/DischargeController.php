@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
+use Illuminate\Support\Facades\Validator;
 
 class DischargeController extends Controller
 {
@@ -834,4 +835,88 @@ class DischargeController extends Controller
             ->whereBetween('to_date', [$from, $to])
             ->update(['to_date' => $newDischargeAt->format('Y-m-d H:i:s')]);
     }
+
+
+
+public function ipdDischargePatientReport(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'start_date' => 'nullable|date_format:Y-m-d',
+        'end_date' => 'nullable|date_format:Y-m-d|after_or_equal:start_date',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => false,
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    $query = DischargeCard::query()
+        ->select([
+            'id',
+            'ipd_details_id',
+            'admission_date',
+            'discharge_date',
+            'discharge_time',
+            'bed',
+            'ot_done_by'
+        ])
+        ->selectRaw("
+        CASE
+            WHEN ot_name IS NOT NULL AND TRIM(ot_name) != ''
+            THEN 'OT'
+            ELSE 'Medicine'
+        END AS ot_name
+    ")
+        ->with([
+        'ipdDetails:id,patient_id,refference,cons_doctor,is_cashless',
+            'ipdDetails.patient:id,patient_name',
+            'ipdDetails.doctor:id,name',
+        ])
+        ->whereNotNull('ipd_details_id');
+
+    if ($request->filled('start_date')) {
+        $query->whereDate('discharge_date', '>=', $request->start_date);
+    }
+
+    if ($request->filled('end_date')) {
+        $query->whereDate('discharge_date', '<=', $request->end_date);
+    }
+
+    $reports = $query
+        ->orderByDesc('discharge_date')
+        ->orderByDesc('discharge_time')
+        ->get();
+
+    $billingController = app(IpdBillingController::class);
+    $billingSummaries = [];
+    foreach ($reports as $report) {
+        $ipdId = (int) $report->ipd_details_id;
+        if (!array_key_exists($ipdId, $billingSummaries)) {
+            $billingSummaries[$ipdId] = $billingController->getFinalBillRegisterDaySummary($ipdId);
+        }
+
+        $summary = $billingSummaries[$ipdId];
+        $report->setAttribute('total_bill_amount', $summary['total_bill_amount']);
+        $report->setAttribute('total_discount', $summary['discount_amount']);
+        $report->setAttribute('doctor_visit_amount', $summary['doctor_visit_amount']);
+    }
+
+    $reportData = $reports->map(function ($report) {
+        $data = $report->toArray();
+        if (isset($data['ipd_details'])) {
+            $data['ipd_details']['is_cashless'] = $report->ipdDetails->is_cashless ? 'TPA' : 'Cash';
+        }
+
+        return $data;
+    });
+
+    return response()->json([
+        'status' => true,
+        'total' => $reports->count(),
+        'data' => $reportData
+    ]);
+}
+
 }

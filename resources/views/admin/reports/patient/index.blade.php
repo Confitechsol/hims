@@ -35,6 +35,14 @@
                                 </div>
                             </a>
                         </div>
+                        <div class="col-md-4">
+                            <a href="{{ route('patient.discharge_patient_details') }}">
+                                <div class="module_billing">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                    <p>Discharge Patient Details</p>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -46,44 +46,9 @@
                     </div>
                 </div>
 
-                {{-- <div class="card-body">
-                    <div class="row align-items-center gy-4">
-                        <div class="col-md-4">
-                            <a href="backend-bill-report">
-                                <div class="module_billing">
-                                    <i class="fa-solid fa-calendar-check"></i>
-                                    <p>Backend Bill Report</p>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div> --}}
             </div>
         </div>
-        <!-- <div class="col-md-11">
-            <div class="card shadow-sm border-0 mt-1">
-                <div class="card-header" style="background: linear-gradient(-90deg, #75009673 0%, #CB6CE673 100%)">
-                    <h5 class="mb-0" style="color: #750096"><i class="fas fa-cogs me-2"></i> OPD/IPD Billing Through Case Id
-                    </h5>
-                </div>
-
-                <div class="card-body">
-                    <form action="">
-                        <div class="d-flex gap-3 align-items-center">
-                            <div class="col-md-1">
-                                <label for="case_id" class="form-label">Case ID <span class="text-danger">*</span></label>
-                            </div>
-                            <div class="col-md-4">
-                                <input type="text" class="form-control caseId" name="case_id" id="case_id" value="">
-                            </div>
-                            <div class="col-md-3">
-                                <button type="button" onclick="search()" class="btn btn-primary btn-sm">Search</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div> -->
+        
     </div>
 
 

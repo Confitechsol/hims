@@ -1930,6 +1930,7 @@ class IpdBillingController extends Controller
      *     diagnosis_charges: float,
      *     other_charges: float,
      *     service_charges: float,
+     *     total_bill_amount: float,
      *     home_amount: float,
      *     discount_amount: float,
      *     doctor_visit_amount: float,
@@ -1943,6 +1944,7 @@ class IpdBillingController extends Controller
             'diagnosis_charges' => 0.0,
             'other_charges' => 0.0,
             'service_charges' => 0.0,
+            'total_bill_amount' => 0.0,
             'home_amount' => 0.0,
             'discount_amount' => 0.0,
             'doctor_visit_amount' => 0.0,
@@ -1978,6 +1980,7 @@ class IpdBillingController extends Controller
         $otherCharges = round((float) ($breakup['ipd_charges'] ?? 0), 2);
         $doctorVisit = round((float) ($breakup['doctor_visit_charges'] ?? 0), 2);
         $package = round((float) ($breakup['package_charges'] ?? 0), 2);
+        $totalBillAmount = round((float) ($breakup['total_charges'] ?? 0), 2);
         $discount = round((float) ($ipd->mou_discount ?? 0) + (float) ($ipd->special_discount ?? 0), 2);
         $homeAmount = $this->resolveFinalBillGrandTotal($ipd, $breakup);
 
@@ -1986,6 +1989,7 @@ class IpdBillingController extends Controller
             'diagnosis_charges' => $diagnosisCharges,
             'other_charges' => $otherCharges,
             'service_charges' => $serviceCharges,
+            'total_bill_amount' => $totalBillAmount,
             'home_amount' => $homeAmount,
             'discount_amount' => $discount,
             'doctor_visit_amount' => $doctorVisit,

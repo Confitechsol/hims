@@ -1216,6 +1216,7 @@ Route::prefix('reports')->group(function () {
     Route::get('/ipd-balance-reports', [ipdController::class, 'ipdBalanceReport'])->name('ipd.ipd_balance_reports');
     Route::get('/ipd-discharge-reports', [ipdController::class, 'ipdDischargeReport'])->name('ipd.ipd-discharge-reports');
 
+
 });
 Route::get('/allTransactionReport', function () {
     return view('admin.reports.finance.all-transaction-report');
@@ -1288,6 +1289,10 @@ Route::get('/reports/patient-reports', function () {
 
 Route::get('/patient-reports', [PatientReportController::class, 'patientReport'])->name('patient.patient_reports');
 
+Route::get('/reports/discharge-patient-details', function () {
+    return view('admin.reports.patient.discharge_patient_details');
+})->name('patient.discharge_patient_details');
+
 
     // Patient report view
 
@@ -1314,3 +1319,8 @@ Route::get('/reports/backend-bill-reports', [BackendMoneyReciptController::class
 Route::get('/backends-bill-reports', function () {
     return redirect()->route('hospital.backend_bill_reports', request()->query());
 });
+
+Route::get('/ipd-discharge-patient-reports', [
+    DischargeController::class,
+    'ipdDischargePatientReport'
+])->name('ipd.ipd-discharge-patient-reports');
